@@ -1,0 +1,2 @@
+all:
+	clang++ test.cc
