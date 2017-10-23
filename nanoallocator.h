@@ -27,13 +27,22 @@ THE SOFTWARE.
 
 namespace nanostl {
 
-typedef unsigned long long size_t;
+typedef unsigned long long size_type;
 
 template<typename T>
 class allocator {
  public:
   typedef T value_type;
+  //typedef T* pointer;
+  //typedef const T* const_pointer;
 
+  T *allocate(size_type n, const void *hint = 0) {
+    return new T[n];
+  }
+
+  void deallocate(T *p, size_type n) {
+    delete [] p;
+  }
 
  private:
 };
