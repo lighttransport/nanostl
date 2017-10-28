@@ -10,9 +10,8 @@
 namespace nanostl {
 
 // TODO(LTE): Support allocator.
-template<class T, class Allocator = nanostl::allocator<T> >
-class vector
-{
+template <class T, class Allocator = nanostl::allocator<T> >
+class vector {
  public:
   vector() : active_index_(0), size_(0) {
     data_[0] = 0;
@@ -52,12 +51,15 @@ class vector
     }
 
     if (count > capacity()) {
-      // TODO(LTE): Use memcpy() or realloc() like functionality to speed up resizing.
+      // TODO(LTE): Use memcpy() or realloc() like functionality to speed up
+      // resizing.
       size_type n = (count > recommended_size()) ? count : recommended_size();
 #ifdef NANOSTL_DEBUG
-      std::cout << "vector::resize: count " << count << ", capacity " << capacity() << ", recommended_size " << recommended_size() << ", n " << n << std::endl;
+      std::cout << "vector::resize: count " << count << ", capacity "
+                << capacity() << ", recommended_size " << recommended_size()
+                << ", n " << n << std::endl;
 #endif
-      size_type next_index = active_index_ ^ 1;
+      size_type next_index = active_index_ ? 0 : 1;
       if (data_[next_index]) {
         allocator_.deallocate(data_[next_index], capacity_[next_index]);
       }
@@ -77,59 +79,49 @@ class vector
     }
 
     size_ = count;
-
   }
 
-  void push_back(const value_type &val) {
+  void push_back(const value_type& val) {
     resize(size() + 1);
-    data_[active_index_][size_-1] = val;
+    data_[active_index_][size_ - 1] = val;
   }
 
-  //void push_back(value_type &val); // C++11
+  // void push_back(value_type &val); // C++11
 
-  bool empty() const {
-    return size_ == 0;
-  }
-  
-  size_type size() const {
-    return size_;
-  }
+  bool empty() const { return size_ == 0; }
 
-  void clear() {
-    size_ = 0;
-  }
+  size_type size() const { return size_; }
 
-  size_type capacity() const {
-    return capacity_[active_index_];
-  }
+  void clear() { size_ = 0; }
 
-  reference operator[](size_type pos) {
-    return data_[active_index_][pos];
-  }
+  size_type capacity() const { return capacity_[active_index_]; }
+
+  reference operator[](size_type pos) { return data_[active_index_][pos]; }
 
   const_reference operator[](size_type pos) const {
     return data_[active_index_][pos];
   }
 
  private:
+  size_type recommended_size() const {
+    // Simply use twice as large.
+    size_type s = 2 * capacity();
+    return s;
+  }
+
   // Simple double buffering.
   // TODO(LTE): Implement another buffer algorithm to save memory.
-  T *data_[2];  
+  T* data_[2];
   size_type capacity_[2];
-  int       active_index_;
+  size_type active_index_;
 
   size_type size_;
 
   allocator_type allocator_;
 
-  size_type recommended_size() const {
-    // Simply use twice as large.
-    size_type s = 2 * capacity(); 
-    return s;
-  }
-
+  char __pad1_[7];
 };
 
 }  // nanostl
 
-#endif // NANOVECTOR_H_
+#endif  // NANOVECTOR_H_
