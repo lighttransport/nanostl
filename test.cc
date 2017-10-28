@@ -1,4 +1,5 @@
 #include "nanovector.h"
+#include "nanoalgorithm.h"
 
 #include <cstdlib>
 #include <cstdio>
@@ -35,6 +36,9 @@ int main(int argc, char **argv)
   assert(v.at(0) == 1);
   assert(v[1] == 2);
   assert(v[2] == 3);
+
+  assert(nanostl::min(1, 2) == 1);
+  assert(nanostl::max(1, 2) == 2);
 
   std::cout << "size    : " << v.size() << std::endl;
   std::cout << "capacity: " << v.capacity() << std::endl;
