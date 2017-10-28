@@ -25,22 +25,43 @@ THE SOFTWARE.
 #ifndef NANOALLOCATOR_H_
 #define NANOALLOCATOR_H_
 
+#ifdef NANOSTL_DEBUG
+#include <iostream>
+#endif
+
 namespace nanostl {
 
 typedef unsigned long long size_type;
 
+///
+/// allocator class implementaion without libc function
+///
 template<typename T>
 class allocator {
  public:
   typedef T value_type;
-  //typedef T* pointer;
-  //typedef const T* const_pointer;
+  typedef T* pointer;
+  typedef const T* const_pointer;
+  typedef T& reference;
+  typedef const T& const_reference;
+
+  allocator() {}
 
   T *allocate(size_type n, const void *hint = 0) {
+    (void)hint; // Ignore `hint' for a while.
+    if (n < 1) {
+      return 0;
+    }
+
+#ifdef NANOSTL_DEBUG
+    std::cerr << "allocator::allocate: n " << n << std::endl;
+#endif
+
     return new T[n];
   }
 
   void deallocate(T *p, size_type n) {
+    (void)n;
     delete [] p;
   }
 

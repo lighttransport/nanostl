@@ -7,10 +7,14 @@ NanoSTL is good for using STL-like feature in your C++-like JIT compiler.
 * vector
 * string
 
-## Differences compared to C++ STL
+## Differences compared to (full featured) C++ STL
 
 * RTTI and exception is not supported.
-* Returns NULL whene memory allocation failed(no bad_alloc)
+* Returns `NULL` when memory allocation failed(no `bad_alloc`)
+
+## TODO
+
+* [ ] CUDA NVRTC support
 
 ## Licenss
 
