@@ -6,6 +6,9 @@ NanoSTL is good for using STL-like feature in your C++-like JIT compiler.
 
 * vector
 * string
+* algorithm
+* limits
+* map
 
 ## Supported architectures
 

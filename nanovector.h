@@ -44,6 +44,11 @@ class vector {
     capacity_[1] = 0;
   }
 
+  vector(const vector &rhs) {
+    clear();
+    assign(rhs.begin(), rhs.end());
+  }
+
   ~vector() {
     if (data_[0]) {
       allocator_.deallocate(data_[0], capacity_[0]);
@@ -56,6 +61,10 @@ class vector {
   typedef T value_type;
   typedef T& reference;
   typedef const T& const_reference;
+  typedef T* pointer;
+  typedef const T* const_pointer;
+  typedef pointer iterator;
+  typedef const_pointer const_iterator;
   typedef Allocator allocator_type;
 
   reference at(size_type pos) {
@@ -126,6 +135,29 @@ class vector {
     return data_[active_index_][pos];
   }
 
+  pointer data() {
+    return data_[active_index_];
+  }
+
+  vector& operator=(const vector &rhs);
+  vector& operator+=(const vector &rhs);
+
+  inline iterator begin(void) const {
+    return data_[active_index_] + 0;
+  }
+
+  inline iterator end(void) const {
+    return data_[active_index_] + size_;
+  }
+
+  template <class InputIterator>
+  void assign(InputIterator first, InputIterator last) {
+    clear();
+    for (; first != last; ++first) {
+      push_back(*first);
+    }
+  }
+
  private:
   size_type recommended_size() const {
     // Simply use twice as large.
@@ -145,6 +177,24 @@ class vector {
 
   char __pad1_[7];
 };
+
+//template <class T, class Allocator>
+//template <class InputIterator>
+//vector<T, Allocator>::assign(InputIterator first, InputIterator last)
+//{
+//  clear();
+//  for (; first != last; ++first) {
+//    push_back(*first);
+//  }
+//}
+
+template <class T, class Allocator>
+inline vector<T, Allocator>& vector<T, Allocator>::operator=(const vector<T, Allocator> &rhs) {
+  if (this != &rhs) {
+    assign(rhs.begin(), rhs.end());
+  }
+  return *this;
+}
 
 }  // nanostl
 

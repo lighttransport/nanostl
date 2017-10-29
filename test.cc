@@ -1,6 +1,8 @@
 #include "nanovector.h"
 #include "nanoalgorithm.h"
 #include "nanolimits.h"
+#include "nanostring.h"
+#include "nanomap.h"
 
 #include <cstdlib>
 #include <cstdio>
@@ -99,6 +101,14 @@ TEST(AlgorithmTest) {
 
   ASSERT_EQ(nanostl::min(1, 2), 1);
   ASSERT_EQ(nanostl::max(1, 2), 2);
+
+}
+
+TEST(StringTest) {
+
+  nanostl::string s("a");
+
+  ASSERT_FALSE(s.empty());
 
 }
 
