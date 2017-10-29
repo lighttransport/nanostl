@@ -1,4 +1,3 @@
-/*
 The MIT License (MIT)
 
 Copyright (c) 2017 Light Transport Entertainment, Inc.
@@ -20,21 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-*/
-
-#ifndef NANOALGORITHM_H_
-#define NANOALGORITHM_H_
-
-namespace nanostl {
-
-template <class T> const T& min(const T& a, const T& b) {
-  return !(b<a)?a:b;
-}
-
-template <class T> const T& max(const T& a, const T& b) {
-  return !(b>a)?a:b;
-}
-
-}  // namespace nanostl
-
-#endif  // NANOALGORITHM_H_

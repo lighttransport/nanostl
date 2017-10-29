@@ -1,2 +1,2 @@
 all:
-	clang++ -Weverything -Werror -Wno-c++11-long-long -fsanitize=address -g -O0 -DNANOSTL_DEBUG test.cc
+	clang++ -o test -std=c++11 -Weverything -Werror -Wno-c++1z-extensions -Wno-c++98-compat-pedantic -Wno-c++11-long-long -fsanitize=address -g -O0 -DNANOSTL_DEBUG test.cc

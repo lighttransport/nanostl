@@ -7,6 +7,19 @@ NanoSTL is good for using STL-like feature in your C++-like JIT compiler.
 * vector
 * string
 
+## Supported architectures
+
+* 64bit and 32bit machine.
+
+## Types
+
+* char : 8bit
+* short : 16bit
+* int : 32bit
+* long long : 64bit
+* float : 32bit IEEE754 floating point.
+* double : 64bit IEEE754 floating point.
+
 ## Differences compared to (full featured) C++ STL
 
 * RTTI and exception is not supported.
@@ -19,3 +32,7 @@ NanoSTL is good for using STL-like feature in your C++-like JIT compiler.
 ## Licenss
 
 MIT license
+
+### Third party licenses
+
+* microtest.h : MIT license.
