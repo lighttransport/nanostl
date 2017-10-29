@@ -28,6 +28,7 @@ NanoSTL is good for using STL-like feature in your C++-like JIT compiler.
 ## TODO
 
 * [ ] CUDA NVRTC support
+* [ ] isnan/isinf/isfinite support
 
 ## Licenss
 
