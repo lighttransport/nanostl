@@ -55,6 +55,14 @@ class string {
     }
   }
 
+  string(const char *first, const char *last) {
+    const char *s = first;
+    while (s && (s <= last)) {
+      data_.push_back(*s);
+      s++;
+    }
+  }
+
   // void push_back(value_type &val); // C++11
 
   bool empty() const { return data_.size() == 0; }
