@@ -4,6 +4,7 @@
 #include "nanostring.h"
 #include "nanomap.h"
 #include "nanoutility.h"
+#include "nanosstream.h"
 
 #include <cstdlib>
 #include <cstdio>
