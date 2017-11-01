@@ -63,6 +63,12 @@ class string {
     }
   }
 
+  string(const char *s, size_type count) {
+    for (size_type i = 0; i < count; i++) {
+      data_.push_back(s[i]);
+    } 
+  }
+
   // void push_back(value_type &val); // C++11
 
   bool empty() const { return data_.size() == 0; }

@@ -26,6 +26,7 @@ THE SOFTWARE.
 #define NANOSSTREAM_H_
 
 #include "nanoios.h"
+#include "nanostring.h"
 
 namespace nanostl {
 
@@ -83,6 +84,11 @@ class stringstream
     }
 
     stringstream &seekg(pos_type pos);
+
+    string str() const {
+      return string(reinterpret_cast<const char *>(binary_), length_);
+    }
+  
 
   private:
 
