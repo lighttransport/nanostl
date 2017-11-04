@@ -27,6 +27,7 @@ THE SOFTWARE.
 
 #include "nanoios.h"
 #include "nanostring.h"
+#include "nanostreambuf.h"
 
 namespace nanostl {
 
@@ -90,20 +91,7 @@ class stringstream
     }
   
 
-  private:
-
-  bool read1(unsigned char* ret) {
-    if ((idx_ + 1) > length_) {
-      return false;
-    }
-
-    const unsigned char val = binary_[idx_];
-
-    (*ret) = val;
-    idx_ += 1;
-
-    return true;
-  }
+ private:
 
   size_t tell() const { return idx_; }
 

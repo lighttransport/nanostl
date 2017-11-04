@@ -39,23 +39,34 @@ THE SOFTWARE.
 
 namespace nanostl {
 
-class string {
+template <class charT>
+class basic_string {
  public:
-  string() {
+  typedef unsigned long long size_type;
+
+  typedef charT value_type;
+  typedef charT& reference;
+  typedef const charT& const_reference;
+  typedef charT* pointer;
+  typedef const charT* const_pointer;
+  typedef pointer iterator;
+  typedef const_pointer const_iterator;
+
+  basic_string() {
   }
 
-  string(const string &s) {
+  basic_string(const basic_string &s) {
     data_ = s.data_;
   }
 
-  string(const char *s) {
+  basic_string(const charT *s) {
     while (s && (*s) != '\0') {
       data_.push_back(*s);
       s++;
     }
   }
 
-  string(const char *first, const char *last) {
+  basic_string(const charT *first, const charT *last) {
     const char *s = first;
     while (s && (s <= last)) {
       data_.push_back(*s);
@@ -63,13 +74,11 @@ class string {
     }
   }
 
-  string(const char *s, size_type count) {
+  basic_string(const charT *s, size_type count) {
     for (size_type i = 0; i < count; i++) {
       data_.push_back(s[i]);
     } 
   }
-
-  // void push_back(value_type &val); // C++11
 
   bool empty() const { return data_.size() == 0; }
 
@@ -78,28 +87,68 @@ class string {
 
   void clear() { data_.clear(); }
 
-  const char *c_str() const {
+  const charT *c_str() const {
     return &data_.at(0);
   }
 
-  string operator+(const string &s) const;
-  string& operator+=(const string &s);
+  char &at(size_type pos) {
+    return data_[pos];
+  }
 
-  string& operator=(const string &s);
+  const charT &at(size_type pos) const {
+    return data_[pos];
+  }
+
+  char &operator[](size_type pos) {
+    return data_[pos];
+  }
+
+  const charT &operator[](size_type pos) const {
+    return data_[pos];
+  }
+
+  int compare(const basic_string &str) const {
+    return compare_(&data_[0], &str[0]);
+  }
+
+  int compare(const charT *s) const {
+    return compare_(&data_[0], s);
+  }
+
+  iterator erase(iterator pos) {
+    return data_.erase(pos);
+  }
+
+  basic_string operator+(const basic_string &s) const;
+  basic_string& operator+=(const basic_string &s);
+
+  basic_string& operator=(const basic_string &s);
 
  private:
-  nanostl::vector<char> data_;
+  nanostl::vector<charT> data_;
+
+  inline int compare_(const charT *p, const charT *q) const {
+    while (*p && (*p == *q)) {
+      p++;
+      q++;
+    }
+
+    return *reinterpret_cast<const unsigned char*>(p) - *reinterpret_cast<const unsigned char*>(q);
+  }
+    
 };
 
-string string::operator+(const string &s) const {
-  string result(*this);
+template <class charT>
+basic_string<charT> basic_string<charT>::operator+(const basic_string<charT> &s) const {
+  basic_string<charT> result(*this);
   result += s;
   return result;
 }
 
-string& string::operator+=(const string &s) {
-  vector<char>::const_iterator first = s.data_.begin();
-  vector<char>::const_iterator last = s.data_.end();
+template <class charT>
+basic_string<charT>& basic_string<charT>::operator+=(const basic_string<charT> &s) {
+  const_iterator first = s.data_.begin();
+  const_iterator last = s.data_.end();
 
   for (; first != last; ++first) {
     data_.push_back(*first);
@@ -107,6 +156,8 @@ string& string::operator+=(const string &s) {
 
   return (*this);
 }
+
+typedef basic_string<char> string;
 
 }  // nanostl
 

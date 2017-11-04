@@ -97,6 +97,10 @@ TEST(VectorTest) {
   ASSERT_EQ(v.at(0), 1);
   ASSERT_EQ(v[1], 2);
   ASSERT_EQ(v[2], 3);
+
+  v.erase(v.begin());
+  ASSERT_EQ(v.at(0), 2);
+   
 }
 
 TEST(AlgorithmTest) {
@@ -111,6 +115,9 @@ TEST(StringTest) {
   nanostl::string s("a");
 
   ASSERT_FALSE(s.empty());
+
+  ASSERT_EQ(s[0], 'a');
+  ASSERT_EQ(s.at(0), 'a');
 
 }
 

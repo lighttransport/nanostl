@@ -150,6 +150,16 @@ class vector {
     return data_[active_index_] + size_;
   }
 
+  inline iterator erase(iterator pos) {
+    while ((pos+1) != end()) {
+      (*pos) = *(pos+1);
+      pos++;
+    }
+    size_--;
+
+    return pos;
+  }
+
   template <class InputIterator>
   void assign(InputIterator first, InputIterator last) {
     clear();
