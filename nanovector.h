@@ -33,30 +33,17 @@ THE SOFTWARE.
 
 namespace nanostl {
 
+template<class T>
+static void __swap(T &x, T &y) {
+  T c(x);
+  x = y;
+  y = c;
+}
+
 // TODO(LTE): Support allocator.
 template <class T, class Allocator = nanostl::allocator<T> >
 class vector {
  public:
-  vector() : active_index_(0), size_(0) {
-    data_[0] = 0;
-    data_[1] = 0;
-    capacity_[0] = 0;
-    capacity_[1] = 0;
-  }
-
-  vector(const vector &rhs) {
-    clear();
-    assign(rhs.begin(), rhs.end());
-  }
-
-  ~vector() {
-    if (data_[0]) {
-      allocator_.deallocate(data_[0], capacity_[0]);
-    }
-    if (data_[1]) {
-      allocator_.deallocate(data_[1], capacity_[1]);
-    }
-  }
 
   typedef T value_type;
   typedef T& reference;
@@ -67,14 +54,29 @@ class vector {
   typedef const_pointer const_iterator;
   typedef Allocator allocator_type;
 
+  vector() : elements_(0), capacity_(0), size_(0) {
+  }
+
+  vector(const vector &rhs) {
+    clear();
+    assign(rhs.begin(), rhs.end());
+  }
+
+  ~vector() {
+    allocator_type allocator;
+    if (elements_) {
+      allocator.deallocate(elements_, capacity_);
+    }
+  }
+
   reference at(size_type pos) {
     // TODO(LTE): out-of-range check.
-    return data_[active_index_][pos];
+    return elements_[pos];
   }
 
   const_reference at(size_type pos) const {
     // TODO(LTE): out-of-range check.
-    return data_[active_index_][pos];
+    return elements_[pos];
   }
 
   // No initialized value
@@ -92,23 +94,21 @@ class vector {
                 << capacity() << ", recommended_size " << recommended_size()
                 << ", n " << n << std::endl;
 #endif
-      size_type next_index = active_index_ ? 0 : 1;
-      if (data_[next_index]) {
-        allocator_.deallocate(data_[next_index], capacity_[next_index]);
-      }
+      allocator_type allocator;
 
-      data_[next_index] = allocator_.allocate(n);
-      capacity_[next_index] = n;
+      value_type *new_elements = allocator.allocate(n);
+      size_type new_capacity = n;
 
       for (size_type i = 0; i < size(); i++) {
-        data_[next_index][i] = data_[active_index_][i];
+        new_elements[i] = elements_[i];
       }
 
       // delete old buffer
-      allocator_.deallocate(data_[active_index_], capacity_[active_index_]);
-      data_[active_index_] = 0;
+      allocator.deallocate(elements_, capacity_);
 
-      active_index_ = next_index;
+      elements_ = new_elements;
+      capacity_ = new_capacity;
+
     }
 
     size_ = count;
@@ -116,7 +116,7 @@ class vector {
 
   void push_back(const value_type& val) {
     resize(size() + 1);
-    data_[active_index_][size_ - 1] = val;
+    elements_[size_ - 1] = val;
   }
 
   // void push_back(value_type &val); // C++11
@@ -127,27 +127,27 @@ class vector {
 
   void clear() { size_ = 0; }
 
-  size_type capacity() const { return capacity_[active_index_]; }
+  size_type capacity() const { return capacity_; }
 
-  reference operator[](size_type pos) { return data_[active_index_][pos]; }
+  reference operator[](size_type pos) { return elements_[pos]; }
 
   const_reference operator[](size_type pos) const {
-    return data_[active_index_][pos];
+    return elements_[pos];
   }
 
   pointer data() {
-    return data_[active_index_];
+    return elements_;
   }
 
   vector& operator=(const vector &rhs);
   vector& operator+=(const vector &rhs);
 
   inline iterator begin(void) const {
-    return data_[active_index_] + 0;
+    return elements_ + 0;
   }
 
   inline iterator end(void) const {
-    return data_[active_index_] + size_;
+    return elements_ + size_;
   }
 
   inline iterator erase(iterator pos) {
@@ -168,6 +168,12 @@ class vector {
     }
   }
 
+  void swap(vector &x) {
+    __swap(elements_, x.elements_); 
+    __swap(capacity_, x.capacity_); 
+    __swap(size_, x.size_); 
+  }
+
  private:
   size_type recommended_size() const {
     // Simply use twice as large.
@@ -175,28 +181,10 @@ class vector {
     return s;
   }
 
-  // Simple double buffering.
-  // TODO(LTE): Implement another buffer algorithm to save memory.
-  T* data_[2];
-  size_type capacity_[2];
-  size_type active_index_;
-
+  T* elements_;
+  size_type capacity_;
   size_type size_;
-
-  allocator_type allocator_;
-
-  char __pad1_[7];
 };
-
-//template <class T, class Allocator>
-//template <class InputIterator>
-//vector<T, Allocator>::assign(InputIterator first, InputIterator last)
-//{
-//  clear();
-//  for (; first != last; ++first) {
-//    push_back(*first);
-//  }
-//}
 
 template <class T, class Allocator>
 inline vector<T, Allocator>& vector<T, Allocator>::operator=(const vector<T, Allocator> &rhs) {

@@ -100,7 +100,12 @@ TEST(VectorTest) {
 
   v.erase(v.begin());
   ASSERT_EQ(v.at(0), 2);
-   
+
+  nanostl::vector<int> y;
+  y.swap(v);
+
+  ASSERT_EQ(y.at(0), 2);
+  ASSERT_EQ(v.size(), 0);
 }
 
 TEST(AlgorithmTest) {
