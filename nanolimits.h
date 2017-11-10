@@ -29,6 +29,11 @@ THE SOFTWARE.
 #include <iostream>
 #endif
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc99-extensions"
+#endif
+
 namespace nanostl {
 
 template <class T>
@@ -105,5 +110,9 @@ struct numeric_limits<double> {
 };
 
 }  // namespace nanostl
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #endif  // NANOLIMITS_H_
