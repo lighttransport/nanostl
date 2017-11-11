@@ -31,15 +31,17 @@ THE SOFTWARE.
 
 namespace nanostl {
 
+#if 0
 class stringstream
 {
   typedef unsigned long long pos_type;
+  typedef long long off_type;
 
   public:
     stringstream() : binary_(0), length_(0) {}
     ~stringstream() {}
 
-    bool seek_set(const uint64_t offset) {
+    bool seek_set(const pos_type offset) {
       if (offset > length_) {
         return false;
       }
@@ -48,16 +50,16 @@ class stringstream
       return true;
     }
 
-    bool seek_from_currect(const int64_t offset) {
+    bool seek_from_currect(const off_type offset) {
       if ((int64_t(idx_) + offset) < 0) {
         return false;
       }
 
-      if (size_t((int64_t(idx_) + offset)) > length_) {
+      if (size_t((off_type(idx_) + offset)) > length_) {
         return false;
       }
 
-      idx_ = size_t(int64_t(idx_) + offset);
+      idx_ = size_t(off_type(idx_) + offset);
       return true;
     }
 
@@ -105,6 +107,7 @@ class stringstream
   char pad_[7];
   unsigned long long idx_;
 };
+#endif
 
 
 }  // namespace nanostl
