@@ -4,6 +4,8 @@ NanoSTL is good for using STL-like feature in your C++-like JIT compiler.
 
 ## Supported features
 
+Not all C++ STL functions are supported for each module.
+
 * vector
 * string
 * algorithm
@@ -13,6 +15,13 @@ NanoSTL is good for using STL-like feature in your C++-like JIT compiler.
 ## Supported architectures
 
 * 64bit and 32bit machine.
+
+## Supported compilers
+
+Even though NanoSTL can be compilable with old and various C++ compilers, at least following compilers works well.
+
+* gcc 4.8.x+
+* clang 3.4+
 
 ## Types
 
@@ -32,6 +41,10 @@ NanoSTL is good for using STL-like feature in your C++-like JIT compiler.
 
 * [ ] CUDA NVRTC support
 * [ ] isnan/isinf/isfinite support
+
+## Developer note
+
+Use `NANOSTL_DEBUG` define for debugging.
 
 ## Licenss
 
