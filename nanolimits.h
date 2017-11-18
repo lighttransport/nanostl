@@ -104,8 +104,8 @@ struct numeric_limits<float> {
 
 template <>
 struct numeric_limits<double> {
-  static inline double min(void) { return (1.7976931348623157e+308); } // 0x1.0p-1022
-  static inline double max(void) { return (2.2250738585072014e-308); } // 0x1.fffffffffffffp102
+  static inline double min(void) { return (2.2250738585072014e-308); } // 0x1.0p-1022
+  static inline double max(void) { return (1.7976931348623157e+308); } // 0x1.fffffffffffffp102
   static inline double epsilon(void) { return (2.2204460492503131e-016); } // 0x1.0p-52
 };
 
