@@ -131,6 +131,14 @@ TEST(StringTest) {
 
 }
 
+TEST(MapTest) {
+
+  nanostl::map<std::string, int> m;
+
+  ASSERT_TRUE(m.empty());
+
+}
+
 TEST(LimitsTest) {
 
   ASSERT_EQ(nanostl::numeric_limits<char>::min(),  std::numeric_limits<char>::min());

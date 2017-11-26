@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "nanovector.h"
 #include "nanoutility.h"    // nanostl::pair
 
-#define NANOSTL_DEBUG
+//#define NANOSTL_DEBUG
 
 #ifdef NANOSTL_DEBUG
 #include <iostream>
@@ -43,7 +43,7 @@ namespace nanostl {
 typedef unsigned int priority_type;
 
 // https://ja.wikipedia.org/wiki/Xorshift
-priority_type priority_rand() {
+static inline priority_type priority_rand() {
   static priority_type y = 2463534242;
   y = y ^ (y << 13); y = y ^ (y >> 17);
   return y = y ^ (y << 5);
@@ -161,6 +161,7 @@ class map {
 
   // for debug
   void __print(Node *t) {
+#ifdef NANOSTL_DEBUG
     if (!t) {
       std::cout << "[]" << std::endl;
       return;
@@ -170,6 +171,7 @@ class map {
               << ", pri = " << t->pri << "]" << std::endl;
     __print(t->ch[0]);
     __print(t->ch[1]);
+#endif
   }
 };
 
