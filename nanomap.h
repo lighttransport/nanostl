@@ -93,9 +93,9 @@ class map {
   bool empty() const { return !root; }
   // size_type size() const { return t.size(); }
   // size_type max_size() const { return t.max_size(); }
-  // Allocator<T>::reference operator[](const key_type& k) {
-  //   return (*((insert(value_type(k, T()))).first)).second;
-  // }
+  T& operator[](const key_type& k) {
+    return (*((insert(value_type(k, T()))).first)).second;
+  }
   // void swap(map<Key, T, Compare>& x) { t.swap(x.t); }
 
 // insert/erase
