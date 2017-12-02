@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "nanovector.h"
 #include "nanoutility.h"    // nanostl::pair
 
-//#define NANOSTL_DEBUG
+// #define NANOSTL_DEBUG
 
 #ifdef NANOSTL_DEBUG
 #include <iostream>
@@ -100,8 +100,11 @@ class map {
 
 // insert/erase
 
-  void insert(const value_type& x) {
-    root = __insert(root, x);
+  typedef pair<iterator, bool> pair_iterator_bool;
+  pair_iterator_bool insert(const value_type& x) {
+    pair<Node*, pair_iterator_bool> p = __insert(root, x);
+    root = p.first;
+    return p.second;
   }
 
 // map operations:
@@ -133,17 +136,21 @@ class map {
     return s;   // return the upper node after the rotation
   }
 
-  Node *__insert(Node *t, const value_type& x) {
-    if (!t) return new Node(x);
+  // {pointer to the root node of the subtree, {iterator to inserted/found value, inserted or not}}
+  pair<Node*, pair_iterator_bool> __insert(Node *t, const value_type& x) {
+    if (!t) {
+      Node *n = new Node(x);
+      return make_pair(n, make_pair(&(n->val), true));
+    }
     int key = x.first;
     if (key == t->key()) {
-      // If there exists the node has the same key, return the node
-      return t;
+      return make_pair(t, make_pair(&(t->val), false));
     }
     int b = key > t->key();
-    t->ch[b] = __insert(t->ch[b], x);
+    pair<Node*, pair_iterator_bool> p = __insert(t->ch[b], x);
+    t->ch[b] = p.first;
     if (t->pri > t->ch[b]->pri) t = __rotate(t, 1-b);
-    return t;
+    return make_pair(t, p.second);
   }
 
   Node *__find(Node *t, const key_type& key) {
