@@ -77,7 +77,7 @@ class basic_string {
   basic_string(const charT *s, size_type count) {
     for (size_type i = 0; i < count; i++) {
       data_.push_back(s[i]);
-    } 
+    }
   }
 
   bool empty() const { return data_.size() == 0; }
@@ -115,6 +115,9 @@ class basic_string {
     return compare_(&data_[0], s);
   }
 
+
+
+
   iterator erase(iterator pos) {
     return data_.erase(pos);
   }
@@ -123,6 +126,15 @@ class basic_string {
   basic_string& operator+=(const basic_string &s);
 
   basic_string& operator=(const basic_string &s);
+
+  bool operator==(const basic_string &str) const    { return compare(str) == 0; }
+  bool operator==(const charT *s) const             { return compare(s) == 0; }
+  bool operator!=(const basic_string &str) const    { return compare(str) != 0; }
+  bool operator!=(const charT *s) const             { return compare(s) != 0; }
+  bool operator<(const basic_string &str) const     { return compare(str) < 0; }
+  bool operator<(const charT *s) const              { return compare(s) < 0; }
+  bool operator>(const basic_string &str) const     { return compare(str) > 0; }
+  bool operator>(const charT *s) const              { return compare(s) > 0; }
 
  private:
   nanostl::vector<charT> data_;
@@ -135,7 +147,7 @@ class basic_string {
 
     return *reinterpret_cast<const unsigned char*>(p) - *reinterpret_cast<const unsigned char*>(q);
   }
-    
+
 };
 
 template <class charT>
