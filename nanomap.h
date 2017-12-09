@@ -28,8 +28,6 @@ THE SOFTWARE.
 #include "nanovector.h"
 #include "nanoutility.h"    // nanostl::pair
 
-// #define NANOSTL_DEBUG
-
 #ifdef NANOSTL_DEBUG
 #include <iostream>
 #endif
@@ -59,14 +57,9 @@ class map {
   typedef const value_type& const_reference;
   typedef value_type* pointer;
   typedef const value_type* const_pointer;
-  typedef pointer iterator; // nanostl::pair<const Key, T>*
-  typedef const_pointer const_iterator;
-  typedef T mapped_value;
-  // typedef Compare key_compare;
-  // typedef Allocator allocator_type;
 
   struct Node {
-    value_type val; // {key, mapped}
+    value_type val;
     priority_type pri;
     Node* ch[2];  // left, right
     Node(value_type v) : val(v), pri(priority_rand()) {
@@ -76,27 +69,52 @@ class map {
     inline T mapped() { return val.second; }
   };
 
+  class iterator {
+    map<Key, T>* mp;
+    Node* p;
+  public:
+    iterator(map<Key, T>* _mp = 0, Node* _p = 0) : mp(_mp), p(_p) {}
+    iterator& operator++() {
+      // O(log n)
+      p = mp->__upper_bound(mp->root, p->val.first);
+      return *this;
+    }
+    reference operator*() const {
+      return p->val;
+    }
+    pointer operator->() const {
+      return &(p->val);
+    }
+    bool operator==(const iterator& rhs) const {
+      if (rhs.isEnd() && this->isEnd()) return true;
+      return *rhs == this->p->val;
+    }
+    bool operator!=(const iterator& rhs) const {
+      if (rhs.isEnd() && this->isEnd())       return false;
+      else if (rhs.isEnd() || this->isEnd())  return true;
+      return *rhs != this->p->val;
+    }
+    bool isEnd() const {
+      return p == 0;
+    }
+  };
+
   map() {
     root = 0;
   }
 
   ~map() {
-    // TODO(yurahuna): implement deconstructor
+    __delete(root);
   }
 
 // accessors:
 
-  iterator begin() { return root; }
-  const_iterator begin() const { return root; }
-  iterator end() { return 0; }              // TODO(yurahuna): where is end?
-  const_iterator end() const { return 0; }  // TODO(yurahuna): where is end?
+  iterator begin() { return iterator(this, root); }
+  iterator end() { return iterator(this, 0); }
   bool empty() const { return !root; }
-  // size_type size() const { return t.size(); }
-  // size_type max_size() const { return t.max_size(); }
   T& operator[](const key_type& k) {
     return (*((insert(value_type(k, T()))).first)).second;
   }
-  // void swap(map<Key, T, Compare>& x) { t.swap(x.t); }
 
 // insert/erase
 
@@ -109,14 +127,14 @@ class map {
 
 // map operations:
 
-  iterator find(const key_type& key) {
+  iterator find(const key_type& key) const {
     Node *t = __find(root, key);
-    return !t ? this->end() : &(t->val);
+    return !t ? this->end() : iterator(this, t);
   }
 
-  iterator upper_bound(const key_type& key) {
+  iterator upper_bound(const key_type& key) const {
     Node *t = __upper_bound(root, key);
-    return !t ? this->end() : &(t->val);
+    return !t ? this->end() : iterator(this, t);
   }
 
 // debug:
@@ -140,11 +158,11 @@ class map {
   pair<Node*, pair_iterator_bool> __insert(Node *t, const value_type& x) {
     if (!t) {
       Node *n = new Node(x);
-      return make_pair(n, make_pair(&(n->val), true));
+      return make_pair(n, make_pair(iterator(this, n), true));
     }
     int key = x.first;
     if (key == t->key()) {
-      return make_pair(t, make_pair(&(t->val), false));
+      return make_pair(t, make_pair(iterator(this, t), false));
     }
     int b = key > t->key();
     pair<Node*, pair_iterator_bool> p = __insert(t->ch[b], x);
@@ -153,17 +171,24 @@ class map {
     return make_pair(t, p.second);
   }
 
-  Node *__find(Node *t, const key_type& key) {
+  Node *__find(Node *t, const key_type& key) const {
     return (!t || key == t->key()) ? t : __find(t->ch[key > t->key()], key);
   }
 
-  Node *__upper_bound(Node *t, const key_type& key) {
+  Node *__upper_bound(Node *t, const key_type& key) const {
     if (!t) return 0;
     if (key < t->key()) {
       Node *s = __upper_bound(t->ch[0], key);
       return s ? s : t;
     }
     return __upper_bound(t->ch[1], key);
+  }
+
+  void __delete(Node *t) {
+    if (!t) return;
+    __delete(t->ch[0]);
+    __delete(t->ch[1]);
+    delete t;
   }
 
   // for debug
