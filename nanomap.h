@@ -160,7 +160,7 @@ class map {
       Node *n = new Node(x);
       return make_pair(n, make_pair(iterator(this, n), true));
     }
-    int key = x.first;
+    Key key = x.first;
     if (key == t->key()) {
       return make_pair(t, make_pair(iterator(this, t), false));
     }
