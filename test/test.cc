@@ -133,9 +133,15 @@ TEST(StringTest) {
 
 TEST(MapTest) {
 
-  nanostl::map<std::string, int> m;
+  nanostl::map<nanostl::string, int> m;
 
   ASSERT_TRUE(m.empty());
+
+  m["a"] = 1;
+  m["b"] = 2;
+
+  ASSERT_EQ(m["a"], 1);
+  ASSERT_EQ(m["b"], 2);
 
 }
 
