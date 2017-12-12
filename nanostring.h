@@ -64,6 +64,7 @@ class basic_string {
       data_.push_back(*s);
       s++;
     }
+    data_.push_back('\0');
   }
 
   basic_string(const charT *first, const charT *last) {
