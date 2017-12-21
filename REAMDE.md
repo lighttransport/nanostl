@@ -1,4 +1,4 @@
-# NanoSTL, small subset of C++ STL.
+# NanoSTL, a small subset of C++ STL.
 
 NanoSTL is good for using STL-like feature in your C++ application and C++-like JIT compiler.
 
