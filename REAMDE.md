@@ -1,10 +1,14 @@
 # NanoSTL, small subset of C++ STL.
 
-NanoSTL is good for using STL-like feature in your C++-like JIT compiler.
+NanoSTL is good for using STL-like feature in your C++ application and C++-like JIT compiler.
+
+## Status
+
+Eearly testing stage. Not ready for the production use.
 
 ## Supported features
 
-Not all C++ STL functions are supported for each module.
+Be careful! Not all C++ STL functions are supported for each module.
 
 * vector
 * string
@@ -41,8 +45,13 @@ Even though NanoSTL can be compilable with old and various C++ compilers, at lea
 
 * [ ] CUDA NVRTC support
 * [ ] isnan/isinf/isfinite support
+* [ ] Unit tests
+* [ ] Multithread support
+* [ ] Backport of some C++11 features(e.g. `unordered_map`)
 
 ## Developer note
+
+### Debugging 
 
 Use `NANOSTL_DEBUG` define for debugging.
 
