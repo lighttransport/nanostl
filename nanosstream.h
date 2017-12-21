@@ -26,8 +26,8 @@ THE SOFTWARE.
 #define NANOSSTREAM_H_
 
 #include "nanoios.h"
-#include "nanostring.h"
 #include "nanostreambuf.h"
+#include "nanostring.h"
 
 namespace nanostl {
 
@@ -108,7 +108,6 @@ class stringstream
   unsigned long long idx_;
 };
 #endif
-
 
 }  // namespace nanostl
 

@@ -25,8 +25,8 @@ THE SOFTWARE.
 #ifndef NANOMAP_H_
 #define NANOMAP_H_
 
+#include "nanoutility.h"  // nanostl::pair
 #include "nanovector.h"
-#include "nanoutility.h"    // nanostl::pair
 
 #ifdef NANOSTL_DEBUG
 #include <iostream>
@@ -43,12 +43,13 @@ typedef unsigned int priority_type;
 // https://ja.wikipedia.org/wiki/Xorshift
 static inline priority_type priority_rand() {
   static priority_type y = 2463534242;
-  y = y ^ (y << 13); y = y ^ (y >> 17);
+  y = y ^ (y << 13);
+  y = y ^ (y >> 17);
   return y = y ^ (y << 5);
 }
 
 // TODO(LTE): Support Comparator and Allocator.
-template<class Key, class T>
+template <class Key, class T>
 class map {
  public:
   typedef Key key_type;
@@ -62,9 +63,7 @@ class map {
     value_type val;
     priority_type pri;
     Node* ch[2];  // left, right
-    Node(value_type v) : val(v), pri(priority_rand()) {
-      ch[0] = ch[1] = 0;
-    }
+    Node(value_type v) : val(v), pri(priority_rand()) { ch[0] = ch[1] = 0; }
     inline Key key() { return val.first; }
     inline T mapped() { return val.second; }
   };
@@ -72,42 +71,35 @@ class map {
   class iterator {
     map<Key, T>* mp;
     Node* p;
-  public:
+
+   public:
     iterator(map<Key, T>* _mp = 0, Node* _p = 0) : mp(_mp), p(_p) {}
     iterator& operator++() {
       // O(log n)
       p = mp->__upper_bound(mp->root, p->val.first);
       return *this;
     }
-    reference operator*() const {
-      return p->val;
-    }
-    pointer operator->() const {
-      return &(p->val);
-    }
+    reference operator*() const { return p->val; }
+    pointer operator->() const { return &(p->val); }
     bool operator==(const iterator& rhs) const {
       if (rhs.isEnd() && this->isEnd()) return true;
       return *rhs == this->p->val;
     }
     bool operator!=(const iterator& rhs) const {
-      if (rhs.isEnd() && this->isEnd())       return false;
-      else if (rhs.isEnd() || this->isEnd())  return true;
+      if (rhs.isEnd() && this->isEnd())
+        return false;
+      else if (rhs.isEnd() || this->isEnd())
+        return true;
       return *rhs != this->p->val;
     }
-    bool isEnd() const {
-      return p == 0;
-    }
+    bool isEnd() const { return p == 0; }
   };
 
-  map() {
-    root = 0;
-  }
+  map() { root = 0; }
 
-  ~map() {
-    __delete(root);
-  }
+  ~map() { __delete(root); }
 
-// accessors:
+  // accessors:
 
   iterator begin() { return iterator(this, root); }
   iterator end() { return iterator(this, 0); }
@@ -116,7 +108,7 @@ class map {
     return (*((insert(value_type(k, T()))).first)).second;
   }
 
-// insert/erase
+  // insert/erase
 
   typedef pair<iterator, bool> pair_iterator_bool;
   pair_iterator_bool insert(const value_type& x) {
@@ -125,39 +117,42 @@ class map {
     return p.second;
   }
 
-// map operations:
+  // map operations:
 
   iterator find(const key_type& key) const {
-    Node *t = __find(root, key);
+    Node* t = __find(root, key);
     return !t ? this->end() : iterator(this, t);
   }
 
   iterator upper_bound(const key_type& key) const {
-    Node *t = __upper_bound(root, key);
+    Node* t = __upper_bound(root, key);
     return !t ? this->end() : iterator(this, t);
   }
 
-// debug:
+  // debug:
 
   void print() {
+#ifdef NANOSTL_DEBUG
     __print(root);
+#endif
   }
 
  private:
-  Node *root;
+  Node* root;
 
   // b: the direction of rotation
-  Node *__rotate(Node *t, int b) {
-    Node *s = t->ch[1 - b];
+  Node* __rotate(Node* t, int b) {
+    Node* s = t->ch[1 - b];
     t->ch[1 - b] = s->ch[b];
     s->ch[b] = t;
-    return s;   // return the upper node after the rotation
+    return s;  // return the upper node after the rotation
   }
 
-  // {pointer to the root node of the subtree, {iterator to inserted/found value, inserted or not}}
-  pair<Node*, pair_iterator_bool> __insert(Node *t, const value_type& x) {
+  // {pointer to the root node of the subtree, {iterator to inserted/found
+  // value, inserted or not}}
+  pair<Node*, pair_iterator_bool> __insert(Node* t, const value_type& x) {
     if (!t) {
-      Node *n = new Node(x);
+      Node* n = new Node(x);
       return make_pair(n, make_pair(iterator(this, n), true));
     }
     Key key = x.first;
@@ -167,33 +162,33 @@ class map {
     int b = key > t->key();
     pair<Node*, pair_iterator_bool> p = __insert(t->ch[b], x);
     t->ch[b] = p.first;
-    if (t->pri > t->ch[b]->pri) t = __rotate(t, 1-b);
+    if (t->pri > t->ch[b]->pri) t = __rotate(t, 1 - b);
     return make_pair(t, p.second);
   }
 
-  Node *__find(Node *t, const key_type& key) const {
+  Node* __find(Node* t, const key_type& key) const {
     return (!t || key == t->key()) ? t : __find(t->ch[key > t->key()], key);
   }
 
-  Node *__upper_bound(Node *t, const key_type& key) const {
+  Node* __upper_bound(Node* t, const key_type& key) const {
     if (!t) return 0;
     if (key < t->key()) {
-      Node *s = __upper_bound(t->ch[0], key);
+      Node* s = __upper_bound(t->ch[0], key);
       return s ? s : t;
     }
     return __upper_bound(t->ch[1], key);
   }
 
-  void __delete(Node *t) {
+  void __delete(Node* t) {
     if (!t) return;
     __delete(t->ch[0]);
     __delete(t->ch[1]);
     delete t;
   }
 
-  // for debug
-  void __print(Node *t) {
 #ifdef NANOSTL_DEBUG
+  // for debug
+  void __print(Node* t) {
     if (!t) {
       std::cout << "[]" << std::endl;
       return;
@@ -203,10 +198,10 @@ class map {
               << ", pri = " << t->pri << "]" << std::endl;
     __print(t->ch[0]);
     __print(t->ch[1]);
-#endif
   }
+#endif
 };
 
-}  // nanostl
+}  // namespace nanostl
 
 #endif  // NANOMAP_H_

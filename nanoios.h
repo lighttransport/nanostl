@@ -27,14 +27,9 @@ THE SOFTWARE.
 
 namespace nanostl {
 
-class ios_base
-{
+class ios_base {
  public:
-  enum seekdir {
-    beg,
-    cur,
-    end
-  };
+  enum seekdir { beg, cur, end };
 };
 
 }  // namespace nanostl

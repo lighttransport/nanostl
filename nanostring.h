@@ -45,19 +45,16 @@ class basic_string {
   typedef unsigned long long size_type;
 
   typedef charT value_type;
-  typedef charT& reference;
-  typedef const charT& const_reference;
-  typedef charT* pointer;
-  typedef const charT* const_pointer;
+  typedef charT &reference;
+  typedef const charT &const_reference;
+  typedef charT *pointer;
+  typedef const charT *const_pointer;
   typedef pointer iterator;
   typedef const_pointer const_iterator;
 
-  basic_string() {
-  }
+  basic_string() {}
 
-  basic_string(const basic_string &s) {
-    data_ = s.data_;
-  }
+  basic_string(const basic_string &s) { data_ = s.data_; }
 
   basic_string(const charT *s) {
     while (s && (*s) != '\0') {
@@ -88,54 +85,37 @@ class basic_string {
 
   void clear() { data_.clear(); }
 
-  const charT *c_str() const {
-    return &data_.at(0);
-  }
+  const charT *c_str() const { return &data_.at(0); }
 
-  char &at(size_type pos) {
-    return data_[pos];
-  }
+  char &at(size_type pos) { return data_[pos]; }
 
-  const charT &at(size_type pos) const {
-    return data_[pos];
-  }
+  const charT &at(size_type pos) const { return data_[pos]; }
 
-  char &operator[](size_type pos) {
-    return data_[pos];
-  }
+  char &operator[](size_type pos) { return data_[pos]; }
 
-  const charT &operator[](size_type pos) const {
-    return data_[pos];
-  }
+  const charT &operator[](size_type pos) const { return data_[pos]; }
 
   int compare(const basic_string &str) const {
     return compare_(&data_[0], &str[0]);
   }
 
-  int compare(const charT *s) const {
-    return compare_(&data_[0], s);
-  }
+  int compare(const charT *s) const { return compare_(&data_[0], s); }
 
-
-
-
-  iterator erase(iterator pos) {
-    return data_.erase(pos);
-  }
+  iterator erase(iterator pos) { return data_.erase(pos); }
 
   basic_string operator+(const basic_string &s) const;
-  basic_string& operator+=(const basic_string &s);
+  basic_string &operator+=(const basic_string &s);
 
-  basic_string& operator=(const basic_string &s);
+  basic_string &operator=(const basic_string &s);
 
-  bool operator==(const basic_string &str) const    { return compare(str) == 0; }
-  bool operator==(const charT *s) const             { return compare(s) == 0; }
-  bool operator!=(const basic_string &str) const    { return compare(str) != 0; }
-  bool operator!=(const charT *s) const             { return compare(s) != 0; }
-  bool operator<(const basic_string &str) const     { return compare(str) < 0; }
-  bool operator<(const charT *s) const              { return compare(s) < 0; }
-  bool operator>(const basic_string &str) const     { return compare(str) > 0; }
-  bool operator>(const charT *s) const              { return compare(s) > 0; }
+  bool operator==(const basic_string &str) const { return compare(str) == 0; }
+  bool operator==(const charT *s) const { return compare(s) == 0; }
+  bool operator!=(const basic_string &str) const { return compare(str) != 0; }
+  bool operator!=(const charT *s) const { return compare(s) != 0; }
+  bool operator<(const basic_string &str) const { return compare(str) < 0; }
+  bool operator<(const charT *s) const { return compare(s) < 0; }
+  bool operator>(const basic_string &str) const { return compare(str) > 0; }
+  bool operator>(const charT *s) const { return compare(s) > 0; }
 
  private:
   nanostl::vector<charT> data_;
@@ -146,20 +126,22 @@ class basic_string {
       q++;
     }
 
-    return *reinterpret_cast<const unsigned char*>(p) - *reinterpret_cast<const unsigned char*>(q);
+    return *reinterpret_cast<const unsigned char *>(p) -
+           *reinterpret_cast<const unsigned char *>(q);
   }
-
 };
 
 template <class charT>
-basic_string<charT> basic_string<charT>::operator+(const basic_string<charT> &s) const {
+basic_string<charT> basic_string<charT>::operator+(
+    const basic_string<charT> &s) const {
   basic_string<charT> result(*this);
   result += s;
   return result;
 }
 
 template <class charT>
-basic_string<charT>& basic_string<charT>::operator+=(const basic_string<charT> &s) {
+basic_string<charT> &basic_string<charT>::operator+=(
+    const basic_string<charT> &s) {
   const_iterator first = s.data_.begin();
   const_iterator last = s.data_.end();
 
@@ -172,6 +154,6 @@ basic_string<charT>& basic_string<charT>::operator+=(const basic_string<charT> &
 
 typedef basic_string<char> string;
 
-}  // nanostl
+}  // namespace nanostl
 
 #endif  // NANOVECTOR_H_

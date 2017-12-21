@@ -97,16 +97,24 @@ struct numeric_limits<unsigned long long> {
 
 template <>
 struct numeric_limits<float> {
-  static inline float min(void) { return (1.17549435E-38f); } // 0x1.0p-126f
-  static inline float max(void) { return (3.402823466e+38F); } // 0x1.fffffep127f
-  static inline float epsilon(void) { return (1.19209290E-07f); } // 0x1.0p-23f
+  static inline float min(void) { return (1.17549435E-38f); }  // 0x1.0p-126f
+  static inline float max(void) {
+    return (3.402823466e+38F);
+  }  // 0x1.fffffep127f
+  static inline float epsilon(void) { return (1.19209290E-07f); }  // 0x1.0p-23f
 };
 
 template <>
 struct numeric_limits<double> {
-  static inline double min(void) { return (2.2250738585072014e-308); } // 0x1.0p-1022
-  static inline double max(void) { return (1.7976931348623157e+308); } // 0x1.fffffffffffffp102
-  static inline double epsilon(void) { return (2.2204460492503131e-016); } // 0x1.0p-52
+  static inline double min(void) {
+    return (2.2250738585072014e-308);
+  }  // 0x1.0p-1022
+  static inline double max(void) {
+    return (1.7976931348623157e+308);
+  }  // 0x1.fffffffffffffp102
+  static inline double epsilon(void) {
+    return (2.2204460492503131e-016);
+  }  // 0x1.0p-52
 };
 
 }  // namespace nanostl

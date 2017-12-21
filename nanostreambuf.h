@@ -30,10 +30,7 @@ THE SOFTWARE.
 namespace nanostl {
 
 template <class charT>
-class basic_streambuf
-{
-
-};
+class basic_streambuf {};
 
 typedef basic_streambuf<char> streambuf;
 

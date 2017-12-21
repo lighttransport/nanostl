@@ -33,8 +33,8 @@ THE SOFTWARE.
 
 namespace nanostl {
 
-template<class T>
-static void __swap(T &x, T &y) {
+template <class T>
+static void __swap(T& x, T& y) {
   T c(x);
   x = y;
   y = c;
@@ -44,7 +44,6 @@ static void __swap(T &x, T &y) {
 template <class T, class Allocator = nanostl::allocator<T> >
 class vector {
  public:
-
   typedef T value_type;
   typedef T& reference;
   typedef const T& const_reference;
@@ -54,10 +53,9 @@ class vector {
   typedef const_pointer const_iterator;
   typedef Allocator allocator_type;
 
-  vector() : elements_(0), capacity_(0), size_(0) {
-  }
+  vector() : elements_(0), capacity_(0), size_(0) {}
 
-  vector(const vector &rhs) {
+  vector(const vector& rhs) {
     clear();
     assign(rhs.begin(), rhs.end());
   }
@@ -96,7 +94,7 @@ class vector {
 #endif
       allocator_type allocator;
 
-      value_type *new_elements = allocator.allocate(n);
+      value_type* new_elements = allocator.allocate(n);
       size_type new_capacity = n;
 
       for (size_type i = 0; i < size(); i++) {
@@ -108,7 +106,6 @@ class vector {
 
       elements_ = new_elements;
       capacity_ = new_capacity;
-
     }
 
     size_ = count;
@@ -131,28 +128,20 @@ class vector {
 
   reference operator[](size_type pos) { return elements_[pos]; }
 
-  const_reference operator[](size_type pos) const {
-    return elements_[pos];
-  }
+  const_reference operator[](size_type pos) const { return elements_[pos]; }
 
-  pointer data() {
-    return elements_;
-  }
+  pointer data() { return elements_; }
 
-  vector& operator=(const vector &rhs);
-  vector& operator+=(const vector &rhs);
+  vector& operator=(const vector& rhs);
+  vector& operator+=(const vector& rhs);
 
-  inline iterator begin(void) const {
-    return elements_ + 0;
-  }
+  inline iterator begin(void) const { return elements_ + 0; }
 
-  inline iterator end(void) const {
-    return elements_ + size_;
-  }
+  inline iterator end(void) const { return elements_ + size_; }
 
   inline iterator erase(iterator pos) {
-    while ((pos+1) != end()) {
-      (*pos) = *(pos+1);
+    while ((pos + 1) != end()) {
+      (*pos) = *(pos + 1);
       pos++;
     }
     size_--;
@@ -168,10 +157,10 @@ class vector {
     }
   }
 
-  void swap(vector &x) {
-    __swap(elements_, x.elements_); 
-    __swap(capacity_, x.capacity_); 
-    __swap(size_, x.size_); 
+  void swap(vector& x) {
+    __swap(elements_, x.elements_);
+    __swap(capacity_, x.capacity_);
+    __swap(size_, x.size_);
   }
 
  private:
@@ -187,13 +176,14 @@ class vector {
 };
 
 template <class T, class Allocator>
-inline vector<T, Allocator>& vector<T, Allocator>::operator=(const vector<T, Allocator> &rhs) {
+inline vector<T, Allocator>& vector<T, Allocator>::operator=(
+    const vector<T, Allocator>& rhs) {
   if (this != &rhs) {
     assign(rhs.begin(), rhs.end());
   }
   return *this;
 }
 
-}  // nanostl
+}  // namespace nanostl
 
 #endif  // NANOVECTOR_H_
