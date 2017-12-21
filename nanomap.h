@@ -22,10 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef NANOSTRING_H_
-#define NANOSTRING_H_
+#ifndef NANOMAP_H_
+#define NANOMAP_H_
 
 #include "nanovector.h"
+#include "nanoutility.h"    // nanostl::pair
 
 #ifdef NANOSTL_DEBUG
 #include <iostream>
@@ -37,45 +38,175 @@ THE SOFTWARE.
 
 namespace nanostl {
 
+typedef unsigned int priority_type;
+
+// https://ja.wikipedia.org/wiki/Xorshift
+static inline priority_type priority_rand() {
+  static priority_type y = 2463534242;
+  y = y ^ (y << 13); y = y ^ (y >> 17);
+  return y = y ^ (y << 5);
+}
+
 // TODO(LTE): Support Comparator and Allocator.
 template<class Key, class T>
 class map {
  public:
+  typedef Key key_type;
+  typedef nanostl::pair<const Key, T> value_type;
+  typedef value_type& reference;
+  typedef const value_type& const_reference;
+  typedef value_type* pointer;
+  typedef const value_type* const_pointer;
+
+  struct Node {
+    value_type val;
+    priority_type pri;
+    Node* ch[2];  // left, right
+    Node(value_type v) : val(v), pri(priority_rand()) {
+      ch[0] = ch[1] = 0;
+    }
+    inline Key key() { return val.first; }
+    inline T mapped() { return val.second; }
+  };
+
+  class iterator {
+    map<Key, T>* mp;
+    Node* p;
+  public:
+    iterator(map<Key, T>* _mp = 0, Node* _p = 0) : mp(_mp), p(_p) {}
+    iterator& operator++() {
+      // O(log n)
+      p = mp->__upper_bound(mp->root, p->val.first);
+      return *this;
+    }
+    reference operator*() const {
+      return p->val;
+    }
+    pointer operator->() const {
+      return &(p->val);
+    }
+    bool operator==(const iterator& rhs) const {
+      if (rhs.isEnd() && this->isEnd()) return true;
+      return *rhs == this->p->val;
+    }
+    bool operator!=(const iterator& rhs) const {
+      if (rhs.isEnd() && this->isEnd())       return false;
+      else if (rhs.isEnd() || this->isEnd())  return true;
+      return *rhs != this->p->val;
+    }
+    bool isEnd() const {
+      return p == 0;
+    }
+  };
+
   map() {
+    root = 0;
   }
 
   ~map() {
+    __delete(root);
   }
 
+// accessors:
 
-  // void push_back(value_type &val); // C++11
+  iterator begin() { return iterator(this, root); }
+  iterator end() { return iterator(this, 0); }
+  bool empty() const { return !root; }
+  T& operator[](const key_type& k) {
+    return (*((insert(value_type(k, T()))).first)).second;
+  }
 
-  bool empty() const { return data_.size() == 0; }
+// insert/erase
 
-  size_type size() const { return data_.size(); }
+  typedef pair<iterator, bool> pair_iterator_bool;
+  pair_iterator_bool insert(const value_type& x) {
+    pair<Node*, pair_iterator_bool> p = __insert(root, x);
+    root = p.first;
+    return p.second;
+  }
 
-  void clear() { data_ = 0; }
+// map operations:
 
-  const char *c_str() const {
-    return data_.data();
+  iterator find(const key_type& key) const {
+    Node *t = __find(root, key);
+    return !t ? this->end() : iterator(this, t);
+  }
+
+  iterator upper_bound(const key_type& key) const {
+    Node *t = __upper_bound(root, key);
+    return !t ? this->end() : iterator(this, t);
+  }
+
+// debug:
+
+  void print() {
+    __print(root);
   }
 
  private:
+  Node *root;
 
-  // https://arxiv.org/abs/1406.2294
-  int JumpConsistentHash(unsigned long long key, int num_buckets) { 
-    long long b = ­1, j = 0;
-    while (j < num_buckets) {
-      b=j;
-      key = key * 2862933555777941757ULL + 1;
-      j = (b + 1) * (double(1LL << 31) / double((key >> 33) + 1));
-    }
-    return b;
+  // b: the direction of rotation
+  Node *__rotate(Node *t, int b) {
+    Node *s = t->ch[1 - b];
+    t->ch[1 - b] = s->ch[b];
+    s->ch[b] = t;
+    return s;   // return the upper node after the rotation
   }
 
-  std::vector<char> data_;
+  // {pointer to the root node of the subtree, {iterator to inserted/found value, inserted or not}}
+  pair<Node*, pair_iterator_bool> __insert(Node *t, const value_type& x) {
+    if (!t) {
+      Node *n = new Node(x);
+      return make_pair(n, make_pair(iterator(this, n), true));
+    }
+    Key key = x.first;
+    if (key == t->key()) {
+      return make_pair(t, make_pair(iterator(this, t), false));
+    }
+    int b = key > t->key();
+    pair<Node*, pair_iterator_bool> p = __insert(t->ch[b], x);
+    t->ch[b] = p.first;
+    if (t->pri > t->ch[b]->pri) t = __rotate(t, 1-b);
+    return make_pair(t, p.second);
+  }
+
+  Node *__find(Node *t, const key_type& key) const {
+    return (!t || key == t->key()) ? t : __find(t->ch[key > t->key()], key);
+  }
+
+  Node *__upper_bound(Node *t, const key_type& key) const {
+    if (!t) return 0;
+    if (key < t->key()) {
+      Node *s = __upper_bound(t->ch[0], key);
+      return s ? s : t;
+    }
+    return __upper_bound(t->ch[1], key);
+  }
+
+  void __delete(Node *t) {
+    if (!t) return;
+    __delete(t->ch[0]);
+    __delete(t->ch[1]);
+    delete t;
+  }
+
+  // for debug
+  void __print(Node *t) {
+#ifdef NANOSTL_DEBUG
+    if (!t) {
+      std::cout << "[]" << std::endl;
+      return;
+    }
+    // preorder
+    std::cout << "[key = " << t->val.first << ", mapped = " << t->val.second
+              << ", pri = " << t->pri << "]" << std::endl;
+    __print(t->ch[0]);
+    __print(t->ch[1]);
+#endif
+  }
 };
 
 }  // nanostl
 
-#endif  // NANOVECTOR_H_
+#endif  // NANOMAP_H_

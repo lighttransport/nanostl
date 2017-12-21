@@ -131,6 +131,20 @@ TEST(StringTest) {
 
 }
 
+TEST(MapTest) {
+
+  nanostl::map<nanostl::string, int> m;
+
+  ASSERT_TRUE(m.empty());
+
+  m["a"] = 1;
+  m["b"] = 2;
+
+  ASSERT_EQ(m["a"], 1);
+  ASSERT_EQ(m["b"], 2);
+
+}
+
 TEST(LimitsTest) {
 
   ASSERT_EQ(nanostl::numeric_limits<char>::min(),  std::numeric_limits<char>::min());
