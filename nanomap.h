@@ -95,6 +95,8 @@ class map {
     bool isEnd() const { return p == 0; }
   };
 
+  typedef const iterator const_iterator;
+
   map() { root = 0; }
 
   ~map() { __delete(root); }
@@ -103,6 +105,7 @@ class map {
 
   iterator begin() { return iterator(this, root); }
   iterator end() { return iterator(this, 0); }
+  const_iterator end() const { return iterator(this, 0); }
   bool empty() const { return !root; }
   T& operator[](const key_type& k) {
     return (*((insert(value_type(k, T()))).first)).second;
@@ -119,14 +122,14 @@ class map {
 
   // map operations:
 
-  iterator find(const key_type& key) const {
+  const_iterator find(const key_type& key) const {
     Node* t = __find(root, key);
-    return !t ? this->end() : iterator(this, t);
+    return (!t) ? this->end() : iterator(this, t);
   }
 
-  iterator upper_bound(const key_type& key) const {
+  const_iterator upper_bound(const key_type& key) const {
     Node* t = __upper_bound(root, key);
-    return !t ? this->end() : iterator(this, t);
+    return (!t) ? this->end() : iterator(this, t);
   }
 
   // debug:
