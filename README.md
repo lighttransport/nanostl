@@ -1,6 +1,8 @@
-# NanoSTL, a small subset of C++ STL.
+# NanoSTL, a portable and small subset of C++ STL.
 
 NanoSTL is good for using STL-like feature in your C++ application and C++-like JIT compiler.
+
+NanoSTL is portable, it should run well on many environments including Windows, Linux, macOS, x86, ARM, SPARC, etc.
 
 ## Status
 
@@ -51,6 +53,13 @@ Even though NanoSTL can be compilable with old and various C++ compilers, at lea
 
 ## Developer note
 
+### Generate single header file.
+
+```
+$ cd scripts
+$ python generateSingleHeader.py
+```
+
 ### Debugging 
 
 Use `NANOSTL_DEBUG` define for debugging.
@@ -61,4 +70,4 @@ MIT license
 
 ### Third party licenses
 
-* microtest.h : MIT license.
+* Catch 1.x : MIT license.
