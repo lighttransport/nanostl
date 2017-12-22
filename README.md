@@ -26,9 +26,10 @@ Be careful! Not all C++ STL functions are supported for each module.
 
 ## Supported compilers
 
-Even though NanoSTL can be compilable with old and various C++ compilers, at least following compilers works well.
+Even though NanoSTL should be compilable with older and various C++ compilers, at least following compilers works well.
 
 * gcc 4.4.7+
+  * NanoSTL itself can be compilable with gcc 4.2.4(fails to compile Catch unit test code)
 * clang 3.4+
 
 ## Types
