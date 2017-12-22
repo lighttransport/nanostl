@@ -973,11 +973,11 @@ namespace Catch {
             if( decomposedExpression != CATCH_NULL ) {
                 decomposedExpression->reconstructExpression( reconstructedExpression );
                 if( parenthesized ) {
-                    reconstructedExpression.insert( 0, 1, '(' );
+                    reconstructedExpression.insert( size_t(0), 1, '(' );
                     reconstructedExpression.append( 1, ')' );
                 }
                 if( negated ) {
-                    reconstructedExpression.insert( 0, 1, '!' );
+                    reconstructedExpression.insert( size_t(0), 1, '!' );
                 }
                 decomposedExpression = CATCH_NULL;
             }
@@ -6244,7 +6244,7 @@ namespace TestCaseTracking {
         }
         void addNextFilters( std::vector<std::string> const& filters ) {
             if( filters.size() > 1 )
-                m_filters.insert( m_filters.end(), ++filters.begin(), filters.end() );
+                m_filters.insert( m_filters.end(), filters.begin()+1, filters.end() );
         }
     };
 
