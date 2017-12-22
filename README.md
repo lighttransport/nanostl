@@ -1,5 +1,7 @@
 # NanoSTL, a portable and small subset of C++ STL.
 
+[![Build Status](https://travis-ci.org/lighttransport/nanostl.svg?branch=master)](https://travis-ci.org/lighttransport/nanostl)
+
 NanoSTL is good for using STL-like feature in your C++ application and C++-like JIT compiler.
 
 NanoSTL is portable, it should run well on many environments including Windows, Linux, macOS, x86, ARM, SPARC, etc.
