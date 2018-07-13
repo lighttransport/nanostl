@@ -44,6 +44,9 @@
 #if __has_warning("-Wundefined-func-template")
 #pragma clang diagnostic ignored "-Wundefined-func-template"
 #endif
+#if __has_warning("-Wzero-as-null-pointer-constant")
+#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
 #endif
 
 //#include "microtest.h"

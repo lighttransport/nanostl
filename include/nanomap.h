@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2017 Light Transport Entertainment, Inc.
+ * Copyright (c) 2017-2018 Light Transport Entertainment, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,13 @@
 //
 
 namespace nanostl {
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#if __has_warning("-Wzero-as-null-pointer-constant")
+#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
+#endif
 
 typedef unsigned int priority_type;
 
@@ -204,6 +211,10 @@ class map {
   }
 #endif
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }  // namespace nanostl
 

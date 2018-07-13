@@ -33,6 +33,13 @@ namespace nanostl {
 
 typedef unsigned long long size_type;
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#if __has_warning("-Wzero-as-null-pointer-constant")
+#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
+#endif
+
 ///
 /// allocator class implementaion without libc function
 ///
@@ -67,6 +74,10 @@ class allocator {
 
  private:
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }  // namespace nanostl
 
