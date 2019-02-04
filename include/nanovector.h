@@ -38,6 +38,9 @@ namespace nanostl {
 #if __has_warning("-Wzero-as-null-pointer-constant")
 #pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
 #endif
+#if __has_warning("-Wunused-template")
+#pragma clang diagnostic ignored "-Wunused-template"
+#endif
 #endif
 
 template <class T>
