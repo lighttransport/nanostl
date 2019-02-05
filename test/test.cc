@@ -5,12 +5,14 @@
 #include "nanomap.h"
 #include "nanoutility.h"
 #include "nanosstream.h"
+#include "nanomath.h"
 
 #include <cstdlib>
 #include <cstdio>
 //#include <cstdint>
 #include <cassert>
 #include <iostream>
+#include <cmath>
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -173,6 +175,17 @@ TEST_CASE("LimitsTest", "[limits]") {
 
   REQUIRE(nanostl::numeric_limits<double>::min() == Approx(std::numeric_limits<double>::min()) );
   REQUIRE(nanostl::numeric_limits<double>::max() == Approx(std::numeric_limits<double>::max()) );
+
+}
+
+TEST_CASE("MathTest", "[math]") {
+
+  REQUIRE(nanostl::ceil(2.0f) == Approx(std::ceil(2.0f)));
+  REQUIRE(nanostl::ceil(1.2f) == Approx(std::ceil(1.2f)));
+  REQUIRE(nanostl::ceil(-2.5f) == Approx(std::ceil(-2.5f)));
+  REQUIRE(nanostl::ceil(0.0f) == Approx(std::ceil(0.0f)));
+  REQUIRE(nanostl::ceil(-0.0f) == Approx(std::ceil(-0.0f)));
+  REQUIRE(nanostl::ceil(-1.0f) == Approx(std::ceil(-1.0f)));
 
 }
 

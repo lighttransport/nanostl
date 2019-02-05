@@ -20,6 +20,10 @@ Be careful! Not all C++ STL functions are supported for each module.
 * limits
 * map
 
+### Limited support
+
+* math(cmath like, but does not provide full precision)
+
 ## Supported architectures
 
 * 64bit and 32bit machine.
