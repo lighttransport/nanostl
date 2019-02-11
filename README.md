@@ -20,6 +20,10 @@ Be careful! Not all C++ STL functions are supported for each module.
 * limits
 * map
 
+### Limited support
+
+* math : Approximate math functions.
+
 ## Supported architectures
 
 * 64bit and 32bit machine.
@@ -73,4 +77,4 @@ MIT license
 
 ### Third party licenses
 
-* Catch 1.x : MIT license.
+* acutest : MIT license.
