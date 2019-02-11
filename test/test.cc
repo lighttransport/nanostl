@@ -187,6 +187,11 @@ TEST_CASE("MathTest", "[math]") {
   REQUIRE(nanostl::ceil(-0.0f) == Approx(std::ceil(-0.0f)));
   REQUIRE(nanostl::ceil(-1.0f) == Approx(std::ceil(-1.0f)));
 
+  REQUIRE(nanostl::fabs(1.22f) == Approx(std::fabs(1.22f)));
+  REQUIRE(nanostl::fabs(-1.0f) == Approx(std::fabs(-1.0f)));
+  REQUIRE(nanostl::fabs(0.0f) == Approx(std::fabs(0.0f)));
+  REQUIRE(nanostl::fabs(-0.0f) == Approx(std::fabs(-0.0f)));
+
 }
 
 //TEST_MAIN();
