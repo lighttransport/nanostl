@@ -8,7 +8,7 @@
 
 #include <cstdlib>
 #include <cstdio>
-#include <cstdint>
+//#include <cstdint>
 #include <cassert>
 #include <iostream>
 
@@ -46,7 +46,10 @@
 #endif
 #endif
 
-#include "microtest.h"
+//#include "microtest.h"
+#define CATCH_CONFIG_MAIN
+//#define CATCH_CONFIG_NO_CPP11
+#include "catch.hpp"
 
 #ifdef __clang__
 #pragma clang diagnostic pop
@@ -60,6 +63,7 @@
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #endif
 
+#if 0
 #define FLOAT_EQ(a, b) { \
   float val0 = (a); \
   float val1 = (b); \
@@ -71,15 +75,20 @@
   double val1 = (b); \
   ASSERT_EQ(*(reinterpret_cast<unsigned long long *>(&val0)), *(reinterpret_cast<unsigned long long *>(&val1))); \
 }
+#endif
 
-TEST(VectorTest) {
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
+
+TEST_CASE("VectorTest", "[vector]") {
 
   nanostl::vector<int> v;
 
-  ASSERT_TRUE(v.empty());
+  REQUIRE(v.empty() == true);
 
   v.push_back(1);
-  ASSERT_FALSE(v.empty());
+  REQUIRE(v.empty() == false);
 
   v.push_back(2);
   v.push_back(3);
@@ -87,81 +96,81 @@ TEST(VectorTest) {
   v.push_back(5);
 
 
-  ASSERT_EQ(v.at(0), 1);
-  ASSERT_EQ(v[1], 2);
-  ASSERT_EQ(v[2], 3);
-  ASSERT_EQ(v[3], 4);
-  ASSERT_EQ(v[4], 5);
+  REQUIRE(v.at(0) == 1);
+  REQUIRE(v[1] == 2);
+  REQUIRE(v[2] == 3);
+  REQUIRE(v[3] == 4);
+  REQUIRE(v[4] == 5);
 
   v.resize(3);
-  ASSERT_EQ(v.at(0), 1);
-  ASSERT_EQ(v[1], 2);
-  ASSERT_EQ(v[2], 3);
+  REQUIRE(v.at(0) == 1);
+  REQUIRE(v[1] == 2);
+  REQUIRE(v[2] == 3);
 
   v.resize(6);
-  ASSERT_EQ(v.at(0), 1);
-  ASSERT_EQ(v[1], 2);
-  ASSERT_EQ(v[2], 3);
+  REQUIRE(v.at(0) == 1);
+  REQUIRE(v[1] == 2);
+  REQUIRE(v[2] == 3);
 
   v.erase(v.begin());
-  ASSERT_EQ(v.at(0), 2);
+  REQUIRE(v.at(0) == 2);
 
   nanostl::vector<int> y;
   y.swap(v);
 
-  ASSERT_EQ(y.at(0), 2);
-  ASSERT_EQ(v.size(), 0);
+  REQUIRE(y.at(0) == 2);
+  REQUIRE(v.size() == 0);
 }
 
-TEST(AlgorithmTest) {
+TEST_CASE("AlgorithmTest", "[algorithm]") {
 
-  ASSERT_EQ(nanostl::min(1, 2), 1);
-  ASSERT_EQ(nanostl::max(1, 2), 2);
+  REQUIRE(nanostl::min(1, 2) == 1);
+  REQUIRE(nanostl::max(1, 2) == 2);
 
 }
 
-TEST(StringTest) {
+TEST_CASE("StringTest", "[string]") {
 
   nanostl::string s("a");
 
-  ASSERT_FALSE(s.empty());
+  REQUIRE(s.empty() == false);
 
-  ASSERT_EQ(s[0], 'a');
-  ASSERT_EQ(s.at(0), 'a');
+  REQUIRE(s[0] == 'a');
+  REQUIRE(s.at(0) == 'a');
 
 }
 
-TEST(MapTest) {
+TEST_CASE("MapTest", "[map]") {
 
   nanostl::map<nanostl::string, int> m;
 
-  ASSERT_TRUE(m.empty());
+  REQUIRE(m.empty());
 
   m["a"] = 1;
   m["b"] = 2;
 
-  ASSERT_EQ(m["a"], 1);
-  ASSERT_EQ(m["b"], 2);
+  REQUIRE(m["a"] == 1);
+  REQUIRE(m["b"] == 2);
 
 }
 
-TEST(LimitsTest) {
+TEST_CASE("LimitsTest", "[limits]") {
 
-  ASSERT_EQ(nanostl::numeric_limits<char>::min(),  std::numeric_limits<char>::min());
-  ASSERT_EQ(nanostl::numeric_limits<char>::max(),  std::numeric_limits<char>::max());
+  REQUIRE(nanostl::numeric_limits<char>::min() == std::numeric_limits<char>::min());
+  REQUIRE(nanostl::numeric_limits<char>::max() == std::numeric_limits<char>::max());
 
-  ASSERT_EQ(nanostl::numeric_limits<short>::min(),  std::numeric_limits<short>::min());
-  ASSERT_EQ(nanostl::numeric_limits<short>::max(),  std::numeric_limits<short>::max());
+  REQUIRE(nanostl::numeric_limits<short>::min() ==  std::numeric_limits<short>::min());
+  REQUIRE(nanostl::numeric_limits<short>::max() ==  std::numeric_limits<short>::max());
 
-  ASSERT_EQ(nanostl::numeric_limits<int>::min(), std::numeric_limits<int>::min());
-  ASSERT_EQ(nanostl::numeric_limits<int>::max(), std::numeric_limits<int>::max());
+  REQUIRE(nanostl::numeric_limits<int>::min() == std::numeric_limits<int>::min());
+  REQUIRE(nanostl::numeric_limits<int>::max() == std::numeric_limits<int>::max());
 
-  FLOAT_EQ(nanostl::numeric_limits<float>::min(),  std::numeric_limits<float>::min());
-  FLOAT_EQ(nanostl::numeric_limits<float>::max(),  std::numeric_limits<float>::max());
+  REQUIRE(double(nanostl::numeric_limits<float>::min()) == Approx(double(std::numeric_limits<float>::min())) );
+  REQUIRE(double(nanostl::numeric_limits<float>::max()) == Approx(double(std::numeric_limits<float>::max())) );
 
-  DOUBLE_EQ(nanostl::numeric_limits<double>::min(),  std::numeric_limits<double>::min());
-  DOUBLE_EQ(nanostl::numeric_limits<double>::max(),  std::numeric_limits<double>::max());
+  REQUIRE(nanostl::numeric_limits<double>::min() == Approx(std::numeric_limits<double>::min()) );
+  REQUIRE(nanostl::numeric_limits<double>::max() == Approx(std::numeric_limits<double>::max()) );
 
 }
 
-TEST_MAIN();
+//TEST_MAIN();

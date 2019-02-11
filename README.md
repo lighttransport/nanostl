@@ -1,6 +1,10 @@
-# NanoSTL, a small subset of C++ STL.
+# NanoSTL, a portable and small subset of C++ STL.
+
+[![Build Status](https://travis-ci.org/lighttransport/nanostl.svg?branch=master)](https://travis-ci.org/lighttransport/nanostl)
 
 NanoSTL is good for using STL-like feature in your C++ application and C++-like JIT compiler.
+
+NanoSTL is portable, it should run well on many environments including Windows, Linux, macOS, x86, ARM, SPARC, etc.
 
 ## Status
 
@@ -22,9 +26,10 @@ Be careful! Not all C++ STL functions are supported for each module.
 
 ## Supported compilers
 
-Even though NanoSTL can be compilable with old and various C++ compilers, at least following compilers works well.
+Even though NanoSTL should be compilable with older and various C++ compilers, at least following compilers works well.
 
-* gcc 4.8.x+
+* gcc 4.4.7+
+  * NanoSTL itself can be compilable with gcc 4.2.4(fails to compile Catch unit test code)
 * clang 3.4+
 
 ## Types
@@ -51,6 +56,13 @@ Even though NanoSTL can be compilable with old and various C++ compilers, at lea
 
 ## Developer note
 
+### Generate single header file.
+
+```
+$ cd scripts
+$ python generateSingleHeader.py
+```
+
 ### Debugging 
 
 Use `NANOSTL_DEBUG` define for debugging.
@@ -61,4 +73,4 @@ MIT license
 
 ### Third party licenses
 
-* microtest.h : MIT license.
+* Catch 1.x : MIT license.
