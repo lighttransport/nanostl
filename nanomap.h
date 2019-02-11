@@ -95,6 +95,8 @@ class map {
     bool isEnd() const { return p == 0; }
   };
 
+  typedef const iterator const_iterator;
+
   map() { root = 0; }
 
   ~map() { __delete(root); }
