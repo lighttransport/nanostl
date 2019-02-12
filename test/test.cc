@@ -172,6 +172,6 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-map", test_map},
              {"test-algorithm", test_algorithm},
              {"test-math", test_math},
-             {NULL, NULL}};
+             {nullptr, nullptr}};
 
 // TEST_MAIN();
