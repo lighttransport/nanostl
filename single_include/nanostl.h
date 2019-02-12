@@ -1,6 +1,6 @@
 /*
  * NanoSTL v0.1.0
- * Generated: 2017-12-22 13:38:35.969917
+ * Generated: 2019-02-13 02:39:07.058478
  * ----------------------------------------------------------
  * The MIT License (MIT)
  *
@@ -45,6 +45,13 @@ namespace nanostl {
 
 typedef unsigned long long size_type;
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#if __has_warning("-Wzero-as-null-pointer-constant")
+#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
+#endif
+
 ///
 /// allocator class implementaion without libc function
 ///
@@ -80,6 +87,10 @@ class allocator {
  private:
 };
 
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 }  // namespace nanostl
 
 #ifdef NANOSTL_DEBUG
@@ -87,6 +98,16 @@ class allocator {
 #endif
 
 namespace nanostl {
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#if __has_warning("-Wzero-as-null-pointer-constant")
+#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
+#if __has_warning("-Wunused-template")
+#pragma clang diagnostic ignored "-Wunused-template"
+#endif
+#endif
 
 template <class T>
 static void __swap(T& x, T& y) {
@@ -238,6 +259,10 @@ inline vector<T, Allocator>& vector<T, Allocator>::operator=(
   }
   return *this;
 }
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }  // namespace nanostl
 
@@ -419,6 +444,13 @@ inline pair<T1, T2> make_pair(const T1& x, const T2& y) {
 
 namespace nanostl {
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#if __has_warning("-Wzero-as-null-pointer-constant")
+#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
+#endif
+
 typedef unsigned int priority_type;
 
 // https://ja.wikipedia.org/wiki/Xorshift
@@ -586,6 +618,10 @@ class map {
 #endif
 };
 
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 }  // namespace nanostl
 
 // #included from: nanolimits.h
@@ -595,6 +631,51 @@ class map {
 #ifdef NANOSTL_DEBUG
 #include <iostream>
 #endif
+
+// #included from: nanocommon.h
+
+#define NANOSTL_COMMON_H_
+
+namespace nanostl {
+
+// In BigEndian architecture, must define NANOSTL_BIG_ENDIAN explicitly at the
+// moment.
+
+namespace {
+
+union IEEE754Float {
+  float f;
+  struct {
+#if defined(NANOSTL_BIG_ENDIAN)
+    unsigned int sign : 1;
+    unsigned int exponent : 8;
+    unsigned int mantissa : 23;
+#else
+    unsigned int mantissa : 23;
+    unsigned int exponent : 8;
+    unsigned int sign : 1;
+#endif
+  } bits;
+};
+
+union IEEE754Double {
+  double f;
+  struct {
+#if defined(NANOSTL_BIG_ENDIAN)
+    unsigned long long sign : 1;
+    unsigned long long exponent : 11;
+    unsigned long long mantissa : 52;
+#else
+    unsigned long long mantissa : 52;
+    unsigned long long exponent : 11;
+    unsigned long long sign : 1;
+#endif
+  } bits;
+};
+
+} // namespace
+
+}  // namespace nanostl
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -669,6 +750,14 @@ struct numeric_limits<float> {
     return (3.402823466e+38F);
   }  // 0x1.fffffep127f
   static inline float epsilon(void) { return (1.19209290E-07f); }  // 0x1.0p-23f
+  static inline float infinity(void) {
+    IEEE754Float flt;
+    flt.bits.exponent = 255;
+    flt.bits.mantissa = 0;
+    flt.bits.sign = 0;
+
+    return flt.f;
+  }
 };
 
 template <>
@@ -682,6 +771,15 @@ struct numeric_limits<double> {
   static inline double epsilon(void) {
     return (2.2204460492503131e-016);
   }  // 0x1.0p-52
+
+  static inline double infinity(void) {
+    IEEE754Double flt;
+    flt.bits.exponent = 2047;
+    flt.bits.mantissa = 0;
+    flt.bits.sign = 0;
+
+    return flt.f;
+  }
 };
 
 }  // namespace nanostl
@@ -704,6 +802,128 @@ const T& min(const T& a, const T& b) {
 template <class T>
 const T& max(const T& a, const T& b) {
   return !(b > a) ? a : b;
+}
+
+}  // namespace nanostl
+
+// #included from: nanomath.h
+
+#define NANOSTL_MATH_H_
+
+//
+// Implements some <cmath> functionality.
+// WARNING: Implementation is approximation. Not IEEE-754 compatible, it looses
+// some precision, don't work well depending on CPU's rounding-mode.
+//
+
+namespace nanostl {
+
+template <typename T>
+static T fabs(T num) {
+  // TODO(LTE): Handle +0 and -0 case correctly.
+  // TODO(LTE): Handle +inf and -inf case correctly.
+
+  if (num < static_cast<T>(0)) {
+    return -num;
+  }
+
+  return num;
+}
+
+// https://stackoverflow.com/questions/8377412/ceil-function-how-can-we-implement-it-ourselves
+// FIXME(LTE): Won't work for large float value.
+template <typename T>
+inline T ceil(T num) {
+  int inum = int(num);
+  T diff = num - static_cast<T>(inum);
+  if (fabs(diff) < nanostl::numeric_limits<T>::epsilon()) {
+    return inum;
+  }
+
+  if (num > static_cast<T>(0)) {
+    return inum + 1;
+  } else {
+    return inum;
+  }
+}
+
+// https://stackoverflow.com/questions/5122993/floor-int-function-implementaton
+template <typename T>
+inline T floor(T x) {
+  if (x >= static_cast<T>(0)) {
+    return int(x);
+  } else {
+    int y = int(x);
+    if (fabs(static_cast<T>(y) - x) < nanostl::numeric_limits<T>::epsilon()) {
+      return y;
+    } else {
+      return y - 1;
+    }
+  }
+}
+
+inline bool isfinite(float x) {
+  IEEE754Float flt;
+  flt.f = x;
+
+  bool ret = flt.bits.exponent != 255;
+  return ret;
+}
+
+inline bool isfinite(double x) {
+  IEEE754Double flt;
+  flt.f = x;
+
+  bool ret = flt.bits.exponent != 2047;
+  return ret;
+}
+
+inline bool isinf(float x) {
+  IEEE754Float flt;
+  flt.f = x;
+
+  bool ret = (flt.bits.exponent == 255) && (flt.bits.mantissa == 0);
+  return ret;
+}
+
+inline bool isinf(double x) {
+  IEEE754Double flt;
+  flt.f = x;
+
+  bool ret = (flt.bits.exponent == 2047) && (flt.bits.mantissa == 0);
+  return ret;
+}
+
+inline bool isnan(float x) {
+  IEEE754Float flt;
+  flt.f = x;
+
+  bool ret = (flt.bits.exponent == 255) && (flt.bits.mantissa != 0);
+  return ret;
+}
+
+inline bool isnan(double x) {
+  IEEE754Double flt;
+  flt.f = x;
+
+  bool ret = (flt.bits.exponent == 2047) && (flt.bits.mantissa != 0);
+  return ret;
+}
+
+inline bool isnormal(float x) {
+  IEEE754Float flt;
+  flt.f = x;
+
+  bool ret = (flt.bits.exponent != 0) && (flt.bits.exponent != 255);
+  return ret;
+}
+
+inline bool isnormal(double x) {
+  IEEE754Double flt;
+  flt.f = x;
+
+  bool ret = (flt.bits.exponent != 0) && (flt.bits.exponent != 2047);
+  return ret;
 }
 
 }  // namespace nanostl

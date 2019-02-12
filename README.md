@@ -22,7 +22,7 @@ Be careful! Not all C++ STL functions are supported for each module.
 
 ### Limited support
 
-* math : Approximate math functions.
+* math : Approximate math functions. May not be IEEE-754 compliant and not work well for processor's rounding mode.
 
 ## Supported architectures
 
@@ -38,12 +38,18 @@ Even though NanoSTL should be compilable with older and various C++ compilers, a
 
 ## Types
 
-* char : 8bit
+NanoSTL assumes following type definitions.
+
+* char : 8bit(NOTE: unsigned is default for some ARM compiler. Use `signed char` if you want signed 8bit type)
 * short : 16bit
 * int : 32bit
 * long long : 64bit
 * float : 32bit IEEE754 floating point.
 * double : 64bit IEEE754 floating point.
+
+## Compiler macros
+
+* `NANOSTL_BIG_ENDIAN` Set endianness to big endian. Considering to support various compilers, user must explicitly specify endianness to the compiler. Default is little endian.
 
 ## Differences compared to (full featured) C++ STL
 

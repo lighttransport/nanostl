@@ -164,6 +164,64 @@ static void test_math(void) {
   TEST_CHECK(float_equals(nanostl::floor(-3.0f / 2.0f), std::floor(-3.0f / 2.0f)));
   TEST_CHECK(float_equals(nanostl::floor(-4.0f / 2.0f), std::floor(-4.0f / 2.0f)));
   TEST_CHECK(float_equals(nanostl::floor(-5.0f / 2.0f), std::floor(-5.0f / 2.0f)));
+
+  TEST_CHECK(nanostl::isfinite(std::numeric_limits<float>::max()) == std::isfinite(std::numeric_limits<float>::max()));
+  TEST_CHECK(nanostl::isfinite(std::numeric_limits<float>::infinity()) == std::isfinite(std::numeric_limits<float>::infinity()));
+
+
+  TEST_CHECK(nanostl::isnan(0.0f) == false);
+  TEST_CHECK(nanostl::isnan(1.0f) == false);
+  TEST_CHECK(nanostl::isnan(0.0f/0.0f) == true);
+
+  const float pos_inf_f = std::numeric_limits<float>::infinity();
+  const double pos_inf_d = std::numeric_limits<double>::infinity();
+  const float nan_f = 0.0f / 0.0f;
+  const double nan_d = 0.0 / 0.0;
+  const float denormal_f = nanostl::numeric_limits<float>::min() / 2.0f;
+  const double denormal_d = nanostl::numeric_limits<double>::min() / 2.0;
+
+  TEST_CHECK(nanostl::isfinite(nan_f) == false);
+  TEST_CHECK(nanostl::isfinite(pos_inf_f) == false);
+  TEST_CHECK(nanostl::isfinite(0.0f) == true);
+  TEST_CHECK(nanostl::isfinite(denormal_f) == true);
+
+  TEST_CHECK(nanostl::isfinite(nan_d) == false);
+  TEST_CHECK(nanostl::isfinite(pos_inf_d) == false);
+  TEST_CHECK(nanostl::isfinite(0.0) == true);
+  TEST_CHECK(nanostl::isfinite(denormal_d) == true);
+
+  TEST_CHECK(nanostl::isinf(nan_f) == false);
+  TEST_CHECK(nanostl::isinf(1.0f) == false);
+  TEST_CHECK(nanostl::isinf(pos_inf_f) == true);
+
+  TEST_CHECK(nanostl::isinf(nan_d) == false);
+  TEST_CHECK(nanostl::isinf(1.0) == false);
+  TEST_CHECK(nanostl::isinf(pos_inf_d) == true);
+
+  TEST_CHECK(nanostl::isnan(nan_f) == true);
+  TEST_CHECK(nanostl::isnan(pos_inf_f) == false);
+  TEST_CHECK(nanostl::isnan(denormal_f) == false);
+  TEST_CHECK(nanostl::isnan(0.0f) == false);
+  TEST_CHECK(nanostl::isnan(pos_inf_f - pos_inf_f) == true);
+
+  TEST_CHECK(nanostl::isnan(nan_d) == true);
+  TEST_CHECK(nanostl::isnan(pos_inf_d) == false);
+  TEST_CHECK(nanostl::isnan(denormal_d) == false);
+  TEST_CHECK(nanostl::isnan(0.0) == false);
+  TEST_CHECK(nanostl::isnan(pos_inf_d - pos_inf_d) == true);
+
+  TEST_CHECK(std::isnormal(nan_f) == false);
+  TEST_CHECK(std::isnormal(pos_inf_f) == false);
+  TEST_CHECK(std::isnormal(0.0f) == false);
+  TEST_CHECK(std::isnormal(1.0f) == true);
+  TEST_CHECK(std::isnormal(nanostl::numeric_limits<float>::min() / 2.0f) == false);
+
+  TEST_CHECK(std::isnormal(nan_d) == false);
+  TEST_CHECK(std::isnormal(pos_inf_d) == false);
+  TEST_CHECK(std::isnormal(0.0) == false);
+  TEST_CHECK(std::isnormal(1.0) == true);
+  TEST_CHECK(std::isnormal(nanostl::numeric_limits<double>::min() / 2.0) == false);
+
 }
 
 TEST_LIST = {{"test-vector", test_vector},

@@ -29,10 +29,13 @@
 #include <iostream>
 #endif
 
+#include "nanocommon.h"
+
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wc99-extensions"
 #endif
+
 
 namespace nanostl {
 
@@ -102,6 +105,14 @@ struct numeric_limits<float> {
     return (3.402823466e+38F);
   }  // 0x1.fffffep127f
   static inline float epsilon(void) { return (1.19209290E-07f); }  // 0x1.0p-23f
+  static inline float infinity(void) {
+    IEEE754Float flt;
+    flt.bits.exponent = 255;
+    flt.bits.mantissa = 0;
+    flt.bits.sign = 0;
+
+    return flt.f;
+  }
 };
 
 template <>
@@ -115,6 +126,15 @@ struct numeric_limits<double> {
   static inline double epsilon(void) {
     return (2.2204460492503131e-016);
   }  // 0x1.0p-52
+
+  static inline double infinity(void) {
+    IEEE754Double flt;
+    flt.bits.exponent = 2047;
+    flt.bits.mantissa = 0;
+    flt.bits.sign = 0;
+
+    return flt.f;
+  }
 };
 
 }  // namespace nanostl
