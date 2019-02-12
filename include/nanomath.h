@@ -27,25 +27,57 @@
 
 #include "nanolimits.h"
 
+//
+// Implements some <cmath> functionality.
+// WARNING: Implementation is approximation. Not IEEE-754 compatible, it looses some precision, don't work well depending on CPU's rounding-mode.
+//
+
 namespace nanostl {
+
+template<typename T>
+static T fabs(T num)
+{
+  // TODO(LTE): Handle +0 and -0 case correctly.
+  // TODO(LTE): Handle +inf and -inf case correctly.
+
+  if (num < static_cast<T>(0)) {
+    return -num;
+  }
+
+  return num;
+}
 
 // https://stackoverflow.com/questions/8377412/ceil-function-how-can-we-implement-it-ourselves
 // FIXME(LTE): Won't work for large float value.
 template<typename T>
-static T ceil(T num)
+inline T ceil(T num)
 {
     int inum = int(num);
     T diff = num - static_cast<T>(inum);
-    if ((-nanostl::numeric_limits<T>::epsilon() < diff) &&
-        (diff < nanostl::numeric_limits<T>::epsilon())) {
+    if (fabs(diff) < nanostl::numeric_limits<T>::epsilon()) {
         return inum;
     }
 
-    if (inum > 0) {
+    if (num > static_cast<T>(0)) {
       return inum + 1;
     } else {
       return inum;
     }
+}
+
+// https://stackoverflow.com/questions/5122993/floor-int-function-implementaton
+template<typename T>
+inline T floor(T x) {
+  if (x >= static_cast<T>(0)) {
+    return int(x);
+  } else {
+    int y = int(x);
+    if (fabs(static_cast<T>(y) - x) < nanostl::numeric_limits<T>::epsilon()) {
+      return y;
+    } else {
+      return y - 1;
+    }
+  }
 }
 
 }  // namespace nanostl

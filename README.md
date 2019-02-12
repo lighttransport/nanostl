@@ -22,7 +22,7 @@ Be careful! Not all C++ STL functions are supported for each module.
 
 ### Limited support
 
-* math(cmath like, but does not provide full precision)
+* math : Approximate math functions.
 
 ## Supported architectures
 
@@ -77,4 +77,4 @@ MIT license
 
 ### Third party licenses
 
-* Catch 1.x : MIT license.
+* acutest : MIT license.
