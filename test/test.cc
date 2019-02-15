@@ -42,6 +42,42 @@ static bool float_equals(T x, T y) {
   return false;
 }
 
+// Ulps based equality check
+// TODO(LTE): Consider nan, inf case.
+// Based on this blog post: https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
+template <typename T>
+static bool float_equals_by_ulps(T x, T y, int max_ulp_diffs) {
+  nanostl::IEEE754Float flt_x;
+  nanostl::IEEE754Float flt_y;
+
+  flt_x.f = x;
+  flt_y.f = y;
+
+  if (flt_x.bits.sign != flt_y.bits.sign) {
+    // Check if +0/-0 
+    if ((flt_x.bits.exponent == 0) &&
+        (flt_y.bits.exponent == 0) &&
+        (flt_x.bits.mantissa == 0) &&
+        (flt_y.bits.mantissa == 0)) {
+      return true;
+    }
+    
+    return false;
+  }
+  
+  int diff = int(flt_x.ui) - int(flt_y.ui);
+  
+  // abs
+  diff = (diff < 0) ? -diff : diff;
+  //std::cout << "diff_ulps = " << diff << std::endl;
+
+  if (diff <= max_ulp_diffs) {
+    return true;
+  }
+
+  return false;
+}
+
 static void test_vector(void) {
   nanostl::vector<int> v;
 
@@ -134,8 +170,7 @@ static void test_limits(void) {
                           std::numeric_limits<double>::max()));
 }
 
-static void test_math(void) {
-
+static void test_math_func1(void) {
   TEST_CHECK(float_equals(nanostl::ceil(0.0f), std::ceil(0.0f)));
 
   TEST_CHECK(float_equals(nanostl::ceil(1.0f / 2.0f), std::ceil(1.0f / 2.0f)));
@@ -145,33 +180,51 @@ static void test_math(void) {
 
   TEST_CHECK(float_equals(nanostl::ceil(0.0f / 2.0f), std::ceil(0.0f / 2.0f)));
 
-  TEST_CHECK(float_equals(nanostl::ceil(-1.0f / 2.0f), std::ceil(-1.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::ceil(-2.0f / 2.0f), std::ceil(-2.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::ceil(-3.0f / 2.0f), std::ceil(-3.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::ceil(-4.0f / 2.0f), std::ceil(-4.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::ceil(-5.0f / 2.0f), std::ceil(-5.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::ceil(-1.0f / 2.0f), std::ceil(-1.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::ceil(-2.0f / 2.0f), std::ceil(-2.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::ceil(-3.0f / 2.0f), std::ceil(-3.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::ceil(-4.0f / 2.0f), std::ceil(-4.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::ceil(-5.0f / 2.0f), std::ceil(-5.0f / 2.0f)));
 
-  TEST_CHECK(float_equals(nanostl::floor(0.0f / 2.0f), std::floor(0.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::floor(1.0f / 2.0f), std::floor(1.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::floor(2.0f / 2.0f), std::floor(2.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::floor(3.0f / 2.0f), std::floor(3.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::floor(4.0f / 2.0f), std::floor(4.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::floor(5.0f / 2.0f), std::floor(5.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::floor(0.0f / 2.0f), std::floor(0.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::floor(1.0f / 2.0f), std::floor(1.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::floor(2.0f / 2.0f), std::floor(2.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::floor(3.0f / 2.0f), std::floor(3.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::floor(4.0f / 2.0f), std::floor(4.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::floor(5.0f / 2.0f), std::floor(5.0f / 2.0f)));
 
-  TEST_CHECK(float_equals(nanostl::floor(-0.0f / 2.0f), std::floor(-0.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::floor(-1.0f / 2.0f), std::floor(-1.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::floor(-2.0f / 2.0f), std::floor(-2.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::floor(-3.0f / 2.0f), std::floor(-3.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::floor(-4.0f / 2.0f), std::floor(-4.0f / 2.0f)));
-  TEST_CHECK(float_equals(nanostl::floor(-5.0f / 2.0f), std::floor(-5.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::floor(-0.0f / 2.0f), std::floor(-0.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::floor(-1.0f / 2.0f), std::floor(-1.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::floor(-2.0f / 2.0f), std::floor(-2.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::floor(-3.0f / 2.0f), std::floor(-3.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::floor(-4.0f / 2.0f), std::floor(-4.0f / 2.0f)));
+  TEST_CHECK(
+      float_equals(nanostl::floor(-5.0f / 2.0f), std::floor(-5.0f / 2.0f)));
 
-  TEST_CHECK(nanostl::isfinite(std::numeric_limits<float>::max()) == std::isfinite(std::numeric_limits<float>::max()));
-  TEST_CHECK(nanostl::isfinite(std::numeric_limits<float>::infinity()) == std::isfinite(std::numeric_limits<float>::infinity()));
-
+  TEST_CHECK(nanostl::isfinite(std::numeric_limits<float>::max()) ==
+             std::isfinite(std::numeric_limits<float>::max()));
+  TEST_CHECK(nanostl::isfinite(std::numeric_limits<float>::infinity()) ==
+             std::isfinite(std::numeric_limits<float>::infinity()));
 
   TEST_CHECK(nanostl::isnan(0.0f) == false);
   TEST_CHECK(nanostl::isnan(1.0f) == false);
-  TEST_CHECK(nanostl::isnan(0.0f/0.0f) == true);
+  TEST_CHECK(nanostl::isnan(0.0f / 0.0f) == true);
 
   const float pos_inf_f = std::numeric_limits<float>::infinity();
   const double pos_inf_d = std::numeric_limits<double>::infinity();
@@ -214,14 +267,36 @@ static void test_math(void) {
   TEST_CHECK(std::isnormal(pos_inf_f) == false);
   TEST_CHECK(std::isnormal(0.0f) == false);
   TEST_CHECK(std::isnormal(1.0f) == true);
-  TEST_CHECK(std::isnormal(nanostl::numeric_limits<float>::min() / 2.0f) == false);
+  TEST_CHECK(std::isnormal(nanostl::numeric_limits<float>::min() / 2.0f) ==
+             false);
 
   TEST_CHECK(std::isnormal(nan_d) == false);
   TEST_CHECK(std::isnormal(pos_inf_d) == false);
   TEST_CHECK(std::isnormal(0.0) == false);
   TEST_CHECK(std::isnormal(1.0) == true);
-  TEST_CHECK(std::isnormal(nanostl::numeric_limits<double>::min() / 2.0) == false);
+  TEST_CHECK(std::isnormal(nanostl::numeric_limits<double>::min() / 2.0) ==
+             false);
+}
 
+static void test_math_exp(void) {
+
+  TEST_CHECK(float_equals(nanostl::exp(0.0f), std::exp(0.0f)));
+  TEST_CHECK(float_equals_by_ulps(nanostl::exp(1.0f), std::exp(1.0f), 24));
+  TEST_CHECK(float_equals_by_ulps(nanostl::exp(0.1f), std::exp(0.1f), 10));
+  TEST_CHECK(float_equals_by_ulps(nanostl::exp(0.01f), std::exp(0.01f), 0));
+  TEST_CHECK(float_equals_by_ulps(nanostl::exp(3.33f), std::exp(3.33f), 86));
+  TEST_CHECK(float_equals_by_ulps(nanostl::exp(13.33f), std::exp(13.33f), 29));
+}
+
+static void test_math_log(void) {
+  //std::cout << "log(0) = " << nanostl::log(0.0f) << std::endl;
+
+  TEST_CHECK(float_equals_by_ulps(nanostl::log(0.0f), std::log(0.0f), 1));
+  TEST_CHECK(float_equals_by_ulps(nanostl::log(1.0f), std::log(1.0f), 0));
+  TEST_CHECK(float_equals_by_ulps(nanostl::log(0.1f), std::log(0.1f), 0));
+  TEST_CHECK(float_equals_by_ulps(nanostl::log(0.01f), std::log(0.01f), 0));
+  TEST_CHECK(float_equals_by_ulps(nanostl::log(3.33f), std::log(3.33f), 1));
+  TEST_CHECK(float_equals_by_ulps(nanostl::log(13.33f), std::log(13.33f), 0));
 }
 
 TEST_LIST = {{"test-vector", test_vector},
@@ -229,7 +304,9 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-string", test_string},
              {"test-map", test_map},
              {"test-algorithm", test_algorithm},
-             {"test-math", test_math},
+             {"test-math-func1", test_math_func1},
+             {"test-math-exp", test_math_exp},
+             {"test-math-log", test_math_log},
              {nullptr, nullptr}};
 
 // TEST_MAIN();

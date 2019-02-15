@@ -24,6 +24,18 @@ Be careful! Not all C++ STL functions are supported for each module.
 
 * math : Approximate math functions. May not be IEEE-754 compliant and not work well for processor's rounding mode.
 
+#### math functions
+
+* [x] isnan
+* [x] isinf
+* [x] isfinite
+* [x] isnormal
+* [x] exp(float)
+* [x] log(float)
+* [ ] sin(float)
+* [ ] cos(float)
+* [ ] erf(float)
+
 ## Supported architectures
 
 * 64bit and 32bit machine.
@@ -59,10 +71,11 @@ NanoSTL assumes following type definitions.
 ## TODO
 
 * [ ] CUDA NVRTC support
-* [ ] isnan/isinf/isfinite support
-* [ ] Unit tests
+* [x] isnan/isinf/isfinite support
+* [x] Unit tests
 * [ ] Multithread support
 * [ ] Backport of some C++11 features(e.g. `unordered_map`)
+* [ ] Replace oiio math functions so that we can have clean MIT licensed code.
 
 ## Developer note
 
@@ -79,8 +92,9 @@ Use `NANOSTL_DEBUG` define for debugging.
 
 ## Licenss
 
-MIT license
+MIT license. Some functions in nanomath is licenced under modified BSD license.
 
 ### Third party licenses
 
 * acutest : MIT license.
+* faster math functions: Some math functions implemented in nanomath is grabbed from OpenImageIO fmath.h, which is licensed under modified BSD license. https://github.com/OpenImageIO/oiio/

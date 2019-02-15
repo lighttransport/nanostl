@@ -34,6 +34,7 @@ namespace {
 
 union IEEE754Float {
   float f;
+  unsigned int ui;
   struct {
 #if defined(NANOSTL_BIG_ENDIAN)
     unsigned int sign : 1;
@@ -49,6 +50,7 @@ union IEEE754Float {
 
 union IEEE754Double {
   double f;
+  unsigned long long ull;
   struct {
 #if defined(NANOSTL_BIG_ENDIAN)
     unsigned long long sign : 1;
