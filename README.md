@@ -22,7 +22,7 @@ Be careful! Not all C++ STL functions are supported for each module.
 
 ### Limited support
 
-* math : Approximate math functions. May not be IEEE-754 compliant and not work well for processor's rounding mode.
+* math : Approximate math functions. Please keep in mind this is basically not be IEEE-754 compliant and does not consier a processor's rounding mode.
 
 #### math functions
 
@@ -76,6 +76,7 @@ NanoSTL assumes following type definitions.
 * [ ] Multithread support
 * [ ] Backport of some C++11 features(e.g. `unordered_map`)
 * [ ] Replace oiio math functions so that we can have clean MIT licensed code.
+* [ ] BFLOAT16 support.
 
 ## Developer note
 
@@ -86,7 +87,7 @@ $ cd scripts
 $ python generateSingleHeader.py
 ```
 
-### Debugging 
+### Debugging
 
 Use `NANOSTL_DEBUG` define for debugging.
 
