@@ -83,8 +83,7 @@ NanoSTL assumes following type definitions.
 ### Generate single header file.
 
 ```
-$ cd scripts
-$ python generateSingleHeader.py
+$ python scripts/generateSingleHeader.py
 ```
 
 ### Debugging

@@ -13,6 +13,9 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <vector>
+
+#include "nanoiterator.h"
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -54,19 +57,19 @@ static bool float_equals_by_ulps(T x, T y, int max_ulp_diffs) {
   flt_y.f = y;
 
   if (flt_x.bits.sign != flt_y.bits.sign) {
-    // Check if +0/-0 
+    // Check if +0/-0
     if ((flt_x.bits.exponent == 0) &&
         (flt_y.bits.exponent == 0) &&
         (flt_x.bits.mantissa == 0) &&
         (flt_y.bits.mantissa == 0)) {
       return true;
     }
-    
+
     return false;
   }
-  
+
   int diff = int(flt_x.ui) - int(flt_y.ui);
-  
+
   // abs
   diff = (diff < 0) ? -diff : diff;
   //std::cout << "diff_ulps = " << diff << std::endl;
@@ -117,9 +120,36 @@ static void test_vector(void) {
   TEST_CHECK(v.size() == 0);
 }
 
+static void test_iterator(void) {
+  nanostl::vector<float> arr;
+  arr.push_back(0.3f);
+  arr.push_back(1.3f);
+  arr.push_back(0.2f);
+  arr.push_back(2.2f);
+
+  std::vector<float> arr1;
+  arr1.push_back(0.3f);
+  arr1.push_back(1.3f);
+  arr1.push_back(0.2f);
+  arr1.push_back(2.2f);
+
+  TEST_CHECK(nanostl::distance(arr.end(), arr.begin()) == std::distance(arr1.end(), arr1.begin()));
+
+}
+
 static void test_algorithm(void) {
   TEST_CHECK(nanostl::min(1, 2) == 1);
   TEST_CHECK(nanostl::max(1, 2) == 2);
+
+  {
+    nanostl::vector<float> arr;
+    arr.push_back(0.3f);
+    arr.push_back(1.3f);
+    arr.push_back(0.2f);
+
+    nanostl::vector<float>::iterator ret = nanostl::max_element(arr.begin(), arr.end());
+    TEST_CHECK(nanostl::distance(arr.begin(), ret) == 1);
+  }
 }
 
 static void test_string(void) {
@@ -304,6 +334,7 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-string", test_string},
              {"test-map", test_map},
              {"test-algorithm", test_algorithm},
+             {"test-iterator", test_iterator},
              {"test-math-func1", test_math_func1},
              {"test-math-exp", test_math_exp},
              {"test-math-log", test_math_log},

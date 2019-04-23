@@ -1,6 +1,6 @@
-# Based on scripts in Catch unit test framework.
- 
 #!/usr/bin/env python
+
+# Based on scripts in Catch unit test framework.
 
 from __future__ import print_function
 
@@ -12,7 +12,7 @@ import string
 
 #from scriptCommon import catchPath
 
-basePath = "../"
+basePath = "./"
 
 def generate(v):
     includesParser = re.compile( r'\s*#\s*include\s*"(.*)"' )
@@ -27,7 +27,6 @@ def generate(v):
     seenHeaders = set([])
     rootPath = os.path.join( basePath, 'include/' )
     outputPath = os.path.join( basePath, 'single_include/nanostl.h' )
-
 
     globals = {
         'ifdefs'     :  0,
@@ -51,6 +50,7 @@ def generate(v):
             out.write( line )
 
     def parseFile( path, filename ):
+        print('parseFile', path, filename)
         f = open( path + filename, 'r' )
         blanks = 0
         for line in f:
@@ -94,7 +94,7 @@ def generate(v):
     out.write( " * The MIT License (MIT)\n" )
     out.write( " *\n" )
     out.write( " * Copyright (c) 2017 Light Transport Entertainment, Inc.\n" )
-    out.write( " *\n") 
+    out.write( " *\n")
     out.write( " * Permission is hereby granted, free of charge, to any person obtaining a copy\n" )
     out.write( " * of this software and associated documentation files (the \"Software\"), to deal\n" )
     out.write( " * in the Software without restriction, including without limitation the rights\n" )
