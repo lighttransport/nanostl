@@ -30,10 +30,16 @@ Be careful! Not all C++ STL functions are supported for each module.
 * [x] isinf
 * [x] isfinite
 * [x] isnormal
+* [x] fabs(float)
+* [x] copysign(float)
+* [x] sqrt(float)
 * [x] exp(float)
+* [x] pow(float)
 * [x] log(float)
-* [ ] sin(float)
-* [ ] cos(float)
+* [x] log10(float)
+* [x] sin(float)
+* [x] cos(float)
+* [x] tanh(float)
 * [ ] erf(float)
 
 ## Supported architectures
@@ -76,7 +82,7 @@ NanoSTL assumes following type definitions.
 * [ ] Multithread support
 * [ ] Backport of some C++11 features(e.g. `unordered_map`)
 * [ ] Replace oiio math functions so that we can have clean MIT licensed code.
-* [ ] BFLOAT16 support.
+* [ ] FLOAT16 and BFLOAT16 support.
 
 ## Developer note
 

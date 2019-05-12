@@ -45,6 +45,15 @@ static bool float_equals(T x, T y) {
   return false;
 }
 
+template <typename T>
+static bool float_equals_by_eps(T x, T y, T eps) {
+  if (nanostl::fabs(x - y) < eps) {
+    return true;
+  }
+
+  return false;
+}
+
 // Ulps based equality check
 // TODO(LTE): Consider nan, inf case.
 // Based on this blog post: https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
@@ -72,7 +81,7 @@ static bool float_equals_by_ulps(T x, T y, int max_ulp_diffs) {
 
   // abs
   diff = (diff < 0) ? -diff : diff;
-  //std::cout << "diff_ulps = " << diff << std::endl;
+  std::cout << "x: " << x << ", y: " << y << ", diff_ulps = " << diff << std::endl;
 
   if (diff <= max_ulp_diffs) {
     return true;
@@ -329,6 +338,48 @@ static void test_math_log(void) {
   TEST_CHECK(float_equals_by_ulps(nanostl::log(13.33f), std::log(13.33f), 0));
 }
 
+static void test_math_log10(void) {
+  //std::cout << "log10(0) = " << nanostl::log10(0.0f) << std::endl;
+
+  TEST_CHECK(float_equals_by_ulps(nanostl::log10(0.0f), std::log10(0.0f), 1));
+  TEST_CHECK(float_equals_by_ulps(nanostl::log10(1.0f), std::log10(1.0f), 0));
+  TEST_CHECK(float_equals_by_ulps(nanostl::log10(0.1f), std::log10(0.1f), 0));
+  TEST_CHECK(float_equals_by_ulps(nanostl::log10(0.01f), std::log10(0.01f), 0));
+  TEST_CHECK(float_equals_by_ulps(nanostl::log10(3.33f), std::log10(3.33f), 1));
+  TEST_CHECK(float_equals_by_ulps(nanostl::log10(13.33f), std::log10(13.33f), 1));
+}
+
+static void test_math_cos(void) {
+  TEST_CHECK(float_equals_by_ulps(nanostl::cos(0.0f), std::cos(0.0f), 1));
+  TEST_CHECK(float_equals_by_ulps(nanostl::cos(1.0f), std::cos(1.0f), 0));
+  TEST_CHECK(float_equals_by_ulps(nanostl::cos(0.1f), std::cos(0.1f), 0));
+  TEST_CHECK(float_equals_by_ulps(nanostl::cos(0.01f), std::cos(0.01f), 0));
+  TEST_CHECK(float_equals_by_ulps(nanostl::cos(3.33f), std::cos(3.33f), 1));
+  TEST_CHECK(float_equals_by_ulps(nanostl::cos(13.33f), std::cos(13.33f), 0));
+}
+
+static void test_math_sin(void) {
+  TEST_CHECK(float_equals_by_ulps(nanostl::sin(0.0f), std::sin(0.0f), 1));
+  TEST_CHECK(float_equals_by_ulps(nanostl::sin(1.0f), std::sin(1.0f), 0));
+  TEST_CHECK(float_equals_by_ulps(nanostl::sin(0.1f), std::sin(0.1f), 3));
+  TEST_CHECK(float_equals_by_ulps(nanostl::sin(0.01f), std::sin(0.01f), 10));
+  TEST_CHECK(float_equals_by_ulps(nanostl::sin(3.33f), std::sin(3.33f), 2));
+  TEST_CHECK(float_equals_by_ulps(nanostl::sin(13.33f), std::sin(13.33f), 0));
+}
+
+static void test_math_sqrt(void) {
+
+  TEST_CHECK(float_equals_by_ulps(nanostl::sqrt(0.0f), std::sqrt(0.0f), 0));
+  TEST_CHECK(float_equals_by_ulps(nanostl::sqrt(1.0f), std::sqrt(1.0f), 0));
+
+  // TODO(LTE): Use tighter eps bounds.
+  TEST_CHECK(float_equals_by_eps(nanostl::sqrt(0.01f), std::sqrt(0.01f), 0.01f));
+  TEST_CHECK(float_equals_by_eps(nanostl::sqrt(0.1f), std::sqrt(0.1f), 0.001f));
+  TEST_CHECK(float_equals_by_eps(nanostl::sqrt(0.01f), std::sqrt(0.01f), 0.001f));
+  TEST_CHECK(float_equals_by_eps(nanostl::sqrt(3.33f), std::sqrt(3.33f), 0.0001f));
+  TEST_CHECK(float_equals_by_eps(nanostl::sqrt(13.33f), std::sqrt(13.33f), 0.0001f));
+}
+
 TEST_LIST = {{"test-vector", test_vector},
              {"test-limits", test_limits},
              {"test-string", test_string},
@@ -338,6 +389,10 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-math-func1", test_math_func1},
              {"test-math-exp", test_math_exp},
              {"test-math-log", test_math_log},
+             {"test-math-log10", test_math_log10},
+             {"test-math-sin", test_math_sin},
+             {"test-math-cos", test_math_cos},
+             {"test-math-sqrt", test_math_sqrt},
              {nullptr, nullptr}};
 
 // TEST_MAIN();
