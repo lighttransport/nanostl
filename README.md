@@ -6,6 +6,8 @@ NanoSTL is good for using STL-like feature in your C++ application and C++-like 
 
 NanoSTL is portable, it should run well on many environments including Windows, Linux, macOS, x86, ARM, SPARC, etc.
 
+NanoSTL should work well on C++11 compiler or later. C++03 would also work well.
+
 ## Status
 
 Eearly testing stage. Not ready for the production use.
@@ -32,7 +34,7 @@ Be careful! Not all C++ STL functions are supported for each module.
 * [x] isnormal
 * [x] fabs(float)
 * [x] copysign(float)
-* [x] sqrt(float)
+* [x] sqrt(float) Approximated.
 * [x] exp(float)
 * [x] pow(float)
 * [x] log(float)
@@ -40,15 +42,20 @@ Be careful! Not all C++ STL functions are supported for each module.
 * [x] sin(float)
 * [x] cos(float)
 * [x] tanh(float)
-* [ ] erf(float)
+* [x] cbrt(float)
+* [x] erf(float)
+* [x] erfc(float)
+* [x] ierf(float)
 
 ## Supported architectures
 
 * 64bit and 32bit machine.
+* Big endian and little endian
+  * Some math functions may not run on big endian machine.
 
 ## Supported compilers
 
-Even though NanoSTL should be compilable with older and various C++ compilers, at least following compilers works well.
+Even though NanoSTL should be compilable with older and various C++ compilers, at least following compilers shold work well.
 
 * gcc 4.4.7+
   * NanoSTL itself can be compilable with gcc 4.2.4(fails to compile Catch unit test code)
@@ -90,6 +97,16 @@ NanoSTL assumes following type definitions.
 
 ```
 $ python scripts/generateSingleHeader.py
+```
+
+### Unit tests
+
+Compiling unit test requires C++11 compiler since unit test uses some C++11 math functions for the reference.
+
+```
+$ cd tests
+$ make
+$ ./test
 ```
 
 ### Debugging

@@ -174,9 +174,7 @@ static inline int FloatToInt(const float f) {
   return flt.i;
 }
 
-
 static inline float sqrt(const float x) {
-
   IEEE754Float flt;
   flt.f = x;
   if ((flt.bits.mantissa == 0) && (flt.bits.exponent == 0)) {
@@ -197,26 +195,26 @@ static inline float sqrt(const float x) {
     return nanostl::numeric_limits<float>::quiet_NaN();
   }
 
-
   // Faster sqrt using Sqrt2 descrived in:
   // https://www.codeproject.com/Articles/69941/Best-Square-Root-Method-Algorithm-Function-Precisi
 
   // TODO(LTE): Consider Big endian machine.
 
-  const float xhalf = 0.5f*x;
+  const float xhalf = 0.5f * x;
 
-  union // get bits for floating value
+  union  // get bits for floating value
   {
     float x;
     int i;
   } u;
   u.x = x;
   u.i = 0x5f3759df - (u.i >> 1);  // gives initial guess y0
-  return x*u.x*(1.5f - xhalf*u.x*u.x);// Newton step, repeating increases accuracy
+  return x * u.x *
+         (1.5f -
+          xhalf * u.x * u.x);  // Newton step, repeating increases accuracy
 }
 
-static inline float copysign(const float x, const float y)
-{
+static inline float copysign(const float x, const float y) {
   IEEE754Float flt_x;
   flt_x.f = x;
 
@@ -284,11 +282,10 @@ static inline float copysign(const float x, const float y)
 static inline float madd(float a, float b, float c) { return a * b + c; }
 
 /// Round to nearest integer, returning as an int.
-static inline int fast_rint (float x) {
-    // emulate rounding by adding/substracting 0.5
-    return static_cast<int>(x + copysign(0.5f, x));
+static inline int fast_rint(float x) {
+  // emulate rounding by adding/substracting 0.5
+  return static_cast<int>(x + copysign(0.5f, x));
 }
-
 
 // TODO(LTE): Generate our own approx function using sollya
 static inline float fast_exp2(const float& xval) {
@@ -374,7 +371,6 @@ static inline float log(const float& x) {
 }
 
 static inline float log10(const float& x) {
-
   IEEE754Float flt;
   flt.f = x;
 
@@ -398,147 +394,228 @@ static inline float log10(const float& x) {
 
 // fast_safe_pow
 static inline float pow(float x, float y) {
-    if (fabs(y) < nanostl::numeric_limits<float>::epsilon()) return 1.0f; // x^0=1
-    if (fabs(x) < nanostl::numeric_limits<float>::epsilon()) return 0.0f; // 0^y=0
-    // be cheap & exact for special case of squaring and identity
-    if (y == 1.0f)
-        return x;
-    if (y == 2.0f) {
-        return nanostl::min (x*x, nanostl::numeric_limits<float>::max());
-    }
-    float sign = 1.0f;
-    if (x < 0) {
-        // if x is negative, only deal with integer powers
-        // powf returns NaN for non-integers, we will return 0 instead
-        int ybits = FloatToInt(y) & 0x7fffffff;
-        if (ybits >= 0x4b800000) {
-            // always even int, keep positive
-        } else if (ybits >= 0x3f800000) {
-            // bigger than 1, check
-            int k = (ybits >> 23) - 127;  // get exponent
-            int j =  ybits >> (23 - k);   // shift out possible fractional bits
-            if ((j << (23 - k)) == ybits) // rebuild number and check for a match
-                sign = IntToFloat(0x3f800000 | (j << 31)); // +1 for even, -1 for odd
-            else
-                return 0.0f; // not integer
-        } else {
-            return 0.0f; // not integer
-        }
-    }
-    return sign * fast_exp2(y * fast_log2(fabs(x)));
-}
-
-static inline float sin (float x) {
-    // very accurate argument reduction from SLEEF
-    // starts failing around x=262000
-    // Results on: [-2pi,2pi]
-    // Examined 2173837240 values of sin: 0.00662760244 avg ulp diff, 2 max ulp, 1.19209e-07 max error
-    int q = fast_rint (x * float(kM_1_PI));
-    float qf = q;
-    x = madd(qf, -0.78515625f*4, x);
-    x = madd(qf, -0.00024187564849853515625f*4, x);
-    x = madd(qf, -3.7747668102383613586e-08f*4, x);
-    x = madd(qf, -1.2816720341285448015e-12f*4, x);
-    x = float(kM_PI_2) - (float(kM_PI_2) - x); // crush denormals
-    float s = x * x;
-    if ((q & 1) != 0) x = -x;
-    // this polynomial approximation has very low error on [-pi/2,+pi/2]
-    // 1.19209e-07 max error in total over [-2pi,+2pi]
-    float u = 2.6083159809786593541503e-06f;
-    u = madd(u, s, -0.0001981069071916863322258f);
-    u = madd(u, s, +0.00833307858556509017944336f);
-    u = madd(u, s, -0.166666597127914428710938f);
-    u = madd(s, u * x, x);
-    // For large x, the argument reduction can fail and the polynomial can be
-    // evaluated with arguments outside the valid internal. Just clamp the bad
-    // values away (setting to 0.0f means no branches need to be generated).
-    if (fabs(u) > 1.0f) u = 0.0f;
-    return u;
-}
-
-static inline float cos (float x) {
-    // same argument reduction as fast_sin
-    int q = fast_rint (x * float(kM_1_PI));
-    float qf = q;
-    x = madd(qf, -0.78515625f*4, x);
-    x = madd(qf, -0.00024187564849853515625f*4, x);
-    x = madd(qf, -3.7747668102383613586e-08f*4, x);
-    x = madd(qf, -1.2816720341285448015e-12f*4, x);
-    x = float(kM_PI_2) - (float(kM_PI_2) - x); // crush denormals
-    float s = x * x;
-    // polynomial from SLEEF's sincosf, max error is
-    // 4.33127e-07 over [-2pi,2pi] (98% of values are "exact")
-    float u = -2.71811842367242206819355e-07f;
-    u = madd(u, s, +2.47990446951007470488548e-05f);
-    u = madd(u, s, -0.00138888787478208541870117f);
-    u = madd(u, s, +0.0416666641831398010253906f);
-    u = madd(u, s, -0.5f);
-    u = madd(u, s, +1.0f);
-    if ((q & 1) != 0) u = -u;
-    if (fabs(u) > 1.0f) u = 0.0f;
-    return u;
-}
-
-// NOTE: this approximation is only valid on [-8192.0,+8192.0], it starts becoming
-// really poor outside of this range because the reciprocal amplifies errors
-static inline float tan (float x) {
-    // derived from SLEEF implementation
-    // note that we cannot apply the "denormal crush" trick everywhere because
-    // we sometimes need to take the reciprocal of the polynomial
-    int q = fast_rint (x * float(2 * kM_1_PI));
-    float qf = q;
-    x = madd(qf, -0.78515625f*2, x);
-    x = madd(qf, -0.00024187564849853515625f*2, x);
-    x = madd(qf, -3.7747668102383613586e-08f*2, x);
-    x = madd(qf, -1.2816720341285448015e-12f*2, x);
-    if ((q & 1) == 0)
-    x = float(kM_PI_4) - (float(kM_PI_4) - x); // crush denormals (only if we aren't inverting the result later)
-    float s = x * x;
-    float u = 0.00927245803177356719970703f;
-    u = madd(u, s, 0.00331984995864331722259521f);
-    u = madd(u, s, 0.0242998078465461730957031f);
-    u = madd(u, s, 0.0534495301544666290283203f);
-    u = madd(u, s, 0.133383005857467651367188f);
-    u = madd(u, s, 0.333331853151321411132812f);
-    u = madd(s, u * x, x);
-    if ((q & 1) != 0) u = -1.0f / u;
-    return u;
-}
-
-static inline float sinh (float x) {
-    float a = fabs(x);
-    if (a > 1.0f) {
-        // Examined 53389559 values of sinh on [1,87.3300018]: 33.6886442 avg ulp diff, 178 max ulp
-        float e = exp(a);
-        return copysign(0.5f * e - 0.5f / e, x);
+  if (fabs(y) < nanostl::numeric_limits<float>::epsilon())
+    return 1.0f;  // x^0=1
+  if (fabs(x) < nanostl::numeric_limits<float>::epsilon())
+    return 0.0f;  // 0^y=0
+  // be cheap & exact for special case of squaring and identity
+  if (y == 1.0f) return x;
+  if (y == 2.0f) {
+    return nanostl::min(x * x, nanostl::numeric_limits<float>::max());
+  }
+  float sign = 1.0f;
+  if (x < 0) {
+    // if x is negative, only deal with integer powers
+    // powf returns NaN for non-integers, we will return 0 instead
+    int ybits = FloatToInt(y) & 0x7fffffff;
+    if (ybits >= 0x4b800000) {
+      // always even int, keep positive
+    } else if (ybits >= 0x3f800000) {
+      // bigger than 1, check
+      int k = (ybits >> 23) - 127;   // get exponent
+      int j = ybits >> (23 - k);     // shift out possible fractional bits
+      if ((j << (23 - k)) == ybits)  // rebuild number and check for a match
+        sign = IntToFloat(0x3f800000 | (j << 31));  // +1 for even, -1 for odd
+      else
+        return 0.0f;  // not integer
     } else {
-        a = 1.0f - (1.0f - a); // crush denorms
-        float a2 = a * a;
-        // degree 7 polynomial generated with sollya
-        // Examined 2130706434 values of sinh on [-1,1]: 1.19209e-07 max error
-        float r = 2.03945513931e-4f;
-        r = madd(r, a2, 8.32990277558e-3f);
-        r = madd(r, a2, 0.1666673421859f);
-        r = madd(r * a, a2, a);
-        return copysign(r, x);
+      return 0.0f;  // not integer
     }
+  }
+  return sign * fast_exp2(y * fast_log2(fabs(x)));
 }
 
-static inline float cosh (float x) {
-    // Examined 2237485550 values of cosh on [-87.3300018,87.3300018]: 1.78256726 avg ulp diff, 178 max ulp
-    float e = exp(fabs(x));
-    return 0.5f * e + 0.5f / e;
+static inline float sin(float x) {
+  // very accurate argument reduction from SLEEF
+  // starts failing around x=262000
+  // Results on: [-2pi,2pi]
+  // Examined 2173837240 values of sin: 0.00662760244 avg ulp diff, 2 max
+  // ulp, 1.19209e-07 max error
+  int q = fast_rint(x * float(kM_1_PI));
+  float qf = q;
+  x = madd(qf, -0.78515625f * 4, x);
+  x = madd(qf, -0.00024187564849853515625f * 4, x);
+  x = madd(qf, -3.7747668102383613586e-08f * 4, x);
+  x = madd(qf, -1.2816720341285448015e-12f * 4, x);
+  x = float(kM_PI_2) - (float(kM_PI_2) - x);  // crush denormals
+  float s = x * x;
+  if ((q & 1) != 0) x = -x;
+  // this polynomial approximation has very low error on [-pi/2,+pi/2]
+  // 1.19209e-07 max error in total over [-2pi,+2pi]
+  float u = 2.6083159809786593541503e-06f;
+  u = madd(u, s, -0.0001981069071916863322258f);
+  u = madd(u, s, +0.00833307858556509017944336f);
+  u = madd(u, s, -0.166666597127914428710938f);
+  u = madd(s, u * x, x);
+  // For large x, the argument reduction can fail and the polynomial can be
+  // evaluated with arguments outside the valid internal. Just clamp the bad
+  // values away (setting to 0.0f means no branches need to be generated).
+  if (fabs(u) > 1.0f) u = 0.0f;
+  return u;
 }
 
-
-
-static inline float tanh (float x) {
-    // Examined 4278190080 values of tanh on [-3.40282347e+38,3.40282347e+38]: 3.12924e-06 max error
-    // NOTE: ulp error is high because of sub-optimal handling around the origin
-    float e = exp(2.0f * fabs(x));
-    return copysign(1 - 2 / (1 + e), x);
+static inline float cos(float x) {
+  // same argument reduction as fast_sin
+  int q = fast_rint(x * float(kM_1_PI));
+  float qf = q;
+  x = madd(qf, -0.78515625f * 4, x);
+  x = madd(qf, -0.00024187564849853515625f * 4, x);
+  x = madd(qf, -3.7747668102383613586e-08f * 4, x);
+  x = madd(qf, -1.2816720341285448015e-12f * 4, x);
+  x = float(kM_PI_2) - (float(kM_PI_2) - x);  // crush denormals
+  float s = x * x;
+  // polynomial from SLEEF's sincosf, max error is
+  // 4.33127e-07 over [-2pi,2pi] (98% of values are "exact")
+  float u = -2.71811842367242206819355e-07f;
+  u = madd(u, s, +2.47990446951007470488548e-05f);
+  u = madd(u, s, -0.00138888787478208541870117f);
+  u = madd(u, s, +0.0416666641831398010253906f);
+  u = madd(u, s, -0.5f);
+  u = madd(u, s, +1.0f);
+  if ((q & 1) != 0) u = -u;
+  if (fabs(u) > 1.0f) u = 0.0f;
+  return u;
 }
 
+// NOTE: this approximation is only valid on [-8192.0,+8192.0], it starts
+// becoming really poor outside of this range because the reciprocal amplifies
+// errors
+static inline float tan(float x) {
+  // derived from SLEEF implementation
+  // note that we cannot apply the "denormal crush" trick everywhere because
+  // we sometimes need to take the reciprocal of the polynomial
+  int q = fast_rint(x * float(2 * kM_1_PI));
+  float qf = q;
+  x = madd(qf, -0.78515625f * 2, x);
+  x = madd(qf, -0.00024187564849853515625f * 2, x);
+  x = madd(qf, -3.7747668102383613586e-08f * 2, x);
+  x = madd(qf, -1.2816720341285448015e-12f * 2, x);
+  if ((q & 1) == 0)
+    x = float(kM_PI_4) -
+        (float(kM_PI_4) -
+         x);  // crush denormals (only if we aren't inverting the result later)
+  float s = x * x;
+  float u = 0.00927245803177356719970703f;
+  u = madd(u, s, 0.00331984995864331722259521f);
+  u = madd(u, s, 0.0242998078465461730957031f);
+  u = madd(u, s, 0.0534495301544666290283203f);
+  u = madd(u, s, 0.133383005857467651367188f);
+  u = madd(u, s, 0.333331853151321411132812f);
+  u = madd(s, u * x, x);
+  if ((q & 1) != 0) u = -1.0f / u;
+  return u;
+}
+
+static inline float sinh(float x) {
+  float a = fabs(x);
+  if (a > 1.0f) {
+    // Examined 53389559 values of sinh on [1,87.3300018]: 33.6886442 avg ulp
+    // diff, 178 max ulp
+    float e = exp(a);
+    return copysign(0.5f * e - 0.5f / e, x);
+  } else {
+    a = 1.0f - (1.0f - a);  // crush denorms
+    float a2 = a * a;
+    // degree 7 polynomial generated with sollya
+    // Examined 2130706434 values of sinh on [-1,1]: 1.19209e-07 max error
+    float r = 2.03945513931e-4f;
+    r = madd(r, a2, 8.32990277558e-3f);
+    r = madd(r, a2, 0.1666673421859f);
+    r = madd(r * a, a2, a);
+    return copysign(r, x);
+  }
+}
+
+static inline float cosh(float x) {
+  // Examined 2237485550 values of cosh on [-87.3300018,87.3300018]: 1.78256726
+  // avg ulp diff, 178 max ulp
+  float e = exp(fabs(x));
+  return 0.5f * e + 0.5f / e;
+}
+
+static inline float tanh(float x) {
+  // Examined 4278190080 values of tanh on
+  // [-3.40282347e+38,3.40282347e+38]: 3.12924e-06 max error NOTE: ulp error is
+  // high because of sub-optimal handling around the origin
+  float e = exp(2.0f * fabs(x));
+  return copysign(1 - 2 / (1 + e), x);
+}
+
+static inline float erf(float x) {
+  // Examined 1082130433 values of erff on [0,4]: 1.93715e-06 max error
+  // Abramowitz and Stegun, 7.1.28
+  const float a1 = 0.0705230784f;
+  const float a2 = 0.0422820123f;
+  const float a3 = 0.0092705272f;
+  const float a4 = 0.0001520143f;
+  const float a5 = 0.0002765672f;
+  const float a6 = 0.0000430638f;
+  const float a = fabs(x);
+  const float b = 1.0f - (1.0f - a);  // crush denormals
+  const float r =
+      madd(madd(madd(madd(madd(madd(a6, b, a5), b, a4), b, a3), b, a2), b, a1),
+           b, 1.0f);
+  const float s = r * r;  // ^2
+  const float t = s * s;  // ^4
+  const float u = t * t;  // ^8
+  const float v = u * u;  // ^16
+  return copysign(1.0f - 1.0f / v, x);
+}
+
+// Fast cube root (performs better that using fast_pow's above with y=1/3)
+static inline float cbrt(float x) {
+  float x0 = fabs(x);
+  // from hacker's delight
+  float a = IntToFloat(0x2a5137a0 + FloatToInt(x0) / 3);  // Initial guess.
+  // Examined 14272478 values of cbrt on
+  // [-9.99999935e-39,9.99999935e-39]: 8.14687e-14 max error Examined 2131958802
+  // values of cbrt on [9.99999935e-39,3.40282347e+38]: 2.46930719 avg ulp diff,
+  // 12 max ulp
+  a = 0.333333333f * (2.0f * a + x0 / (a * a));  // Newton step.
+  a = 0.333333333f * (2.0f * a + x0 / (a * a));  // Newton step again.
+  a = (fabs(x0) < nanostl::numeric_limits<float>::epsilon()) ? 0
+                                                             : a;  // Fix 0 case
+  return copysign(a, x);
+}
+
+static inline float erfc(float x) {
+  // Examined 2164260866 values of erfcf on [-4,4]: 1.90735e-06 max error
+  // ulp histogram:
+  //   0  = 80.30%
+  return 1.0f - erf(x);
+}
+
+static inline float ierf(float x) {
+  // from: Approximating the erfinv function by Mike Giles
+  // to avoid trouble at the limit, clamp input to 1-eps
+  float a = fabs(x);
+  if (a > 0.99999994f) a = 0.99999994f;
+  float w = -log((1.0f - a) * (1.0f + a)), p;
+  if (w < 5.0f) {
+    w = w - 2.5f;
+    p = 2.81022636e-08f;
+    p = madd(p, w, 3.43273939e-07f);
+    p = madd(p, w, -3.5233877e-06f);
+    p = madd(p, w, -4.39150654e-06f);
+    p = madd(p, w, 0.00021858087f);
+    p = madd(p, w, -0.00125372503f);
+    p = madd(p, w, -0.00417768164f);
+    p = madd(p, w, 0.246640727f);
+    p = madd(p, w, 1.50140941f);
+  } else {
+    w = sqrt(w) - 3.0f;
+    p = -0.000200214257f;
+    p = madd(p, w, 0.000100950558f);
+    p = madd(p, w, 0.00134934322f);
+    p = madd(p, w, -0.00367342844f);
+    p = madd(p, w, 0.00573950773f);
+    p = madd(p, w, -0.0076224613f);
+    p = madd(p, w, 0.00943887047f);
+    p = madd(p, w, 1.00167406f);
+    p = madd(p, w, 2.83297682f);
+  }
+  return p * x;
+}
 
 // -- End OIIO fmath.h
 // ----------------------------------------------------------------------------

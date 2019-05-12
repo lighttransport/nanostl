@@ -81,7 +81,7 @@ static bool float_equals_by_ulps(T x, T y, int max_ulp_diffs) {
 
   // abs
   diff = (diff < 0) ? -diff : diff;
-  std::cout << "x: " << x << ", y: " << y << ", diff_ulps = " << diff << std::endl;
+  //std::cout << "x: " << x << ", y: " << y << ", diff_ulps = " << diff << std::endl;
 
   if (diff <= max_ulp_diffs) {
     return true;
@@ -350,11 +350,11 @@ static void test_math_log10(void) {
 }
 
 static void test_math_cos(void) {
-  TEST_CHECK(float_equals_by_ulps(nanostl::cos(0.0f), std::cos(0.0f), 1));
+  TEST_CHECK(float_equals_by_ulps(nanostl::cos(0.0f), std::cos(0.0f), 0));
   TEST_CHECK(float_equals_by_ulps(nanostl::cos(1.0f), std::cos(1.0f), 0));
   TEST_CHECK(float_equals_by_ulps(nanostl::cos(0.1f), std::cos(0.1f), 0));
   TEST_CHECK(float_equals_by_ulps(nanostl::cos(0.01f), std::cos(0.01f), 0));
-  TEST_CHECK(float_equals_by_ulps(nanostl::cos(3.33f), std::cos(3.33f), 1));
+  TEST_CHECK(float_equals_by_ulps(nanostl::cos(3.33f), std::cos(3.33f), 0));
   TEST_CHECK(float_equals_by_ulps(nanostl::cos(13.33f), std::cos(13.33f), 0));
 }
 
@@ -380,6 +380,46 @@ static void test_math_sqrt(void) {
   TEST_CHECK(float_equals_by_eps(nanostl::sqrt(13.33f), std::sqrt(13.33f), 0.0001f));
 }
 
+static void test_math_erf(void) {
+
+  TEST_CHECK(float_equals_by_ulps(nanostl::erf(0.0f), std::erf(0.0f), 0));
+  TEST_CHECK(float_equals_by_ulps(nanostl::erf(1.0f), std::erf(1.0f), 5));
+
+  TEST_CHECK(float_equals_by_ulps(nanostl::erf(3.33f), std::erf(3.33f), 1));
+  TEST_CHECK(float_equals_by_ulps(nanostl::erf(13.33f), std::erf(13.33f), 0));
+
+  // TODO(LTE): Use eps bounds.
+  TEST_CHECK(float_equals_by_ulps(nanostl::erf(0.1f), std::erf(0.1f), 43));
+  TEST_CHECK(float_equals_by_ulps(nanostl::erf(0.01f), std::erf(0.01f), 1043));
+}
+
+static void test_math_erfc(void) {
+
+  TEST_CHECK(float_equals_by_ulps(nanostl::erfc(0.0f), std::erfc(0.0f), 0));
+
+  TEST_CHECK(float_equals_by_ulps(nanostl::erfc(0.1f), std::erfc(0.1f), 5));
+  TEST_CHECK(float_equals_by_ulps(nanostl::erfc(0.01f), std::erfc(0.01f), 16));
+  TEST_CHECK(float_equals_by_ulps(nanostl::erfc(13.33f), std::erfc(13.33f), 0));
+
+  // TODO(LTE): Use eps bounds.
+  TEST_CHECK(float_equals_by_ulps(nanostl::erfc(1.0f), std::erfc(1.0f), 19));
+  TEST_CHECK(float_equals_by_ulps(nanostl::erfc(3.33f), std::erfc(3.33f), 341679));
+}
+
+// ierf is not present in std::math
+//static void test_math_ierf(void) {
+//
+//  TEST_CHECK(float_equals_by_ulps(nanostl::ierf(0.0f), std::ierf(0.0f), 0));
+//  TEST_CHECK(float_equals_by_ulps(nanostl::ierf(1.0f), std::ierf(1.0f), 5));
+//
+//  TEST_CHECK(float_equals_by_ulps(nanostl::ierf(3.33f), std::ierf(3.33f), 1));
+//  TEST_CHECK(float_equals_by_ulps(nanostl::ierf(13.33f), std::ierf(13.33f), 0));
+//
+//  // TODO(LTE): Use eps bounds.
+//  TEST_CHECK(float_equals_by_ulps(nanostl::ierf(0.1f), std::ierf(0.1f), 43));
+//  TEST_CHECK(float_equals_by_ulps(nanostl::ierf(0.01f), std::ierf(0.01f), 1043));
+//}
+
 TEST_LIST = {{"test-vector", test_vector},
              {"test-limits", test_limits},
              {"test-string", test_string},
@@ -393,6 +433,8 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-math-sin", test_math_sin},
              {"test-math-cos", test_math_cos},
              {"test-math-sqrt", test_math_sqrt},
+             {"test-math-erf", test_math_erf},
+             {"test-math-erfc", test_math_erfc},
              {nullptr, nullptr}};
 
 // TEST_MAIN();
