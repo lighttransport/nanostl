@@ -32,5 +32,8 @@ matrix:
 script:
   - export CXX="${CXX}-${COMPILER_VERSION}"
   - cd test
+  - make build
+  - cd build
+  - cmake ..
   - make
-  - ./test
+  - ./test_nanostl
