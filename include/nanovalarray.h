@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2018 Light Transport Entertainment, Inc.
+ * Copyright (c) 2019 Light Transport Entertainment, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,11 @@
  * THE SOFTWARE.
  */
 
-#ifndef NANOSTL_VECTOR_H_
-#define NANOSTL_VECTOR_H_
+#ifndef NANOSTL_VALARRAY_H_
+#define NANOSTL_VALARRAY_H_
 
 #include "nanoallocator.h"
+#include "nanomath.h"
 
 #ifdef NANOSTL_DEBUG
 #include <iostream>
@@ -45,7 +46,7 @@ namespace nanostl {
 
 // TODO(LTE): Support allocator.
 template <class T, class Allocator = nanostl::allocator<T> >
-class vector {
+class valarray {
  public:
   typedef T value_type;
   typedef T& reference;
@@ -56,28 +57,23 @@ class vector {
   typedef const_pointer const_iterator;
   typedef Allocator allocator_type;
 
-  vector() : elements_(0), capacity_(0), size_(0) {}
+  valarray() : elements_(0), capacity_(0), size_(0) {}
 
-  vector(const vector& rhs) {
+  valarray(const valarray& rhs) {
     __initialize();
     assign(rhs.begin(), rhs.end());
   }
 
-  ~vector() {
+  valarray(const size_type n) {
+    __initialize();
+    resize(n);
+  }
+
+  ~valarray() {
     allocator_type allocator;
     if (elements_) {
       allocator.deallocate(elements_, capacity_);
     }
-  }
-
-  reference at(size_type pos) {
-    // TODO(LTE): out-of-range check.
-    return elements_[pos];
-  }
-
-  const_reference at(size_type pos) const {
-    // TODO(LTE): out-of-range check.
-    return elements_[pos];
   }
 
   // No initialized value
@@ -91,7 +87,7 @@ class vector {
       // resizing.
       size_type n = (count > recommended_size()) ? count : recommended_size();
 #ifdef NANOSTL_DEBUG
-      std::cout << "vector::resize: count " << count << ", capacity "
+      std::cout << "valarray::resize: count " << count << ", capacity "
                 << capacity() << ", recommended_size " << recommended_size()
                 << ", n " << n << std::endl;
 #endif
@@ -114,13 +110,6 @@ class vector {
     size_ = count;
   }
 
-  void push_back(const value_type& val) {
-    resize(size() + 1);
-    elements_[size_ - 1] = val;
-  }
-
-  // void push_back(value_type &val); // C++11
-
   bool empty() const { return size_ == 0; }
 
   size_type size() const { return size_; }
@@ -135,8 +124,8 @@ class vector {
 
   pointer data() { return elements_; }
 
-  vector& operator=(const vector& rhs);
-  vector& operator+=(const vector& rhs);
+  valarray& operator=(const valarray& rhs);
+  valarray& operator+=(const valarray& rhs);
 
   inline iterator begin(void) const { return elements_ + 0; }
 
@@ -156,24 +145,31 @@ class vector {
   void assign(InputIterator first, InputIterator last) {
     clear();
     for (; first != last; ++first) {
-      push_back(*first);
+      __push_back(*first);
     }
   }
 
-  void swap(vector& x) {
+  void swap(valarray& x) {
     __swap(elements_, x.elements_);
     __swap(capacity_, x.capacity_);
     __swap(size_, x.size_);
   }
 
  private:
+
   void __initialize() {
-    size_ = 0;
-    capacity_ = 0;
     elements_ = 0;
+    capacity_ = 0;
+    size_ = 0;
   }
 
-  template <class Ty>
+  void __push_back(const value_type& val) {
+    resize(size() + 1);
+    elements_[size_ - 1] = val;
+  }
+
+
+  template<class Ty>
   inline void __swap(Ty& x, Ty& y) {
     Ty c(x);
     x = y;
@@ -192,18 +188,33 @@ class vector {
 };
 
 template <class T, class Allocator>
-inline vector<T, Allocator>& vector<T, Allocator>::operator=(
-    const vector<T, Allocator>& rhs) {
+inline valarray<T, Allocator>& valarray<T, Allocator>::operator=(
+    const valarray<T, Allocator>& rhs) {
   if (this != &rhs) {
     assign(rhs.begin(), rhs.end());
   }
   return *this;
 }
 
+// math functions.
+
+template <class T>
+valarray<T> sin(const valarray<T>& va) {
+  valarray<T> result;
+  result.resize(va.size());
+  for (size_type i = 0; i < va.size(); i++) {
+    result[i] = nanostl::sin(va[i]);
+  }
+
+  return result;
+}
+
+
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
 
+
 }  // namespace nanostl
 
-#endif  // NANOSTL_VECTOR_H_
+#endif  // NANOSTL_VALARRAY_H_

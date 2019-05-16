@@ -6,6 +6,7 @@
 #include "nanostring.h"
 #include "nanoutility.h"
 #include "nanovector.h"
+#include "nanovalarray.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -14,6 +15,7 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include <valarray>
 
 #include "nanoiterator.h"
 
@@ -81,11 +83,11 @@ static bool float_equals_by_ulps(T x, T y, int max_ulp_diffs) {
 
   // abs
   diff = (diff < 0) ? -diff : diff;
-  //std::cout << "x: " << x << ", y: " << y << ", diff_ulps = " << diff << std::endl;
 
   if (diff <= max_ulp_diffs) {
     return true;
   }
+  std::cout << "x: " << x << ", y: " << y << ", diff_ulps = " << diff << std::endl;
 
   return false;
 }
@@ -128,6 +130,46 @@ static void test_vector(void) {
   TEST_CHECK(y.at(0) == 2);
   TEST_CHECK(v.size() == 0);
 }
+
+#if 0
+static void test_valarray(void) {
+  nanostl::valarray<int> v;
+
+  TEST_CHECK(v.empty() == true);
+
+  v.resize(1);
+  v[0] = 2;
+
+  nanostl::valarray<int> y;
+  y.swap(v);
+
+  TEST_CHECK(y[0] == 2);
+  TEST_CHECK(v.size() == 0);
+
+
+  {
+    nanostl::valarray<float> inp(4);
+    inp[0] = 0.1f;
+    inp[1] = 1.0f;
+    inp[2] = 2.2f;
+    inp[3] = 3.11f;
+
+    std::valarray<float> ref(4);
+    ref[0] = 0.1f;
+    ref[1] = 1.0f;
+    ref[2] = 2.2f;
+    ref[3] = 3.11f;
+
+    nanostl::valarray<float> z = nanostl::sin(inp);
+    std::valarray<float> z_ref = std::sin(ref);
+
+    TEST_CHECK(float_equals_by_ulps(z[0], z_ref[0], 3));
+    TEST_CHECK(float_equals_by_ulps(z[1], z_ref[1], 1));
+    TEST_CHECK(float_equals_by_ulps(z[2], z_ref[2], 1));
+    TEST_CHECK(float_equals_by_ulps(z[3], z_ref[3], 9));
+  }
+}
+#endif
 
 static void test_iterator(void) {
   nanostl::vector<float> arr;
@@ -420,6 +462,8 @@ static void test_math_erfc(void) {
 //  TEST_CHECK(float_equals_by_ulps(nanostl::ierf(0.01f), std::ierf(0.01f), 1043));
 //}
 
+extern "C" void test_valarray(void);
+
 TEST_LIST = {{"test-vector", test_vector},
              {"test-limits", test_limits},
              {"test-string", test_string},
@@ -435,6 +479,7 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-math-sqrt", test_math_sqrt},
              {"test-math-erf", test_math_erf},
              {"test-math-erfc", test_math_erfc},
+             {"test-valarray", test_valarray},
              {nullptr, nullptr}};
 
 // TEST_MAIN();

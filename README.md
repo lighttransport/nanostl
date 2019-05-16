@@ -25,6 +25,7 @@ Be careful! Not all C++ STL functions are supported for each module.
 ### Limited support
 
 * math : Approximate math functions. Please keep in mind this is basically not be IEEE-754 compliant and does not consier a processor's rounding mode.
+* valarray
 
 #### math functions
 
@@ -83,6 +84,7 @@ NanoSTL assumes following type definitions.
 
 ## TODO
 
+* [ ] complex type
 * [ ] CUDA NVRTC support
 * [x] isnan/isinf/isfinite support
 * [x] Unit tests
