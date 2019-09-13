@@ -32,7 +32,7 @@ matrix:
 script:
   - export CXX="${CXX}-${COMPILER_VERSION}"
   - cd test
-  - make build
+  - mkdir build
   - cd build
   - cmake ..
   - make
