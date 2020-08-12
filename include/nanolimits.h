@@ -116,6 +116,14 @@ struct numeric_limits<float> {
   static inline float quiet_NaN(void) {
     IEEE754Float flt;
     flt.bits.exponent = 255;
+    flt.bits.mantissa = 1 << 22;
+    flt.bits.sign = 0;
+
+    return flt.f;
+  }
+  static inline float signaling_NaN(void) {
+    IEEE754Float flt;
+    flt.bits.exponent = 255;
     flt.bits.mantissa = 1;
     flt.bits.sign = 0;
 
@@ -145,6 +153,15 @@ struct numeric_limits<double> {
   }
 
   static inline double quiet_NaN(void) {
+    IEEE754Double flt;
+    flt.bits.exponent = 2047;
+    flt.bits.mantissa = 1ull << 51ull;
+    flt.bits.sign = 0;
+
+    return flt.f;
+  }
+
+  static inline double signaling_NaN(void) {
     IEEE754Double flt;
     flt.bits.exponent = 2047;
     flt.bits.mantissa = 1;

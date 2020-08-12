@@ -448,6 +448,28 @@ static void test_math_erfc(void) {
   TEST_CHECK(float_equals_by_ulps(nanostl::erfc(3.33f), std::erfc(3.33f), 341679));
 }
 
+static void test_math_fmin(void) {
+
+  float xn = std::numeric_limits<float>::quiet_NaN();
+  float yn = std::numeric_limits<float>::signaling_NaN();
+
+  float pinf = std::numeric_limits<float>::infinity();
+
+  float x = 1.0f;
+  float y = 2.0f;
+
+  TEST_CHECK(float_equals_by_ulps(nanostl::fmin(x, y), 1.0f, 0));
+
+  // (NaN, inf) -> inf
+  TEST_CHECK(nanostl::isinf(nanostl::fmin(xn, pinf)) == std::isinf(std::fmin(xn, pinf)));
+
+  // (2, NaN) -> 2
+  TEST_CHECK(!nanostl::isnan(nanostl::fmin(y, xn)));
+
+  // (NaN, NaN) -> NaN
+  TEST_CHECK(nanostl::isnan(nanostl::fmin(yn, xn)));
+}
+
 // ierf is not present in std::math
 //static void test_math_ierf(void) {
 //
@@ -479,6 +501,7 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-math-sqrt", test_math_sqrt},
              {"test-math-erf", test_math_erf},
              {"test-math-erfc", test_math_erfc},
+             {"test-math-fmin", test_math_fmin},
              {"test-valarray", test_valarray},
              {nullptr, nullptr}};
 
