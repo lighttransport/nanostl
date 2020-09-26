@@ -245,10 +245,16 @@ static void test_limits(void) {
   TEST_CHECK(float_equals(double(nanostl::numeric_limits<float>::max()),
                           double(std::numeric_limits<float>::max())));
 
+  TEST_CHECK(float_equals(double(nanostl::numeric_limits<float>::denorm_min()),
+                          double(std::numeric_limits<float>::denorm_min())));
+
   TEST_CHECK(float_equals(nanostl::numeric_limits<double>::min(),
                           std::numeric_limits<double>::min()));
   TEST_CHECK(float_equals(nanostl::numeric_limits<double>::max(),
                           std::numeric_limits<double>::max()));
+
+  TEST_CHECK(float_equals(nanostl::numeric_limits<double>::denorm_min(),
+                          std::numeric_limits<double>::denorm_min()));
 }
 
 static void test_math_func1(void) {
@@ -462,6 +468,45 @@ static void test_math_erfc(void) {
 //  TEST_CHECK(float_equals_by_ulps(nanostl::ierf(0.01f), std::ierf(0.01f), 1043));
 //}
 
+static void test_float_nan(void) {
+
+  float qnan = nanostl::numeric_limits<float>::quiet_NaN();
+
+  nanostl::IEEE754Float flt; flt.f = qnan;
+  TEST_CHECK(flt.bits.exponent == 255);
+  TEST_CHECK((flt.bits.mantissa & (1 << 22)));
+
+  float snan = nanostl::numeric_limits<float>::signaling_NaN();
+  flt.f = snan;
+  TEST_CHECK(flt.bits.exponent == 255);
+  TEST_CHECK((flt.bits.mantissa & (1 << 22)) == 0);
+  TEST_CHECK(flt.bits.mantissa != 0);
+
+}
+
+static void test_double_nan(void) {
+
+  double qnan = nanostl::numeric_limits<double>::quiet_NaN();
+
+  nanostl::IEEE754Double flt; flt.f = qnan;
+  TEST_CHECK(flt.bits.exponent == 2047);
+  TEST_CHECK((flt.bits.mantissa & (1ull << 51)) != 0);
+  // qnanbit: 0008000000000000
+
+  //printf("%016llx\n", flt.ull);
+  //printf("%016llx\n", flt.bits.mantissa);
+  //printf("%016llx\n", (1ull << 51));
+  //printf("%016llx\n", flt.bits.mantissa & (1ull << 51));
+
+  double snan = nanostl::numeric_limits<double>::signaling_NaN();
+  flt.f = snan;
+
+  TEST_CHECK(flt.bits.exponent == 2047);
+  TEST_CHECK((flt.bits.mantissa & (1ull << 51)) == 0);
+  TEST_CHECK(flt.bits.mantissa != 0);
+
+}
+
 extern "C" void test_valarray(void);
 
 TEST_LIST = {{"test-vector", test_vector},
@@ -480,6 +525,8 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-math-erf", test_math_erf},
              {"test-math-erfc", test_math_erfc},
              {"test-valarray", test_valarray},
+             {"test-float-nan", test_float_nan},
+             {"test-double-nan", test_double_nan},
              {nullptr, nullptr}};
 
 // TEST_MAIN();

@@ -36,7 +36,6 @@
 #pragma clang diagnostic ignored "-Wc99-extensions"
 #endif
 
-
 namespace nanostl {
 
 template <class T>
@@ -107,6 +106,16 @@ struct numeric_limits<float> {
   static inline float epsilon(void) { return (1.19209290E-07f); }  // 0x1.0p-23f
 
   NANOSTL_HOST_AND_DEVICE_QUAL
+  static inline float denorm_min(void) {
+    IEEE754Float flt;
+    flt.bits.sign = 0;
+    flt.bits.exponent = 0;
+    flt.bits.mantissa = 1;
+
+    return flt.f;
+  }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline float infinity(void) {
     IEEE754Float flt;
     flt.bits.exponent = 255;
@@ -120,7 +129,17 @@ struct numeric_limits<float> {
   static inline float quiet_NaN(void) {
     IEEE754Float flt;
     flt.bits.exponent = 255;
-    flt.bits.mantissa = 1;
+    flt.bits.mantissa = 1 << 22;
+    flt.bits.sign = 0;
+
+    return flt.f;
+  }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
+  static inline float signaling_NaN(void) {
+    IEEE754Float flt;
+    flt.bits.exponent = 255;
+    flt.bits.mantissa = 1;  // Set LSB at the moment
     flt.bits.sign = 0;
 
     return flt.f;
@@ -140,6 +159,16 @@ struct numeric_limits<double> {
   }  // 0x1.0p-52
 
   NANOSTL_HOST_AND_DEVICE_QUAL
+  static inline double denorm_min(void) {
+    IEEE754Double flt;
+    flt.bits.sign = 0;
+    flt.bits.exponent = 0;
+    flt.bits.mantissa = 1;
+
+    return flt.f;
+  }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline double infinity(void) {
     IEEE754Double flt;
     flt.bits.exponent = 2047;
@@ -153,7 +182,7 @@ struct numeric_limits<double> {
   static inline double quiet_NaN(void) {
     IEEE754Double flt;
     flt.bits.exponent = 2047;
-    flt.bits.mantissa = 1;
+    flt.bits.mantissa = 1ull << 51;
     flt.bits.sign = 0;
 
     return flt.f;
@@ -163,7 +192,7 @@ struct numeric_limits<double> {
   static inline double signaling_NaN(void) {
     IEEE754Double flt;
     flt.bits.exponent = 2047;
-    flt.bits.mantissa = 1;
+    flt.bits.mantissa = 1;  // Set LSB at the moment
     flt.bits.sign = 0;
 
     return flt.f;
