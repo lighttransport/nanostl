@@ -1,3 +1,9 @@
+#ifdef _MSC_VER
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#endif
+
 #include "nanoalgorithm.h"
 #include "nanolimits.h"
 #include "nanomap.h"
@@ -311,12 +317,12 @@ static void test_math_func1(void) {
 
   TEST_CHECK(nanostl::isnan(0.0f) == false);
   TEST_CHECK(nanostl::isnan(1.0f) == false);
-  TEST_CHECK(nanostl::isnan(0.0f / 0.0f) == true);
+  TEST_CHECK(nanostl::isnan(std::numeric_limits<float>::quiet_NaN()) == true);
 
   const float pos_inf_f = std::numeric_limits<float>::infinity();
   const double pos_inf_d = std::numeric_limits<double>::infinity();
-  const float nan_f = 0.0f / 0.0f;
-  const double nan_d = 0.0 / 0.0;
+  const float nan_f = std::numeric_limits<float>::quiet_NaN();
+  const double nan_d = std::numeric_limits<double>::quiet_NaN();
   const float denormal_f = nanostl::numeric_limits<float>::min() / 2.0f;
   const double denormal_d = nanostl::numeric_limits<double>::min() / 2.0;
 
@@ -454,6 +460,28 @@ static void test_math_erfc(void) {
   TEST_CHECK(float_equals_by_ulps(nanostl::erfc(3.33f), std::erfc(3.33f), 341679));
 }
 
+static void test_math_fmin(void) {
+
+  float xn = std::numeric_limits<float>::quiet_NaN();
+  float yn = std::numeric_limits<float>::signaling_NaN();
+
+  float pinf = std::numeric_limits<float>::infinity();
+
+  float x = 1.0f;
+  float y = 2.0f;
+
+  TEST_CHECK(float_equals_by_ulps(nanostl::fmin(x, y), 1.0f, 0));
+
+  // (NaN, inf) -> inf
+  TEST_CHECK(nanostl::isinf(nanostl::fmin(xn, pinf)) == std::isinf(std::fmin(xn, pinf)));
+
+  // (2, NaN) -> 2
+  TEST_CHECK(!nanostl::isnan(nanostl::fmin(y, xn)));
+
+  // (NaN, NaN) -> NaN
+  TEST_CHECK(nanostl::isnan(nanostl::fmin(yn, xn)));
+}
+
 // ierf is not present in std::math
 //static void test_math_ierf(void) {
 //
@@ -524,6 +552,7 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-math-sqrt", test_math_sqrt},
              {"test-math-erf", test_math_erf},
              {"test-math-erfc", test_math_erfc},
+             {"test-math-fmin", test_math_fmin},
              {"test-valarray", test_valarray},
              {"test-float-nan", test_float_nan},
              {"test-double-nan", test_double_nan},
