@@ -93,7 +93,7 @@ def generate(v):
     out.write( " * ----------------------------------------------------------\n" )
     out.write( " * The MIT License (MIT)\n" )
     out.write( " *\n" )
-    out.write( " * Copyright (c) 2017 Light Transport Entertainment, Inc.\n" )
+    out.write( " * Copyright (c) 2017-2020 Light Transport Entertainment, Inc.\n" )
     out.write( " *\n")
     out.write( " * Permission is hereby granted, free of charge, to any person obtaining a copy\n" )
     out.write( " * of this software and associated documentation files (the \"Software\"), to deal\n" )

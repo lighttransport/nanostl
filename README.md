@@ -12,15 +12,20 @@ NanoSTL should work well on C++11 compiler or later. C++03 would also work well.
 
 Eearly testing stage. Not ready for the production use.
 
-## Supported features
+## Features
 
-Be careful! Not all C++ STL functions are supported for each module.
+* Experimental CUDA support. You can use NanoSTL on device functions.
+  * See `sandbox/cuda/`
+
+## Supported features
 
 * vector
 * string
 * algorithm
 * limits
 * map
+
+Be careful! Not all C++ STL functions are supported for each module.
 
 ### Limited support
 
@@ -53,6 +58,7 @@ Be careful! Not all C++ STL functions are supported for each module.
 * 64bit and 32bit machine.
 * Big endian and little endian
   * Some math functions may not run on big endian machine.
+* CUDA device.
 
 ## Supported compilers
 

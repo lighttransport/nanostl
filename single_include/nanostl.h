@@ -1,10 +1,10 @@
 /*
  * NanoSTL v0.1.0
- * Generated: 2019-05-11 22:03:44.495430
+ * Generated: 2020-09-26 18:19:52.346385
  * ----------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2017 Light Transport Entertainment, Inc.
+ * Copyright (c) 2017-2020 Light Transport Entertainment, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,12 +33,73 @@
 
 #define NANOSTL_VECTOR_H_
 
+// #included from: nanocommon.h
+
+#define NANOSTL_COMMON_H_
+
+#ifdef __CUDACC__
+#define NANOSTL_DEVICE_QUAL __device__
+#define NANOSTL_HOST_QUAL __host__
+#define NANOSTL_HOST_AND_DEVICE_QUAL __host__ __device__
+#else
+#define NANOSTL_DEVICE_QUAL
+#define NANOSTL_HOST_QUAL
+#define NANOSTL_HOST_AND_DEVICE_QUAL
+#endif
+
+namespace nanostl {
+
+// In BigEndian architecture, must define NANOSTL_BIG_ENDIAN explicitly at the
+// moment.
+
+namespace {
+
+union IEEE754Float {
+  float f;
+  unsigned int ui;
+  int i;
+  struct {
+#if defined(NANOSTL_BIG_ENDIAN)
+    unsigned int sign : 1;
+    unsigned int exponent : 8;
+    unsigned int mantissa : 23;
+#else
+    unsigned int mantissa : 23;
+    unsigned int exponent : 8;
+    unsigned int sign : 1;
+#endif
+  } bits;
+};
+
+union IEEE754Double {
+  double f;
+  unsigned long long ull;
+  long long ll;
+  struct {
+#if defined(NANOSTL_BIG_ENDIAN)
+    unsigned long long sign : 1;
+    unsigned long long exponent : 11;
+    unsigned long long mantissa : 52;
+#else
+    unsigned long long mantissa : 52;
+    unsigned long long exponent : 11;
+    unsigned long long sign : 1;
+#endif
+  } bits;
+};
+
+} // namespace
+
+}  // namespace nanostl
+
 // #included from: nanoallocator.h
 
 #define NANOSTL_ALLOCATOR_H_
 
 #ifdef NANOSTL_DEBUG
+#if !defined(__CUDACC__)
 #include <iostream>
+#endif
 #endif
 
 namespace nanostl {
@@ -64,22 +125,26 @@ class allocator {
   typedef T& reference;
   typedef const T& const_reference;
 
-  allocator() {}
+  NANOSTL_HOST_AND_DEVICE_QUAL allocator() {}
 
-  T* allocate(size_type n, const void* hint = 0) {
+  NANOSTL_HOST_AND_DEVICE_QUAL T* allocate(size_type n, const void* hint = 0) {
     (void)hint;  // Ignore `hint' for a while.
     if (n < 1) {
       return 0;
     }
 
 #ifdef NANOSTL_DEBUG
+#if defined(__CUDACC__)
+    printf("allocator::allocate: %u\n", n);
+#else
     std::cerr << "allocator::allocate: n " << n << std::endl;
+#endif
 #endif
 
     return new T[n];
   }
 
-  void deallocate(T* p, size_type n) {
+  NANOSTL_HOST_AND_DEVICE_QUAL void deallocate(T* p, size_type n) {
     (void)n;
     delete[] p;
   }
@@ -109,13 +174,6 @@ namespace nanostl {
 #endif
 #endif
 
-template <class T>
-static void __swap(T& x, T& y) {
-  T c(x);
-  x = y;
-  y = c;
-}
-
 // TODO(LTE): Support allocator.
 template <class T, class Allocator = nanostl::allocator<T> >
 class vector {
@@ -129,14 +187,14 @@ class vector {
   typedef const_pointer const_iterator;
   typedef Allocator allocator_type;
 
-  vector() : elements_(0), capacity_(0), size_(0) {}
+  NANOSTL_HOST_AND_DEVICE_QUAL vector() : elements_(0), capacity_(0), size_(0) {}
 
-  vector(const vector& rhs) {
-    clear();
+  NANOSTL_HOST_AND_DEVICE_QUAL vector(const vector& rhs) {
+    __initialize();
     assign(rhs.begin(), rhs.end());
   }
 
-  ~vector() {
+  NANOSTL_HOST_AND_DEVICE_QUAL ~vector() {
     allocator_type allocator;
     if (elements_) {
       allocator.deallocate(elements_, capacity_);
@@ -153,8 +211,7 @@ class vector {
     return elements_[pos];
   }
 
-  // No initialized value
-  void resize(size_type count) {
+  NANOSTL_HOST_AND_DEVICE_QUAL void resize(size_type count) {
     if (count < 1) {
       return;
     }
@@ -187,29 +244,29 @@ class vector {
     size_ = count;
   }
 
-  void push_back(const value_type& val) {
+  NANOSTL_HOST_AND_DEVICE_QUAL void push_back(const value_type& val) {
     resize(size() + 1);
     elements_[size_ - 1] = val;
   }
 
   // void push_back(value_type &val); // C++11
 
-  bool empty() const { return size_ == 0; }
+  NANOSTL_HOST_AND_DEVICE_QUAL bool empty() const { return size_ == 0; }
 
-  size_type size() const { return size_; }
+  NANOSTL_HOST_AND_DEVICE_QUAL size_type size() const { return size_; }
 
-  void clear() { size_ = 0; }
+  NANOSTL_HOST_AND_DEVICE_QUAL void clear() { size_ = 0; }
 
-  size_type capacity() const { return capacity_; }
+  NANOSTL_HOST_AND_DEVICE_QUAL size_type capacity() const { return capacity_; }
 
-  reference operator[](size_type pos) { return elements_[pos]; }
+  NANOSTL_HOST_AND_DEVICE_QUAL reference operator[](size_type pos) { return elements_[pos]; }
 
-  const_reference operator[](size_type pos) const { return elements_[pos]; }
+  NANOSTL_HOST_AND_DEVICE_QUAL const_reference operator[](size_type pos) const { return elements_[pos]; }
 
-  pointer data() { return elements_; }
+  NANOSTL_HOST_AND_DEVICE_QUAL pointer data() { return elements_; }
 
-  vector& operator=(const vector& rhs);
-  vector& operator+=(const vector& rhs);
+  NANOSTL_HOST_AND_DEVICE_QUAL vector& operator=(const vector& rhs);
+  NANOSTL_HOST_AND_DEVICE_QUAL vector& operator+=(const vector& rhs);
 
   inline iterator begin(void) const { return elements_ + 0; }
 
@@ -240,7 +297,20 @@ class vector {
   }
 
  private:
-  size_type recommended_size() const {
+  NANOSTL_HOST_AND_DEVICE_QUAL void __initialize() {
+    size_ = 0;
+    capacity_ = 0;
+    elements_ = 0;
+  }
+
+  template <class Ty>
+  inline void __swap(Ty& x, Ty& y) {
+    Ty c(x);
+    x = y;
+    y = c;
+  }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL size_type recommended_size() const {
     // Simply use twice as large.
     size_type s = 2 * capacity();
     return s;
@@ -271,7 +341,9 @@ inline vector<T, Allocator>& vector<T, Allocator>::operator=(
 #define NANOSTL_STRING_H_
 
 #ifdef NANOSTL_DEBUG
+#if !defined(__CUDACC__)
 #include <iostream>
+#endif
 #endif
 
 //
@@ -295,10 +367,13 @@ class basic_string {
   typedef pointer iterator;
   typedef const_pointer const_iterator;
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   basic_string() {}
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   basic_string(const basic_string &s) { data_ = s.data_; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   basic_string(const charT *s) {
     while (s && (*s) != '\0') {
       data_.push_back(*s);
@@ -307,6 +382,7 @@ class basic_string {
     data_.push_back('\0');
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   basic_string(const charT *first, const charT *last) {
     const char *s = first;
     while (s && (s <= last)) {
@@ -315,49 +391,82 @@ class basic_string {
     }
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   basic_string(const charT *s, size_type count) {
     for (size_type i = 0; i < count; i++) {
       data_.push_back(s[i]);
     }
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   bool empty() const { return data_.size() == 0; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   size_type size() const { return data_.size(); }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   size_type length() const { return data_.size(); }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   void clear() { data_.clear(); }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   const charT *c_str() const { return &data_.at(0); }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   char &at(size_type pos) { return data_[pos]; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   const charT &at(size_type pos) const { return data_[pos]; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   char &operator[](size_type pos) { return data_[pos]; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   const charT &operator[](size_type pos) const { return data_[pos]; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   int compare(const basic_string &str) const {
     return compare_(&data_[0], &str[0]);
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   int compare(const charT *s) const { return compare_(&data_[0], s); }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   iterator erase(iterator pos) { return data_.erase(pos); }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   basic_string operator+(const basic_string &s) const;
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   basic_string &operator+=(const basic_string &s);
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   basic_string &operator=(const basic_string &s);
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   bool operator==(const basic_string &str) const { return compare(str) == 0; }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   bool operator==(const charT *s) const { return compare(s) == 0; }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   bool operator!=(const basic_string &str) const { return compare(str) != 0; }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   bool operator!=(const charT *s) const { return compare(s) != 0; }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   bool operator<(const basic_string &str) const { return compare(str) < 0; }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   bool operator<(const charT *s) const { return compare(s) < 0; }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   bool operator>(const basic_string &str) const { return compare(str) > 0; }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   bool operator>(const charT *s) const { return compare(s) > 0; }
 
  private:
@@ -486,18 +595,29 @@ class map {
     Node* p;
 
    public:
+    NANOSTL_HOST_AND_DEVICE_QUAL
     iterator(map<Key, T>* _mp = 0, Node* _p = 0) : mp(_mp), p(_p) {}
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
     iterator& operator++() {
       // O(log n)
       p = mp->__upper_bound(mp->root, p->val.first);
       return *this;
     }
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
     reference operator*() const { return p->val; }
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
     pointer operator->() const { return &(p->val); }
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
     bool operator==(const iterator& rhs) const {
       if (rhs.isEnd() && this->isEnd()) return true;
       return *rhs == this->p->val;
     }
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
     bool operator!=(const iterator& rhs) const {
       if (rhs.isEnd() && this->isEnd())
         return false;
@@ -505,21 +625,34 @@ class map {
         return true;
       return *rhs != this->p->val;
     }
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
     bool isEnd() const { return p == 0; }
   };
 
   typedef const iterator const_iterator;
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   map() { root = 0; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   ~map() { __delete(root); }
 
   // accessors:
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   iterator begin() { return iterator(this, root); }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   iterator end() { return iterator(this, 0); }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   const_iterator end() const { return iterator(this, 0); }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   bool empty() const { return !root; }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   T& operator[](const key_type& k) {
     return (*((insert(value_type(k, T()))).first)).second;
   }
@@ -527,6 +660,8 @@ class map {
   // insert/erase
 
   typedef pair<iterator, bool> pair_iterator_bool;
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   pair_iterator_bool insert(const value_type& x) {
     pair<Node*, pair_iterator_bool> p = __insert(root, x);
     root = p.first;
@@ -535,11 +670,13 @@ class map {
 
   // map operations:
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   const_iterator find(const key_type& key) const {
     Node* t = __find(root, key);
     return (!t) ? this->end() : iterator(this, t);
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   const_iterator upper_bound(const key_type& key) const {
     Node* t = __upper_bound(root, key);
     return (!t) ? this->end() : iterator(this, t);
@@ -557,6 +694,7 @@ class map {
   Node* root;
 
   // b: the direction of rotation
+  NANOSTL_HOST_AND_DEVICE_QUAL
   Node* __rotate(Node* t, int b) {
     Node* s = t->ch[1 - b];
     t->ch[1 - b] = s->ch[b];
@@ -566,6 +704,7 @@ class map {
 
   // {pointer to the root node of the subtree, {iterator to inserted/found
   // value, inserted or not}}
+  NANOSTL_HOST_AND_DEVICE_QUAL
   pair<Node*, pair_iterator_bool> __insert(Node* t, const value_type& x) {
     if (!t) {
       Node* n = new Node(x);
@@ -582,10 +721,12 @@ class map {
     return make_pair(t, p.second);
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   Node* __find(Node* t, const key_type& key) const {
     return (!t || key == t->key()) ? t : __find(t->ch[key > t->key()], key);
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   Node* __upper_bound(Node* t, const key_type& key) const {
     if (!t) return 0;
     if (key < t->key()) {
@@ -595,6 +736,7 @@ class map {
     return __upper_bound(t->ch[1], key);
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   void __delete(Node* t) {
     if (!t) return;
     __delete(t->ch[0]);
@@ -632,53 +774,6 @@ class map {
 #include <iostream>
 #endif
 
-// #included from: nanocommon.h
-
-#define NANOSTL_COMMON_H_
-
-namespace nanostl {
-
-// In BigEndian architecture, must define NANOSTL_BIG_ENDIAN explicitly at the
-// moment.
-
-namespace {
-
-union IEEE754Float {
-  float f;
-  unsigned int ui;
-  struct {
-#if defined(NANOSTL_BIG_ENDIAN)
-    unsigned int sign : 1;
-    unsigned int exponent : 8;
-    unsigned int mantissa : 23;
-#else
-    unsigned int mantissa : 23;
-    unsigned int exponent : 8;
-    unsigned int sign : 1;
-#endif
-  } bits;
-};
-
-union IEEE754Double {
-  double f;
-  unsigned long long ull;
-  struct {
-#if defined(NANOSTL_BIG_ENDIAN)
-    unsigned long long sign : 1;
-    unsigned long long exponent : 11;
-    unsigned long long mantissa : 52;
-#else
-    unsigned long long mantissa : 52;
-    unsigned long long exponent : 11;
-    unsigned long long sign : 1;
-#endif
-  } bits;
-};
-
-} // namespace
-
-}  // namespace nanostl
-
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wc99-extensions"
@@ -691,67 +786,106 @@ struct numeric_limits;
 
 template <>
 struct numeric_limits<char> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline char min(void) { return -128; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline char max(void) { return 127; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline char epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<unsigned char> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned char min(void) { return 0; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned char max(void) { return 255; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned char epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<short> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline short min(void) { return -32768; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline short max(void) { return 32767; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline short epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<unsigned short> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned short min(void) { return 0; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned short max(void) { return 65535; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned short epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<int> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline int min(void) { return -2147483648; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline int max(void) { return 2147483647; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline int epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<unsigned int> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned int min(void) { return 0; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned int max(void) { return 0xffffffffU; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned int epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<long long> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline long long min(void) { return (-0x7FFFFFFFFFFFFFFFLL - 1LL); }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline long long max(void) { return 0x7FFFFFFFFFFFFFFFLL; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline long long epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<unsigned long long> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned long long min(void) { return 0; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned long long max(void) { return 0xFFFFFFFFFFFFFFFFULL; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned long long epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<float> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline float min(void) { return (1.17549435E-38f); }  // 0x1.0p-126f
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline float max(void) {
     return (3.402823466e+38F);
   }  // 0x1.fffffep127f
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline float epsilon(void) { return (1.19209290E-07f); }  // 0x1.0p-23f
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
+  static inline float denorm_min(void) {
+    IEEE754Float flt;
+    flt.bits.sign = 0;
+    flt.bits.exponent = 0;
+    flt.bits.mantissa = 1;
+
+    return flt.f;
+  }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline float infinity(void) {
     IEEE754Float flt;
     flt.bits.exponent = 255;
@@ -760,24 +894,78 @@ struct numeric_limits<float> {
 
     return flt.f;
   }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
+  static inline float quiet_NaN(void) {
+    IEEE754Float flt;
+    flt.bits.exponent = 255;
+    flt.bits.mantissa = 1 << 22;
+    flt.bits.sign = 0;
+
+    return flt.f;
+  }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
+  static inline float signaling_NaN(void) {
+    IEEE754Float flt;
+    flt.bits.exponent = 255;
+    flt.bits.mantissa = 1;  // Set LSB at the moment
+    flt.bits.sign = 0;
+
+    return flt.f;
+  }
 };
 
 template <>
 struct numeric_limits<double> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline double min(void) {
     return (2.2250738585072014e-308);
   }  // 0x1.0p-1022
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline double max(void) {
     return (1.7976931348623157e+308);
   }  // 0x1.fffffffffffffp102
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline double epsilon(void) {
     return (2.2204460492503131e-016);
   }  // 0x1.0p-52
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
+  static inline double denorm_min(void) {
+    IEEE754Double flt;
+    flt.bits.sign = 0;
+    flt.bits.exponent = 0;
+    flt.bits.mantissa = 1;
+
+    return flt.f;
+  }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline double infinity(void) {
     IEEE754Double flt;
     flt.bits.exponent = 2047;
     flt.bits.mantissa = 0;
+    flt.bits.sign = 0;
+
+    return flt.f;
+  }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
+  static inline double quiet_NaN(void) {
+    IEEE754Double flt;
+    flt.bits.exponent = 2047;
+    flt.bits.mantissa = 1ull << 51;
+    flt.bits.sign = 0;
+
+    return flt.f;
+  }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
+  static inline double signaling_NaN(void) {
+    IEEE754Double flt;
+    flt.bits.exponent = 2047;
+    flt.bits.mantissa = 1;  // Set LSB at the moment
     flt.bits.sign = 0;
 
     return flt.f;
@@ -954,10 +1142,78 @@ static inline float UintToFloat(const unsigned int ui) {
   return flt.f;
 }
 
+static inline float IntToFloat(const int i) {
+  IEEE754Float flt;
+  flt.i = i;
+  return flt.f;
+}
+
 static inline unsigned int FloatToUint(const float f) {
   IEEE754Float flt;
   flt.f = f;
   return flt.ui;
+}
+
+static inline int FloatToInt(const float f) {
+  IEEE754Float flt;
+  flt.f = f;
+  return flt.i;
+}
+
+static inline float sqrt(const float x) {
+  IEEE754Float flt;
+  flt.f = x;
+  if ((flt.bits.mantissa == 0) && (flt.bits.exponent == 0)) {
+    // +0, -0
+    return x;
+  }
+
+  if (flt.ui == 0x3f800000) {  // 1
+    return 1.0f;               // +0
+  }
+
+  // -inf
+  if ((x < 0.0f) && nanostl::isinf(x)) {
+    return x;
+  }
+
+  if (x < 0.0f) {
+    return nanostl::numeric_limits<float>::quiet_NaN();
+  }
+
+  // Faster sqrt using Sqrt2 descrived in:
+  // https://www.codeproject.com/Articles/69941/Best-Square-Root-Method-Algorithm-Function-Precisi
+
+  // TODO(LTE): Consider Big endian machine.
+
+  const float xhalf = 0.5f * x;
+
+  union  // get bits for floating value
+  {
+    float x;
+    int i;
+  } u;
+  u.x = x;
+  u.i = 0x5f3759df - (u.i >> 1);  // gives initial guess y0
+  return x * u.x *
+         (1.5f -
+          xhalf * u.x * u.x);  // Newton step, repeating increases accuracy
+}
+
+static inline float copysign(const float x, const float y) {
+  IEEE754Float flt_x;
+  flt_x.f = x;
+
+  IEEE754Float flt_y;
+  flt_y.f = y;
+
+  unsigned int x_abs = flt_x.ui & 0x7fffffff;
+  unsigned int y_sign = flt_y.ui & 0x80000000;
+
+  IEEE754Float flt;
+  flt.ui = y_sign | x_abs;
+
+  return flt.f;
 }
 
 // Following faster approximated math functions are based on OIIO fmath.h
@@ -1002,10 +1258,20 @@ static inline unsigned int FloatToUint(const float f) {
 //  public domain sources or open source packages with compatible licenses.
 //  The individual functions give references were applicable.
 
+#define kM_1_PI (0.318309886183790671537767526745028724)
+#define kM_PI_2 (1.57079632679489661923132169163975144)
+#define kM_PI_4 (0.785398163397448309615660845819875721)
 #define kM_LN2 (0.69314718055994530941723212145817656)
+#define kM_LN10 (2.30258509299404568401799145468436421)
 
 /// Fused multiply and add: (a*b + c)
 static inline float madd(float a, float b, float c) { return a * b + c; }
+
+/// Round to nearest integer, returning as an int.
+static inline int fast_rint(float x) {
+  // emulate rounding by adding/substracting 0.5
+  return static_cast<int>(x + copysign(0.5f, x));
+}
 
 // TODO(LTE): Generate our own approx function using sollya
 static inline float fast_exp2(const float& xval) {
@@ -1077,8 +1343,8 @@ static inline float log(const float& x) {
     return -nanostl::numeric_limits<float>::infinity();
   }
 
-  if (flt.ui == 0x3f800000) { // 1
-    return 0.0f; // +0
+  if (flt.ui == 0x3f800000) {  // 1
+    return 0.0f;               // +0
   }
 
   if (x < 0.0f) {
@@ -1089,6 +1355,256 @@ static inline float log(const float& x) {
   // 0.313865375 avg ulp diff, 5148137 max ulp, 7.62939e-06 max error
   return fast_log2(x) * static_cast<float>(kM_LN2);
 }
+
+static inline float log10(const float& x) {
+  IEEE754Float flt;
+  flt.f = x;
+
+  if ((flt.bits.mantissa == 0) && (flt.bits.exponent == 0)) {
+    // +0, -0
+    return -nanostl::numeric_limits<float>::infinity();
+  }
+
+  if (flt.ui == 0x3f800000) {  // 1
+    return 0.0f;               // +0
+  }
+
+  if (x < 0.0f) {
+    return nanostl::numeric_limits<float>::infinity();
+  }
+
+  // Examined 2130706432 values of log10f on [1.17549435e-38,3.40282347e+38]:
+  // 0.631237033 avg ulp diff, 4471615 max ulp, 3.8147e-06 max error
+  return fast_log2(x) * static_cast<float>(kM_LN2 / kM_LN10);
+}
+
+// fast_safe_pow
+static inline float pow(float x, float y) {
+  if (fabs(y) < nanostl::numeric_limits<float>::epsilon())
+    return 1.0f;  // x^0=1
+  if (fabs(x) < nanostl::numeric_limits<float>::epsilon())
+    return 0.0f;  // 0^y=0
+  // be cheap & exact for special case of squaring and identity
+  if (y == 1.0f) return x;
+  if (y == 2.0f) {
+    return nanostl::min(x * x, nanostl::numeric_limits<float>::max());
+  }
+  float sign = 1.0f;
+  if (x < 0) {
+    // if x is negative, only deal with integer powers
+    // powf returns NaN for non-integers, we will return 0 instead
+    int ybits = FloatToInt(y) & 0x7fffffff;
+    if (ybits >= 0x4b800000) {
+      // always even int, keep positive
+    } else if (ybits >= 0x3f800000) {
+      // bigger than 1, check
+      int k = (ybits >> 23) - 127;   // get exponent
+      int j = ybits >> (23 - k);     // shift out possible fractional bits
+      if ((j << (23 - k)) == ybits)  // rebuild number and check for a match
+        sign = IntToFloat(0x3f800000 | (j << 31));  // +1 for even, -1 for odd
+      else
+        return 0.0f;  // not integer
+    } else {
+      return 0.0f;  // not integer
+    }
+  }
+  return sign * fast_exp2(y * fast_log2(fabs(x)));
+}
+
+static inline float sin(float x) {
+  // very accurate argument reduction from SLEEF
+  // starts failing around x=262000
+  // Results on: [-2pi,2pi]
+  // Examined 2173837240 values of sin: 0.00662760244 avg ulp diff, 2 max
+  // ulp, 1.19209e-07 max error
+  int q = fast_rint(x * float(kM_1_PI));
+  float qf = q;
+  x = madd(qf, -0.78515625f * 4, x);
+  x = madd(qf, -0.00024187564849853515625f * 4, x);
+  x = madd(qf, -3.7747668102383613586e-08f * 4, x);
+  x = madd(qf, -1.2816720341285448015e-12f * 4, x);
+  x = float(kM_PI_2) - (float(kM_PI_2) - x);  // crush denormals
+  float s = x * x;
+  if ((q & 1) != 0) x = -x;
+  // this polynomial approximation has very low error on [-pi/2,+pi/2]
+  // 1.19209e-07 max error in total over [-2pi,+2pi]
+  float u = 2.6083159809786593541503e-06f;
+  u = madd(u, s, -0.0001981069071916863322258f);
+  u = madd(u, s, +0.00833307858556509017944336f);
+  u = madd(u, s, -0.166666597127914428710938f);
+  u = madd(s, u * x, x);
+  // For large x, the argument reduction can fail and the polynomial can be
+  // evaluated with arguments outside the valid internal. Just clamp the bad
+  // values away (setting to 0.0f means no branches need to be generated).
+  if (fabs(u) > 1.0f) u = 0.0f;
+  return u;
+}
+
+static inline float cos(float x) {
+  // same argument reduction as fast_sin
+  int q = fast_rint(x * float(kM_1_PI));
+  float qf = q;
+  x = madd(qf, -0.78515625f * 4, x);
+  x = madd(qf, -0.00024187564849853515625f * 4, x);
+  x = madd(qf, -3.7747668102383613586e-08f * 4, x);
+  x = madd(qf, -1.2816720341285448015e-12f * 4, x);
+  x = float(kM_PI_2) - (float(kM_PI_2) - x);  // crush denormals
+  float s = x * x;
+  // polynomial from SLEEF's sincosf, max error is
+  // 4.33127e-07 over [-2pi,2pi] (98% of values are "exact")
+  float u = -2.71811842367242206819355e-07f;
+  u = madd(u, s, +2.47990446951007470488548e-05f);
+  u = madd(u, s, -0.00138888787478208541870117f);
+  u = madd(u, s, +0.0416666641831398010253906f);
+  u = madd(u, s, -0.5f);
+  u = madd(u, s, +1.0f);
+  if ((q & 1) != 0) u = -u;
+  if (fabs(u) > 1.0f) u = 0.0f;
+  return u;
+}
+
+// NOTE: this approximation is only valid on [-8192.0,+8192.0], it starts
+// becoming really poor outside of this range because the reciprocal amplifies
+// errors
+static inline float tan(float x) {
+  // derived from SLEEF implementation
+  // note that we cannot apply the "denormal crush" trick everywhere because
+  // we sometimes need to take the reciprocal of the polynomial
+  int q = fast_rint(x * float(2 * kM_1_PI));
+  float qf = q;
+  x = madd(qf, -0.78515625f * 2, x);
+  x = madd(qf, -0.00024187564849853515625f * 2, x);
+  x = madd(qf, -3.7747668102383613586e-08f * 2, x);
+  x = madd(qf, -1.2816720341285448015e-12f * 2, x);
+  if ((q & 1) == 0)
+    x = float(kM_PI_4) -
+        (float(kM_PI_4) -
+         x);  // crush denormals (only if we aren't inverting the result later)
+  float s = x * x;
+  float u = 0.00927245803177356719970703f;
+  u = madd(u, s, 0.00331984995864331722259521f);
+  u = madd(u, s, 0.0242998078465461730957031f);
+  u = madd(u, s, 0.0534495301544666290283203f);
+  u = madd(u, s, 0.133383005857467651367188f);
+  u = madd(u, s, 0.333331853151321411132812f);
+  u = madd(s, u * x, x);
+  if ((q & 1) != 0) u = -1.0f / u;
+  return u;
+}
+
+static inline float sinh(float x) {
+  float a = fabs(x);
+  if (a > 1.0f) {
+    // Examined 53389559 values of sinh on [1,87.3300018]: 33.6886442 avg ulp
+    // diff, 178 max ulp
+    float e = exp(a);
+    return copysign(0.5f * e - 0.5f / e, x);
+  } else {
+    a = 1.0f - (1.0f - a);  // crush denorms
+    float a2 = a * a;
+    // degree 7 polynomial generated with sollya
+    // Examined 2130706434 values of sinh on [-1,1]: 1.19209e-07 max error
+    float r = 2.03945513931e-4f;
+    r = madd(r, a2, 8.32990277558e-3f);
+    r = madd(r, a2, 0.1666673421859f);
+    r = madd(r * a, a2, a);
+    return copysign(r, x);
+  }
+}
+
+static inline float cosh(float x) {
+  // Examined 2237485550 values of cosh on [-87.3300018,87.3300018]: 1.78256726
+  // avg ulp diff, 178 max ulp
+  float e = exp(fabs(x));
+  return 0.5f * e + 0.5f / e;
+}
+
+static inline float tanh(float x) {
+  // Examined 4278190080 values of tanh on
+  // [-3.40282347e+38,3.40282347e+38]: 3.12924e-06 max error NOTE: ulp error is
+  // high because of sub-optimal handling around the origin
+  float e = exp(2.0f * fabs(x));
+  return copysign(1 - 2 / (1 + e), x);
+}
+
+static inline float erf(float x) {
+  // Examined 1082130433 values of erff on [0,4]: 1.93715e-06 max error
+  // Abramowitz and Stegun, 7.1.28
+  const float a1 = 0.0705230784f;
+  const float a2 = 0.0422820123f;
+  const float a3 = 0.0092705272f;
+  const float a4 = 0.0001520143f;
+  const float a5 = 0.0002765672f;
+  const float a6 = 0.0000430638f;
+  const float a = fabs(x);
+  const float b = 1.0f - (1.0f - a);  // crush denormals
+  const float r =
+      madd(madd(madd(madd(madd(madd(a6, b, a5), b, a4), b, a3), b, a2), b, a1),
+           b, 1.0f);
+  const float s = r * r;  // ^2
+  const float t = s * s;  // ^4
+  const float u = t * t;  // ^8
+  const float v = u * u;  // ^16
+  return copysign(1.0f - 1.0f / v, x);
+}
+
+// Fast cube root (performs better that using fast_pow's above with y=1/3)
+static inline float cbrt(float x) {
+  float x0 = fabs(x);
+  // from hacker's delight
+  float a = IntToFloat(0x2a5137a0 + FloatToInt(x0) / 3);  // Initial guess.
+  // Examined 14272478 values of cbrt on
+  // [-9.99999935e-39,9.99999935e-39]: 8.14687e-14 max error Examined 2131958802
+  // values of cbrt on [9.99999935e-39,3.40282347e+38]: 2.46930719 avg ulp diff,
+  // 12 max ulp
+  a = 0.333333333f * (2.0f * a + x0 / (a * a));  // Newton step.
+  a = 0.333333333f * (2.0f * a + x0 / (a * a));  // Newton step again.
+  a = (fabs(x0) < nanostl::numeric_limits<float>::epsilon()) ? 0
+                                                             : a;  // Fix 0 case
+  return copysign(a, x);
+}
+
+static inline float erfc(float x) {
+  // Examined 2164260866 values of erfcf on [-4,4]: 1.90735e-06 max error
+  // ulp histogram:
+  //   0  = 80.30%
+  return 1.0f - erf(x);
+}
+
+static inline float ierf(float x) {
+  // from: Approximating the erfinv function by Mike Giles
+  // to avoid trouble at the limit, clamp input to 1-eps
+  float a = fabs(x);
+  if (a > 0.99999994f) a = 0.99999994f;
+  float w = -log((1.0f - a) * (1.0f + a)), p;
+  if (w < 5.0f) {
+    w = w - 2.5f;
+    p = 2.81022636e-08f;
+    p = madd(p, w, 3.43273939e-07f);
+    p = madd(p, w, -3.5233877e-06f);
+    p = madd(p, w, -4.39150654e-06f);
+    p = madd(p, w, 0.00021858087f);
+    p = madd(p, w, -0.00125372503f);
+    p = madd(p, w, -0.00417768164f);
+    p = madd(p, w, 0.246640727f);
+    p = madd(p, w, 1.50140941f);
+  } else {
+    w = sqrt(w) - 3.0f;
+    p = -0.000200214257f;
+    p = madd(p, w, 0.000100950558f);
+    p = madd(p, w, 0.00134934322f);
+    p = madd(p, w, -0.00367342844f);
+    p = madd(p, w, 0.00573950773f);
+    p = madd(p, w, -0.0076224613f);
+    p = madd(p, w, 0.00943887047f);
+    p = madd(p, w, 1.00167406f);
+    p = madd(p, w, 2.83297682f);
+  }
+  return p * x;
+}
+
+// -- End OIIO fmath.h
+// ----------------------------------------------------------------------------
 
 }  // namespace nanostl
 

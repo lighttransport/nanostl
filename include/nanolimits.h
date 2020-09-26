@@ -43,66 +43,93 @@ struct numeric_limits;
 
 template <>
 struct numeric_limits<char> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline char min(void) { return -128; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline char max(void) { return 127; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline char epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<unsigned char> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned char min(void) { return 0; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned char max(void) { return 255; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned char epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<short> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline short min(void) { return -32768; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline short max(void) { return 32767; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline short epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<unsigned short> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned short min(void) { return 0; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned short max(void) { return 65535; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned short epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<int> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline int min(void) { return -2147483648; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline int max(void) { return 2147483647; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline int epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<unsigned int> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned int min(void) { return 0; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned int max(void) { return 0xffffffffU; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned int epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<long long> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline long long min(void) { return (-0x7FFFFFFFFFFFFFFFLL - 1LL); }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline long long max(void) { return 0x7FFFFFFFFFFFFFFFLL; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline long long epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<unsigned long long> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned long long min(void) { return 0; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned long long max(void) { return 0xFFFFFFFFFFFFFFFFULL; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned long long epsilon(void) { return 0; }
 };
 
 template <>
 struct numeric_limits<float> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline float min(void) { return (1.17549435E-38f); }  // 0x1.0p-126f
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline float max(void) {
     return (3.402823466e+38F);
   }  // 0x1.fffffep127f
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline float epsilon(void) { return (1.19209290E-07f); }  // 0x1.0p-23f
 
   NANOSTL_HOST_AND_DEVICE_QUAL
@@ -148,12 +175,15 @@ struct numeric_limits<float> {
 
 template <>
 struct numeric_limits<double> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline double min(void) {
     return (2.2250738585072014e-308);
   }  // 0x1.0p-1022
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline double max(void) {
     return (1.7976931348623157e+308);
   }  // 0x1.fffffffffffffp102
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline double epsilon(void) {
     return (2.2204460492503131e-016);
   }  // 0x1.0p-52

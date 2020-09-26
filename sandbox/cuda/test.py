@@ -21,9 +21,17 @@ __global__ void multiply_them(float *dest, float *a, float *b)
 {
   float infval = nanostl::numeric_limits<float>::infinity();
   float minval = nanostl::numeric_limits<float>::min();
+  float denorm_minval = nanostl::numeric_limits<float>::denorm_min();
   float maxval = nanostl::numeric_limits<float>::max();
   float qnanval = nanostl::numeric_limits<float>::quiet_NaN();
   float snanval = nanostl::numeric_limits<float>::signaling_NaN();
+
+  double dinfval = nanostl::numeric_limits<double>::infinity();
+  double dminval = nanostl::numeric_limits<double>::min();
+  double ddenorm_minval = nanostl::numeric_limits<double>::denorm_min();
+  double dmaxval = nanostl::numeric_limits<double>::max();
+  double dqnanval = nanostl::numeric_limits<double>::quiet_NaN();
+  double dsnanval = nanostl::numeric_limits<double>::signaling_NaN();
 
   nanostl::map<nanostl::string, int> m;
 
