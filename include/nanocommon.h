@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2019 Light Transport Entertainment, Inc.
+ * Copyright (c) 2019-2020 Light Transport Entertainment, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,16 @@
 
 #ifndef NANOSTL_COMMON_H_
 #define NANOSTL_COMMON_H_
+
+#ifdef __CUDACC__
+#define NANOSTL_DEVICE_QUAL __device__
+#define NANOSTL_HOST_QUAL __host__
+#define NANOSTL_HOST_AND_DEVICE_QUAL __host__ __device__
+#else
+#define NANOSTL_DEVICE_QUAL
+#define NANOSTL_HOST_QUAL
+#define NANOSTL_HOST_AND_DEVICE_QUAL
+#endif
 
 namespace nanostl {
 

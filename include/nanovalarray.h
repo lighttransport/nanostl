@@ -57,18 +57,22 @@ class valarray {
   typedef const_pointer const_iterator;
   typedef Allocator allocator_type;
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   valarray() : elements_(0), capacity_(0), size_(0) {}
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   valarray(const valarray& rhs) {
     __initialize();
     assign(rhs.begin(), rhs.end());
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   valarray(const size_type n) {
     __initialize();
     resize(n);
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   ~valarray() {
     allocator_type allocator;
     if (elements_) {
@@ -76,7 +80,7 @@ class valarray {
     }
   }
 
-  // No initialized value
+  NANOSTL_HOST_AND_DEVICE_QUAL
   void resize(size_type count) {
     if (count < 1) {
       return;
@@ -110,27 +114,40 @@ class valarray {
     size_ = count;
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   bool empty() const { return size_ == 0; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   size_type size() const { return size_; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   void clear() { size_ = 0; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   size_type capacity() const { return capacity_; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   reference operator[](size_type pos) { return elements_[pos]; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   const_reference operator[](size_type pos) const { return elements_[pos]; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   pointer data() { return elements_; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   valarray& operator=(const valarray& rhs);
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   valarray& operator+=(const valarray& rhs);
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   inline iterator begin(void) const { return elements_ + 0; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   inline iterator end(void) const { return elements_ + size_; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   inline iterator erase(iterator pos) {
     while ((pos + 1) != end()) {
       (*pos) = *(pos + 1);
@@ -141,6 +158,7 @@ class valarray {
     return pos;
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   template <class InputIterator>
   void assign(InputIterator first, InputIterator last) {
     clear();
@@ -149,6 +167,7 @@ class valarray {
     }
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   void swap(valarray& x) {
     __swap(elements_, x.elements_);
     __swap(capacity_, x.capacity_);
@@ -157,18 +176,21 @@ class valarray {
 
  private:
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   void __initialize() {
     elements_ = 0;
     capacity_ = 0;
     size_ = 0;
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   void __push_back(const value_type& val) {
     resize(size() + 1);
     elements_[size_ - 1] = val;
   }
 
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   template<class Ty>
   inline void __swap(Ty& x, Ty& y) {
     Ty c(x);
@@ -176,6 +198,7 @@ class valarray {
     y = c;
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   size_type recommended_size() const {
     // Simply use twice as large.
     size_type s = 2 * capacity();

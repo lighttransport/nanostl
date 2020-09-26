@@ -1,18 +1,18 @@
 /*
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2017-2018 Light Transport Entertainment, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -80,18 +80,29 @@ class map {
     Node* p;
 
    public:
+    NANOSTL_HOST_AND_DEVICE_QUAL
     iterator(map<Key, T>* _mp = 0, Node* _p = 0) : mp(_mp), p(_p) {}
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
     iterator& operator++() {
       // O(log n)
       p = mp->__upper_bound(mp->root, p->val.first);
       return *this;
     }
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
     reference operator*() const { return p->val; }
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
     pointer operator->() const { return &(p->val); }
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
     bool operator==(const iterator& rhs) const {
       if (rhs.isEnd() && this->isEnd()) return true;
       return *rhs == this->p->val;
     }
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
     bool operator!=(const iterator& rhs) const {
       if (rhs.isEnd() && this->isEnd())
         return false;
@@ -99,21 +110,34 @@ class map {
         return true;
       return *rhs != this->p->val;
     }
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
     bool isEnd() const { return p == 0; }
   };
 
   typedef const iterator const_iterator;
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   map() { root = 0; }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   ~map() { __delete(root); }
 
   // accessors:
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   iterator begin() { return iterator(this, root); }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   iterator end() { return iterator(this, 0); }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   const_iterator end() const { return iterator(this, 0); }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   bool empty() const { return !root; }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   T& operator[](const key_type& k) {
     return (*((insert(value_type(k, T()))).first)).second;
   }
@@ -121,6 +145,8 @@ class map {
   // insert/erase
 
   typedef pair<iterator, bool> pair_iterator_bool;
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   pair_iterator_bool insert(const value_type& x) {
     pair<Node*, pair_iterator_bool> p = __insert(root, x);
     root = p.first;
@@ -129,11 +155,13 @@ class map {
 
   // map operations:
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   const_iterator find(const key_type& key) const {
     Node* t = __find(root, key);
     return (!t) ? this->end() : iterator(this, t);
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   const_iterator upper_bound(const key_type& key) const {
     Node* t = __upper_bound(root, key);
     return (!t) ? this->end() : iterator(this, t);
@@ -151,6 +179,7 @@ class map {
   Node* root;
 
   // b: the direction of rotation
+  NANOSTL_HOST_AND_DEVICE_QUAL
   Node* __rotate(Node* t, int b) {
     Node* s = t->ch[1 - b];
     t->ch[1 - b] = s->ch[b];
@@ -160,6 +189,7 @@ class map {
 
   // {pointer to the root node of the subtree, {iterator to inserted/found
   // value, inserted or not}}
+  NANOSTL_HOST_AND_DEVICE_QUAL
   pair<Node*, pair_iterator_bool> __insert(Node* t, const value_type& x) {
     if (!t) {
       Node* n = new Node(x);
@@ -176,10 +206,12 @@ class map {
     return make_pair(t, p.second);
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   Node* __find(Node* t, const key_type& key) const {
     return (!t || key == t->key()) ? t : __find(t->ch[key > t->key()], key);
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   Node* __upper_bound(Node* t, const key_type& key) const {
     if (!t) return 0;
     if (key < t->key()) {
@@ -189,6 +221,7 @@ class map {
     return __upper_bound(t->ch[1], key);
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   void __delete(Node* t) {
     if (!t) return;
     __delete(t->ch[0]);

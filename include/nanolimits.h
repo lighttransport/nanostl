@@ -105,6 +105,8 @@ struct numeric_limits<float> {
     return (3.402823466e+38F);
   }  // 0x1.fffffep127f
   static inline float epsilon(void) { return (1.19209290E-07f); }  // 0x1.0p-23f
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline float infinity(void) {
     IEEE754Float flt;
     flt.bits.exponent = 255;
@@ -113,6 +115,8 @@ struct numeric_limits<float> {
 
     return flt.f;
   }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline float quiet_NaN(void) {
     IEEE754Float flt;
     flt.bits.exponent = 255;
@@ -135,6 +139,7 @@ struct numeric_limits<double> {
     return (2.2204460492503131e-016);
   }  // 0x1.0p-52
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline double infinity(void) {
     IEEE754Double flt;
     flt.bits.exponent = 2047;
@@ -144,7 +149,18 @@ struct numeric_limits<double> {
     return flt.f;
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL
   static inline double quiet_NaN(void) {
+    IEEE754Double flt;
+    flt.bits.exponent = 2047;
+    flt.bits.mantissa = 1;
+    flt.bits.sign = 0;
+
+    return flt.f;
+  }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL
+  static inline double signaling_NaN(void) {
     IEEE754Double flt;
     flt.bits.exponent = 2047;
     flt.bits.mantissa = 1;

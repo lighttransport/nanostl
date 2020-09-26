@@ -25,6 +25,7 @@
 #ifndef NANOSTL_VECTOR_H_
 #define NANOSTL_VECTOR_H_
 
+#include "nanocommon.h"
 #include "nanoallocator.h"
 
 #ifdef NANOSTL_DEBUG
@@ -56,14 +57,14 @@ class vector {
   typedef const_pointer const_iterator;
   typedef Allocator allocator_type;
 
-  vector() : elements_(0), capacity_(0), size_(0) {}
+  NANOSTL_HOST_AND_DEVICE_QUAL vector() : elements_(0), capacity_(0), size_(0) {}
 
-  vector(const vector& rhs) {
+  NANOSTL_HOST_AND_DEVICE_QUAL vector(const vector& rhs) {
     __initialize();
     assign(rhs.begin(), rhs.end());
   }
 
-  ~vector() {
+  NANOSTL_HOST_AND_DEVICE_QUAL ~vector() {
     allocator_type allocator;
     if (elements_) {
       allocator.deallocate(elements_, capacity_);
@@ -80,8 +81,7 @@ class vector {
     return elements_[pos];
   }
 
-  // No initialized value
-  void resize(size_type count) {
+  NANOSTL_HOST_AND_DEVICE_QUAL void resize(size_type count) {
     if (count < 1) {
       return;
     }
@@ -114,29 +114,29 @@ class vector {
     size_ = count;
   }
 
-  void push_back(const value_type& val) {
+  NANOSTL_HOST_AND_DEVICE_QUAL void push_back(const value_type& val) {
     resize(size() + 1);
     elements_[size_ - 1] = val;
   }
 
   // void push_back(value_type &val); // C++11
 
-  bool empty() const { return size_ == 0; }
+  NANOSTL_HOST_AND_DEVICE_QUAL bool empty() const { return size_ == 0; }
 
-  size_type size() const { return size_; }
+  NANOSTL_HOST_AND_DEVICE_QUAL size_type size() const { return size_; }
 
-  void clear() { size_ = 0; }
+  NANOSTL_HOST_AND_DEVICE_QUAL void clear() { size_ = 0; }
 
-  size_type capacity() const { return capacity_; }
+  NANOSTL_HOST_AND_DEVICE_QUAL size_type capacity() const { return capacity_; }
 
-  reference operator[](size_type pos) { return elements_[pos]; }
+  NANOSTL_HOST_AND_DEVICE_QUAL reference operator[](size_type pos) { return elements_[pos]; }
 
-  const_reference operator[](size_type pos) const { return elements_[pos]; }
+  NANOSTL_HOST_AND_DEVICE_QUAL const_reference operator[](size_type pos) const { return elements_[pos]; }
 
-  pointer data() { return elements_; }
+  NANOSTL_HOST_AND_DEVICE_QUAL pointer data() { return elements_; }
 
-  vector& operator=(const vector& rhs);
-  vector& operator+=(const vector& rhs);
+  NANOSTL_HOST_AND_DEVICE_QUAL vector& operator=(const vector& rhs);
+  NANOSTL_HOST_AND_DEVICE_QUAL vector& operator+=(const vector& rhs);
 
   inline iterator begin(void) const { return elements_ + 0; }
 
@@ -167,7 +167,7 @@ class vector {
   }
 
  private:
-  void __initialize() {
+  NANOSTL_HOST_AND_DEVICE_QUAL void __initialize() {
     size_ = 0;
     capacity_ = 0;
     elements_ = 0;
@@ -180,7 +180,7 @@ class vector {
     y = c;
   }
 
-  size_type recommended_size() const {
+  NANOSTL_HOST_AND_DEVICE_QUAL size_type recommended_size() const {
     // Simply use twice as large.
     size_type s = 2 * capacity();
     return s;
