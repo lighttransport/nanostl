@@ -85,15 +85,21 @@ NanoSTL assumes following type definitions.
 
 ## Differences compared to (full featured) C++ STL
 
+* **No thread safety** Currently NanoSTL is not thread safe
+  * Application must care about the thread safety
+  * For example, need to use mutex or lock for `nanostl::vector::push_back()` operation if you are accesing `nanostl::vector` object from multiple threads.
 * RTTI and exception is not supported.
 * Returns `NULL` when memory allocation failed(no `bad_alloc`)
 
 ## TODO
 
-* [ ] complex type
-* [ ] CUDA NVRTC support
+* [ ] iostream, fstream(stdout/stdin, file IO)
+* [ ] Math complex type
+* [x] CUDA support(experimental)
 * [x] isnan/isinf/isfinite support
-* [x] Unit tests
+* [ ] Unit tests
+  * [ ] Unit tests on CUDA platform
+  * [ ] Write mote unit tests for CPU platform
 * [ ] Multithread support
 * [ ] Backport of some C++11 features(e.g. `unordered_map`)
 * [ ] Replace oiio math functions so that we can have clean MIT licensed code.
