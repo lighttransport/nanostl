@@ -13,6 +13,7 @@
 #include "nanoutility.h"
 #include "nanovector.h"
 #include "nanovalarray.h"
+#include "__nanostrutil.h"
 
 #include <cstdio>
 #include <cstdlib>

@@ -129,9 +129,11 @@ Use `NANOSTL_DEBUG` define for debugging.
 
 ## Licenss
 
-MIT license. Some functions in nanomath is licenced under modified BSD license.
+Unless otherwise expressed, NanoSTL is licensed under MIT license.
+Some functions in nanomath is licenced under modified BSD license.
 
 ### Third party licenses
 
 * acutest : MIT license.
 * faster math functions: Some math functions implemented in nanomath is grabbed from OpenImageIO fmath.h, which is licensed under modified BSD license. https://github.com/OpenImageIO/oiio/
+* ryu(floating point <-> string converter). NanoSTL choose Boost 1.0 license. https://github.com/ulfjack/ryu
