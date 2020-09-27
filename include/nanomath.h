@@ -35,7 +35,60 @@
 // some precision, don't work well depending on CPU's rounding-mode.
 //
 
+/* we need to import the definition from math.h
+#define FP_NAN (0)
+#define FP_INFINITE (1)
+#define FP_ZERO (2)
+#define FP_SUBNORMAL (3)
+#define FP_NORMAL (4)
+#define NANOSTL_FP_UNKNOWN  (5)
+*/
+
 namespace nanostl {
+
+static inline bool __is_zero(float arg) {
+  IEEE754Float flt;
+  flt.f = arg;
+
+  if ((flt.bits.mantissa == 0) && (flt.bits.exponent == 0)) {
+    return true;
+  }
+
+  return false;
+}
+
+static inline bool __is_zero(double arg) {
+  IEEE754Double flt;
+  flt.f = arg;
+
+  if ((flt.bits.mantissa == 0) && (flt.bits.exponent == 0)) {
+    return true;
+  }
+
+  return false;
+}
+
+static inline bool __is_subnormal(float arg) {
+  IEEE754Float flt;
+  flt.f = arg;
+
+  if ((flt.bits.mantissa != 0) && (flt.bits.exponent == 0)) {
+    return true;
+  }
+
+  return false;
+}
+
+static inline bool __is_subnormal(double arg) {
+  IEEE754Double flt;
+  flt.f = arg;
+
+  if ((flt.bits.mantissa != 0) && (flt.bits.exponent == 0)) {
+    return true;
+  }
+
+  return false;
+}
 
 template <typename T>
 static inline T fabs(T num) {
@@ -144,6 +197,70 @@ static inline bool isnormal(double x) {
   bool ret = (flt.bits.exponent != 0) && (flt.bits.exponent != 2047);
   return ret;
 }
+
+template <typename T>
+static inline T fmin(T x, T y) {
+  // https://en.cppreference.com/w/cpp/numeric/math/fmin
+  // If one of the two arguments is NaN, the value of the other argument is returned 
+  // Only if both arguments are NaN, NaN is returned 
+
+  if (isnan(x) && isnan(y)) {
+    // TODO(LTE): Consider signaling_NaN and quiet_NaN?
+    return x;
+  }
+
+  if (isnan(x)) {
+    return y;
+  }
+
+  if (isnan(y)) {
+    return x;
+  }
+
+  return (x < y) ? x : y;
+}
+
+template <typename T>
+static inline T fmax(T x, T y) {
+  // https://en.cppreference.com/w/cpp/numeric/math/fmin
+  // If one of the two arguments is NaN, the value of the other argument is returned 
+  // Only if both arguments are NaN, NaN is returned 
+
+  if (isnan(x) && isnan(y)) {
+    // TODO(LTE): Consider signaling_NaN and quiet_NaN?
+    return x;
+  }
+
+  if (isnan(x)) {
+    return y;
+  }
+
+  if (isnan(y)) {
+    return x;
+  }
+
+  return (x > y) ? x : y;
+}
+
+
+#if 0
+template <typename T>
+static inline int fpclassify(T arg) {
+  if (isnan(arg)) {
+    return FP_NAN;
+  } else if (isinf(arg)) {
+    return FP_INFINITE;
+  } else if (__is_zero(arg)) {
+    return FP_ZERO;
+  } else if (__is_subnormal(arg)) {
+    return FP_SUBNORMAL;
+  } else if (isnormal(arg)) {
+    return FP_NORMAL;
+  } else {
+    return NANOSTL_FP_UNKNOWN;
+  }
+}
+#endif
 
 template <typename T>
 static inline T clamp(const T& a, const T& low_val, const T& high_val) {
