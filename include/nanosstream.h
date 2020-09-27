@@ -1,18 +1,18 @@
 /*
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2017 Light Transport Entertainment, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,84 +28,44 @@
 #include "nanoios.h"
 #include "nanostreambuf.h"
 #include "nanostring.h"
+#include "nanocstdint.h"
 
 namespace nanostl {
 
-#if 0
+// Work in progress.
+// TODO(LTE): Implement
+#if 1
 class stringstream
 {
-  typedef unsigned long long pos_type;
-  typedef long long off_type;
+  typedef unsigned long long size_type;
 
   public:
-    stringstream() : binary_(0), length_(0) {}
+    NANOSTL_HOST_AND_DEVICE_QUAL
+    stringstream() {}
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
     ~stringstream() {}
 
-    bool seek_set(const pos_type offset) {
-      if (offset > length_) {
-        return false;
-      }
-
-      idx_ = offset;
-      return true;
+    // FIXME(LTE): Signature is different from STL spec. take the reference. drop const
+    NANOSTL_HOST_AND_DEVICE_QUAL
+    string &str() {
+      return str_;
     }
 
-    bool seek_from_currect(const off_type offset) {
-      if ((int64_t(idx_) + offset) < 0) {
-        return false;
-      }
-
-      if (size_t((off_type(idx_) + offset)) > length_) {
-        return false;
-      }
-
-      idx_ = size_t(off_type(idx_) + offset);
-      return true;
+    // TODO(LTE): Use stringbuf or streambuf
+    NANOSTL_HOST_AND_DEVICE_QUAL
+    stringstream& operator<<(const nanostl::string &s) {
+      str_ += s;
+      return (*this);
     }
-
-    size_t read(const size_t n, const uint64_t dst_len, unsigned char* dst) {
-      size_t len = n;
-      if ((idx_ + len) > length_) {
-        len = length_ - idx_;
-      }
-
-      if (len > 0) {
-        if (dst_len < len) {
-          // dst does not have enough space. return 0 for a while.
-          return 0;
-        }
-
-        // TODO(LTE): Use memcpy if available.
-        for (unsigned long long i = 0; i < len; i++) {
-          dst[i] = binary_[idx_ + i];
-        }
-        return len;
-
-      } else {
-        return 0;
-      }
-    }
-
-    stringstream &seekg(pos_type pos);
-
-    string str() const {
-      return string(reinterpret_cast<const char *>(binary_), length_);
-    }
-  
 
  private:
 
-  size_t tell() const { return idx_; }
-
-  //const uint8_t* data() const { return binary_; }
-
-  size_t size() const { return length_; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
+  size_type size() const { return str_.size(); }
 
  private:
-  const unsigned char* binary_;
-  const size_t length_;
-  char pad_[7];
-  unsigned long long idx_;
+  nanostl::string str_;
 };
 #endif
 

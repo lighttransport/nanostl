@@ -535,6 +535,21 @@ static void test_double_nan(void) {
 
 }
 
+static void test_digits10(void) {
+  TEST_CHECK(nanostl::numeric_limits<bool>::digits10 == std::numeric_limits<bool>::digits10);
+
+  TEST_CHECK(nanostl::numeric_limits<char>::digits10 == std::numeric_limits<char>::digits10);
+  TEST_CHECK(nanostl::numeric_limits<unsigned char>::digits10 == std::numeric_limits<unsigned char>::digits10);
+  TEST_CHECK(nanostl::numeric_limits<short>::digits10 == std::numeric_limits<short>::digits10);
+  TEST_CHECK(nanostl::numeric_limits<unsigned short>::digits10 == std::numeric_limits<unsigned short>::digits10);
+
+  TEST_CHECK(nanostl::numeric_limits<int>::digits10 == std::numeric_limits<int>::digits10);
+  TEST_CHECK(nanostl::numeric_limits<unsigned int>::digits10 == std::numeric_limits<unsigned int>::digits10);
+
+  TEST_CHECK(nanostl::numeric_limits<long long>::digits10 == std::numeric_limits<long long>::digits10);
+  TEST_CHECK(nanostl::numeric_limits<unsigned long long>::digits10 == std::numeric_limits<unsigned long long>::digits10);
+}
+
 extern "C" void test_valarray(void);
 
 TEST_LIST = {{"test-vector", test_vector},
@@ -556,6 +571,7 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-valarray", test_valarray},
              {"test-float-nan", test_float_nan},
              {"test-double-nan", test_double_nan},
+             {"test-digits10", test_digits10},
              {nullptr, nullptr}};
 
 // TEST_MAIN();

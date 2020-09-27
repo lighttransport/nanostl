@@ -42,6 +42,17 @@ template <class T>
 struct numeric_limits;
 
 template <>
+struct numeric_limits<bool> {
+  NANOSTL_HOST_AND_DEVICE_QUAL
+  static inline bool min(void) { return false; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
+  static inline bool max(void) { return true; }
+  NANOSTL_HOST_AND_DEVICE_QUAL
+  static inline bool epsilon(void) { return false; }
+  static const int digits10 = 0;
+};
+
+template <>
 struct numeric_limits<char> {
   NANOSTL_HOST_AND_DEVICE_QUAL
   static inline char min(void) { return -128; }
@@ -49,6 +60,7 @@ struct numeric_limits<char> {
   static inline char max(void) { return 127; }
   NANOSTL_HOST_AND_DEVICE_QUAL
   static inline char epsilon(void) { return 0; }
+  static const int digits10 = 2;
 };
 
 template <>
@@ -59,6 +71,7 @@ struct numeric_limits<unsigned char> {
   static inline unsigned char max(void) { return 255; }
   NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned char epsilon(void) { return 0; }
+  static const int digits10 = 2;
 };
 
 template <>
@@ -69,6 +82,7 @@ struct numeric_limits<short> {
   static inline short max(void) { return 32767; }
   NANOSTL_HOST_AND_DEVICE_QUAL
   static inline short epsilon(void) { return 0; }
+  static const int digits10 = 4;
 };
 
 template <>
@@ -79,6 +93,7 @@ struct numeric_limits<unsigned short> {
   static inline unsigned short max(void) { return 65535; }
   NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned short epsilon(void) { return 0; }
+  static const int digits10 = 4;
 };
 
 template <>
@@ -89,6 +104,7 @@ struct numeric_limits<int> {
   static inline int max(void) { return 2147483647; }
   NANOSTL_HOST_AND_DEVICE_QUAL
   static inline int epsilon(void) { return 0; }
+  static const int digits10 = 9;
 };
 
 template <>
@@ -99,8 +115,10 @@ struct numeric_limits<unsigned int> {
   static inline unsigned int max(void) { return 0xffffffffU; }
   NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned int epsilon(void) { return 0; }
+  static const int digits10 = 9;
 };
 
+// assume int64_t
 template <>
 struct numeric_limits<long long> {
   NANOSTL_HOST_AND_DEVICE_QUAL
@@ -109,8 +127,10 @@ struct numeric_limits<long long> {
   static inline long long max(void) { return 0x7FFFFFFFFFFFFFFFLL; }
   NANOSTL_HOST_AND_DEVICE_QUAL
   static inline long long epsilon(void) { return 0; }
+  static const int digits10 = 18;
 };
 
+// assume uint64_t
 template <>
 struct numeric_limits<unsigned long long> {
   NANOSTL_HOST_AND_DEVICE_QUAL
@@ -119,6 +139,7 @@ struct numeric_limits<unsigned long long> {
   static inline unsigned long long max(void) { return 0xFFFFFFFFFFFFFFFFULL; }
   NANOSTL_HOST_AND_DEVICE_QUAL
   static inline unsigned long long epsilon(void) { return 0; }
+  static const int digits10 = 19;
 };
 
 template <>
@@ -171,6 +192,7 @@ struct numeric_limits<float> {
 
     return flt.f;
   }
+  static const int digits10 = 6;
 };
 
 template <>
@@ -227,6 +249,7 @@ struct numeric_limits<double> {
 
     return flt.f;
   }
+  static const int digits10 = 15;
 };
 
 }  // namespace nanostl
