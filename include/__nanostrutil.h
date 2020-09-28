@@ -1,18 +1,18 @@
 /*
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2017 Light Transport Entertainment, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,7 +31,7 @@
 namespace nanostl {
 
 // ==== Ryu =================================================================
-// 
+//
 //
 // Copyright 2018 Ulf Adams
 //
@@ -69,7 +69,7 @@ typedef struct floating_decimal_32 {
   // Decimal exponent's range is -45 to 38
   // inclusive, and can fit in a short if needed.
   int32_t exponent;
-} floating_decimal_32; 
+} floating_decimal_32;
 
 // Returns e == 0 ? 1 : [log_2(5^e)]; requires 0 <= e <= 3528.
 static inline int32_t log2pow5(const int32_t e) {
@@ -552,13 +552,13 @@ int f2s_buffered_n(float f, char* result) {
   return to_chars(v, ieeeSign, result);
 }
 
+// result: 16bytes for float
 void f2s_buffered(float f, char* result) {
   const int index = f2s_buffered_n(f, result);
 
   // Terminate the string.
   result[index] = '\0';
 }
-
 
 //
 // ========================================================

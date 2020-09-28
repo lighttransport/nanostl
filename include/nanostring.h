@@ -26,6 +26,7 @@
 #define NANOSTL_STRING_H_
 
 #include "nanovector.h"
+#include "__nanostrutil.h"
 
 #ifdef NANOSTL_DEBUG
 #if !defined(__CUDACC__)
@@ -192,6 +193,15 @@ basic_string<charT> &basic_string<charT>::operator+=(
 }
 
 typedef basic_string<char> string;
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+static string to_string(float value) {
+  char buf[16];
+  f2s_buffered(value, buf);
+
+  return string(buf);
+}
+
 
 }  // namespace nanostl
 

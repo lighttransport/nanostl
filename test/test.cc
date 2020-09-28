@@ -551,6 +551,16 @@ static void test_digits10(void) {
   TEST_CHECK(nanostl::numeric_limits<unsigned long long>::digits10 == std::numeric_limits<unsigned long long>::digits10);
 }
 
+static void test_to_string(void) {
+  // Ryu uses exponential expression
+  {
+    nanostl::string ns = nanostl::to_string(1.0f);
+    const char *s = ns.c_str();
+    std::string str(s);
+    TEST_CHECK(str.compare("1E0") == 0);
+  }
+}
+
 extern "C" void test_valarray(void);
 
 TEST_LIST = {{"test-vector", test_vector},
@@ -573,6 +583,7 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-float-nan", test_float_nan},
              {"test-double-nan", test_double_nan},
              {"test-digits10", test_digits10},
+             {"test-to_string", test_to_string},
              {nullptr, nullptr}};
 
 // TEST_MAIN();
