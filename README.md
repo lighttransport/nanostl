@@ -6,7 +6,8 @@ NanoSTL is good for using STL-like feature in your C++ application and C++-like 
 
 NanoSTL is portable, it should run well on many environments including Windows, Linux, macOS, x86, ARM, SPARC, etc.
 
-NanoSTL should work well on C++11 compiler or later. C++03 would also work well.
+NanoSTL should work well on C++11 compiler or later.
+(C++03 or earlier is not supported)
 
 ## Status
 
@@ -90,6 +91,8 @@ NanoSTL assumes following type definitions.
   * For example, need to use mutex or lock for `nanostl::vector::push_back()` operation if you are accesing `nanostl::vector` object from multiple threads.
 * RTTI and exception is not supported.
 * Returns `NULL` when memory allocation failed(no `bad_alloc`)
+* stof, stod
+  * Return (signaling) NaN for invalid input
 
 ## TODO
 
