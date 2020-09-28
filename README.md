@@ -86,7 +86,9 @@ Be careful! Not all C++ STL functions are supported for each module.
 ## Other list of implementation status
 
 * cassert
-  * [ ] assert
+  * assert
+    * [x] CUDA
+    * [ ] Other platform
 * To be filled...
 
 ## Supported architectures

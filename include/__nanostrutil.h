@@ -28,6 +28,7 @@
 #include "nanocommon.h"
 #include "nanocstdint.h"
 #include "nanocstring.h"
+#include "nanocassert.h"
 
 namespace nanostl {
 
@@ -89,8 +90,8 @@ static inline int32_t log2pow5(const int32_t e) {
   // This approximation works up to the point that the multiplication overflows at e = 3529.
   // If the multiplication were done in 64 bits, it would fail at 5^4004 which is just greater
   // than 2^9297.
-  //assert(e >= 0);
-  //assert(e <= 3528);
+  assert(e >= 0);
+  assert(e <= 3528);
   return (int32_t) ((((uint32_t) e) * 1217359) >> 19);
 }
 
@@ -100,8 +101,8 @@ static inline int32_t pow5bits(const int32_t e) {
   // This approximation works up to the point that the multiplication overflows at e = 3529.
   // If the multiplication were done in 64 bits, it would fail at 5^4004 which is just greater
   // than 2^9297.
-  //assert(e >= 0);
-  //assert(e <= 3528);
+  assert(e >= 0);
+  assert(e <= 3528);
   return (int32_t) (((((uint32_t) e) * 1217359) >> 19) + 1);
 }
 
@@ -115,8 +116,8 @@ static inline int32_t ceil_log2pow5(const int32_t e) {
 NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t log10Pow2(const int32_t e) {
   // The first value this approximation fails for is 2^1651 which is just greater than 10^297.
-  //assert(e >= 0);
-  //assert(e <= 1650);
+  assert(e >= 0);
+  assert(e <= 1650);
   return (((uint32_t) e) * 78913) >> 18;
 }
 
@@ -124,8 +125,8 @@ static inline uint32_t log10Pow2(const int32_t e) {
 NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t log10Pow5(const int32_t e) {
   // The first value this approximation fails for is 5^2621 which is just greater than 10^1832.
-  //assert(e >= 0);
-  //assert(e <= 2620);
+  assert(e >= 0);
+  assert(e <= 2620);
   return (((uint32_t) e) * 732923) >> 20;
 }
 
@@ -133,7 +134,7 @@ NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t pow5factor_32(uint32_t value) {
   uint32_t count = 0;
   for (;;) {
-    //assert(value != 0);
+    assert(value != 0);
     const uint32_t q = value / 5;
     const uint32_t r = value % 5;
     if (r != 0) {
@@ -162,7 +163,7 @@ static inline bool multipleOfPowerOf2_32(const uint32_t value, const uint32_t p)
 // generated code for uint128_t looks slightly nicer.
 NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t mulShift32(const uint32_t m, const uint64_t factor, const int32_t shift) {
-  //assert(shift > 32);
+  assert(shift > 32);
 
   // The casts here help MSVC to avoid calls to the __allmul library
   // function.
@@ -190,7 +191,7 @@ static inline uint32_t mulShift32(const uint32_t m, const uint64_t factor, const
 #else // RYU_32_BIT_PLATFORM
   const uint64_t sum = (bits0 >> 32) + bits1;
   const uint64_t shiftedSum = sum >> (shift - 32);
-  //assert(shiftedSum <= UINT32_MAX);
+  assert(shiftedSum <= UINT32_MAX);
   return (uint32_t) shiftedSum;
 #endif // RYU_32_BIT_PLATFORM
 }
@@ -416,7 +417,7 @@ static inline uint32_t decimalLength9(const uint32_t v) {
   // Function precondition: v is not a 10-digit number.
   // (f2s: 9 digits are sufficient for round-tripping.)
   // (d2fixed: We print 9-digit blocks.)
-  //assert(v < 1000000000);
+  assert(v < 1000000000);
   if (v >= 100000000) { return 9; }
   if (v >= 10000000) { return 8; }
   if (v >= 1000000) { return 7; }
@@ -434,7 +435,7 @@ static inline uint32_t decimalLength17(const uint64_t v) {
   // The average output length is 16.38 digits, so we check high-to-low.
   // Function precondition: v is not an 18, 19, or 20-digit number.
   // (17 digits are sufficient for round-tripping.)
-  //assert(v < 100000000000000000L);
+  assert(v < 100000000000000000L);
   if (v >= 10000000000000000L) { return 17; }
   if (v >= 1000000000000000L) { return 16; }
   if (v >= 100000000000000L) { return 15; }
@@ -516,8 +517,8 @@ static inline uint64_t umul128(const uint64_t a, const uint64_t b, uint64_t* con
 NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t shiftright128(const uint64_t lo, const uint64_t hi, const uint32_t dist) {
   // We don't need to handle the case dist >= 64 here (see above).
-  //assert(dist < 64);
-  //assert(dist > 0);
+  assert(dist < 64);
+  assert(dist > 0);
   return (hi << (64 - dist)) | (lo >> dist);
 }
 
@@ -629,7 +630,7 @@ NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t pow5Factor(uint64_t value) {
   uint32_t count = 0;
   for (;;) {
-    //assert(value != 0);
+    assert(value != 0);
     const uint64_t q = div5(value);
     const uint32_t r = ((uint32_t) value) - 5 * ((uint32_t) q);
     if (r != 0) {
@@ -651,8 +652,8 @@ static inline bool multipleOfPowerOf5(const uint64_t value, const uint32_t p) {
 // Returns true if value is divisible by 2^p.
 NANOSTL_HOST_AND_DEVICE_QUAL
 static inline bool multipleOfPowerOf2(const uint64_t value, const uint32_t p) {
-  //assert(value != 0);
-  //assert(p < 64);
+  assert(value != 0);
+  assert(p < 64);
   // __builtin_ctzll doesn't appear to be faster here.
   return (value & ((1ull << p) - 1)) == 0;
 }
@@ -1467,7 +1468,7 @@ enum RyuStatus s2f_n(const char * buffer, const int len, float * result) {
     // We now compute [m10 * 10^e10 / 2^e2] = [m10 * 5^e10 / 2^(e2-e10)].
     // To that end, we use the FLOAT_POW5_SPLIT table.
     int j = e2 - e10 - ceil_log2pow5(e10) + RYU_FLOAT_POW5_BITCOUNT;
-    //assert(j >= 0);
+    assert(j >= 0);
     m2 = mulPow5divPow2(m10, e10, j);
 
     // We also compute if the result is exact, i.e.,
@@ -1514,7 +1515,7 @@ enum RyuStatus s2f_n(const char * buffer, const int len, float * result) {
   // the final IEEE exponent into account, so we need to reverse the bias and also special-case
   // the value 0.
   int32_t shift = (ieee_e2 == 0 ? 1 : ieee_e2) - e2 - RYU_FLOAT_EXPONENT_BIAS - RYU_FLOAT_MANTISSA_BITS;
-  //assert(shift >= 0);
+  assert(shift >= 0);
 #ifdef RYU_DEBUG
   printf("ieee_e2 = %d\n", ieee_e2);
   printf("shift = %d\n", shift);
@@ -1534,7 +1535,7 @@ enum RyuStatus s2f_n(const char * buffer, const int len, float * result) {
   printf("ieee_m2 = %u\n", (m2 >> shift) + roundUp);
 #endif
   uint32_t ieee_m2 = (m2 >> shift) + roundUp;
-  //assert(ieee_m2 <= (1u << (RYU_FLOAT_MANTISSA_BITS + 1)));
+  assert(ieee_m2 <= (1u << (RYU_FLOAT_MANTISSA_BITS + 1)));
   ieee_m2 &= (1u << RYU_FLOAT_MANTISSA_BITS) - 1;
   if (ieee_m2 == 0 && roundUp) {
     // Rounding up may overflow the mantissa.
@@ -1690,13 +1691,13 @@ enum RyuStatus s2d_n(const char * buffer, const int len, double * result) {
     // We now compute [m10 * 10^e10 / 2^e2] = [m10 * 5^e10 / 2^(e2-e10)].
     // To that end, we use the DOUBLE_POW5_SPLIT table.
     int j = e2 - e10 - ceil_log2pow5(e10) + RYU_DOUBLE_POW5_BITCOUNT;
-    //assert(j >= 0);
+    assert(j >= 0);
 #if defined(RYU_OPTIMIZE_SIZE)
     uint64_t pow5[2];
     double_computePow5(e10, pow5);
     m2 = mulShift64(m10, pow5, j);
 #else
-    //assert(e10 < DOUBLE_POW5_TABLE_SIZE);
+    assert(e10 < DOUBLE_POW5_TABLE_SIZE);
     m2 = mulShift64(m10, DOUBLE_POW5_SPLIT[e10], j);
 #endif
     // We also compute if the result is exact, i.e.,
@@ -1713,7 +1714,7 @@ enum RyuStatus s2d_n(const char * buffer, const int len, double * result) {
     double_computeInvPow5(-e10, pow5);
     m2 = mulShift64(m10, pow5, j);
 #else
-    //assert(-e10 < RYU_DOUBLE_POW5_INV_TABLE_SIZE);
+    assert(-e10 < RYU_DOUBLE_POW5_INV_TABLE_SIZE);
     m2 = mulShift64(m10, DOUBLE_POW5_INV_SPLIT[-e10], j);
 #endif
     trailingZeros = multipleOfPowerOf5(m10, -e10);
@@ -1737,7 +1738,7 @@ enum RyuStatus s2d_n(const char * buffer, const int len, double * result) {
   // the final IEEE exponent into account, so we need to reverse the bias and also special-case
   // the value 0.
   int32_t shift = (ieee_e2 == 0 ? 1 : ieee_e2) - e2 - RYU_DOUBLE_EXPONENT_BIAS - RYU_DOUBLE_MANTISSA_BITS;
-  //assert(shift >= 0);
+  assert(shift >= 0);
 #ifdef RYU_DEBUG
   printf("ieee_e2 = %d\n", ieee_e2);
   printf("shift = %d\n", shift);
@@ -1757,7 +1758,7 @@ enum RyuStatus s2d_n(const char * buffer, const int len, double * result) {
   printf("ieee_m2 = %" PRIu64 "\n", (m2 >> shift) + roundUp);
 #endif
   uint64_t ieee_m2 = (m2 >> shift) + roundUp;
-  //assert(ieee_m2 <= (1ull << (RYU_DOUBLE_MANTISSA_BITS + 1)));
+  assert(ieee_m2 <= (1ull << (RYU_DOUBLE_MANTISSA_BITS + 1)));
   ieee_m2 &= (1ull << RYU_DOUBLE_MANTISSA_BITS) - 1;
   if (ieee_m2 == 0 && roundUp) {
     // Due to how the IEEE represents +/-Infinity, we don't need to check for overflow here.
