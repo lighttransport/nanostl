@@ -1,3 +1,4 @@
+#error "This code path is not available at this time"
 // Copyright 2018 Ulf Adams
 //
 // The contents of this file may be used under the terms of the Apache License,

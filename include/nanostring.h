@@ -26,6 +26,7 @@
 #define NANOSTL_STRING_H_
 
 #include "nanovector.h"
+#include "nanolimits.h"
 #include "__nanostrutil.h"
 
 #ifdef NANOSTL_DEBUG

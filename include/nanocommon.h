@@ -29,10 +29,14 @@
 #define NANOSTL_DEVICE_QUAL __device__
 #define NANOSTL_HOST_QUAL __host__
 #define NANOSTL_HOST_AND_DEVICE_QUAL __host__ __device__
+#define NANOSTL_GLOBAL_QUAL __global__
+#define NANOSTL_CONSTANT_QUAL __constant__
 #else
 #define NANOSTL_DEVICE_QUAL
 #define NANOSTL_HOST_QUAL
 #define NANOSTL_HOST_AND_DEVICE_QUAL
+#define NANOSTL_GLOBAL_QUAL
+#define NANOSTL_CONSTANT_QUAL
 #endif
 
 namespace nanostl {

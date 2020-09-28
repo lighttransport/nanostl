@@ -25,6 +25,7 @@
 #ifndef NANOSTL_STRUTIL_H_
 #define NANOSTL_STRUTIL_H_
 
+#include "nanocommon.h"
 #include "nanocstdint.h"
 #include "nanocstring.h"
 
@@ -65,6 +66,7 @@ namespace ryu {
 
 
 #if defined(RYU_OPTIMIZE_SIZE)
+#error
 #include "ryu/d2s_small_table.h"
 #else
 #include "ryu/d2s_full_table.h"
@@ -82,6 +84,7 @@ typedef struct floating_decimal_32 {
 } floating_decimal_32;
 
 // Returns e == 0 ? 1 : [log_2(5^e)]; requires 0 <= e <= 3528.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline int32_t log2pow5(const int32_t e) {
   // This approximation works up to the point that the multiplication overflows at e = 3529.
   // If the multiplication were done in 64 bits, it would fail at 5^4004 which is just greater
@@ -92,6 +95,7 @@ static inline int32_t log2pow5(const int32_t e) {
 }
 
 // Returns e == 0 ? 1 : ceil(log_2(5^e)); requires 0 <= e <= 3528.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline int32_t pow5bits(const int32_t e) {
   // This approximation works up to the point that the multiplication overflows at e = 3529.
   // If the multiplication were done in 64 bits, it would fail at 5^4004 which is just greater
@@ -102,11 +106,13 @@ static inline int32_t pow5bits(const int32_t e) {
 }
 
 // Returns e == 0 ? 1 : ceil(log_2(5^e)); requires 0 <= e <= 3528.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline int32_t ceil_log2pow5(const int32_t e) {
   return log2pow5(e) + 1;
 }
 
 // Returns floor(log_10(2^e)); requires 0 <= e <= 1650.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t log10Pow2(const int32_t e) {
   // The first value this approximation fails for is 2^1651 which is just greater than 10^297.
   //assert(e >= 0);
@@ -115,6 +121,7 @@ static inline uint32_t log10Pow2(const int32_t e) {
 }
 
 // Returns floor(log_10(5^e)); requires 0 <= e <= 2620.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t log10Pow5(const int32_t e) {
   // The first value this approximation fails for is 5^2621 which is just greater than 10^1832.
   //assert(e >= 0);
@@ -122,6 +129,7 @@ static inline uint32_t log10Pow5(const int32_t e) {
   return (((uint32_t) e) * 732923) >> 20;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t pow5factor_32(uint32_t value) {
   uint32_t count = 0;
   for (;;) {
@@ -138,11 +146,13 @@ static inline uint32_t pow5factor_32(uint32_t value) {
 }
 
 // Returns true if value is divisible by 5^p.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline bool multipleOfPowerOf5_32(const uint32_t value, const uint32_t p) {
   return pow5factor_32(value) >= p;
 }
 
 // Returns true if value is divisible by 2^p.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline bool multipleOfPowerOf2_32(const uint32_t value, const uint32_t p) {
   // __builtin_ctz doesn't appear to be faster here.
   return (value & ((1u << p) - 1)) == 0;
@@ -150,6 +160,7 @@ static inline bool multipleOfPowerOf2_32(const uint32_t value, const uint32_t p)
 
 // It seems to be slightly faster to avoid uint128_t here, although the
 // generated code for uint128_t looks slightly nicer.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t mulShift32(const uint32_t m, const uint64_t factor, const int32_t shift) {
   //assert(shift > 32);
 
@@ -184,6 +195,7 @@ static inline uint32_t mulShift32(const uint32_t m, const uint64_t factor, const
 #endif // RYU_32_BIT_PLATFORM
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t mulPow5InvDivPow2(const uint32_t m, const uint32_t q, const int32_t j) {
 #if defined(RYU_FLOAT_FULL_TABLE)
   return mulShift32(m, FLOAT_POW5_INV_SPLIT[q], j);
@@ -200,6 +212,7 @@ static inline uint32_t mulPow5InvDivPow2(const uint32_t m, const uint32_t q, con
 }
 
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t mulPow5divPow2(const uint32_t m, const uint32_t i, const int32_t j) {
 #if defined(RYU_FLOAT_FULL_TABLE)
   return mulShift32(m, FLOAT_POW5_SPLIT[i], j);
@@ -213,6 +226,7 @@ static inline uint32_t mulPow5divPow2(const uint32_t m, const uint32_t i, const 
 }
 
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline floating_decimal_32 f2d(const uint32_t ieeeMantissa, const uint32_t ieeeExponent) {
   int32_t e2;
   uint32_t m2;
@@ -397,6 +411,7 @@ static inline floating_decimal_32 f2d(const uint32_t ieeeMantissa, const uint32_
 
 
 // Returns the number of decimal digits in v, which must not contain more than 9 digits.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t decimalLength9(const uint32_t v) {
   // Function precondition: v is not a 10-digit number.
   // (f2s: 9 digits are sufficient for round-tripping.)
@@ -413,6 +428,7 @@ static inline uint32_t decimalLength9(const uint32_t v) {
   return 1;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t decimalLength17(const uint64_t v) {
   // This is slightly faster than a loop.
   // The average output length is 16.38 digits, so we check high-to-low.
@@ -442,11 +458,13 @@ static inline uint32_t decimalLength17(const uint64_t v) {
 
 #include <intrin.h>
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t umul128(const uint64_t a, const uint64_t b, uint64_t* const productHi) {
   return _umul128(a, b, productHi);
 }
 
 // Returns the lower 64 bits of (hi*2^64 + lo) >> dist, with 0 < dist < 64.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t shiftright128(const uint64_t lo, const uint64_t hi, const uint32_t dist) {
   // For the __shiftright128 intrinsic, the shift value is always
   // modulo 64.
@@ -464,6 +482,7 @@ static inline uint64_t shiftright128(const uint64_t lo, const uint64_t hi, const
 
 #else // defined(HAS_64_BIT_INTRINSICS)
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t umul128(const uint64_t a, const uint64_t b, uint64_t* const productHi) {
   // The casts here help MSVC to avoid calls to the __allmul library function.
   const uint32_t aLo = (uint32_t)a;
@@ -494,6 +513,7 @@ static inline uint64_t umul128(const uint64_t a, const uint64_t b, uint64_t* con
   return pLo;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t shiftright128(const uint64_t lo, const uint64_t hi, const uint32_t dist) {
   // We don't need to handle the case dist >= 64 here (see above).
   //assert(dist < 64);
@@ -507,6 +527,7 @@ static inline uint64_t shiftright128(const uint64_t lo, const uint64_t hi, const
 #if defined(RYU_32_BIT_PLATFORM)
 
 // Returns the high 64 bits of the 128-bit product of a and b.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t umulh(const uint64_t a, const uint64_t b) {
   // Reuse the umul128 implementation.
   // Optimizers will likely eliminate the instructions used to compute the
@@ -531,26 +552,32 @@ static inline uint64_t umulh(const uint64_t a, const uint64_t b) {
 // The multipliers and shift values are the ones generated by clang x64
 // for expressions like x/5, x/10, etc.
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t div5(const uint64_t x) {
   return umulh(x, 0xCCCCCCCCCCCCCCCDu) >> 2;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t div10(const uint64_t x) {
   return umulh(x, 0xCCCCCCCCCCCCCCCDu) >> 3;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t div100(const uint64_t x) {
   return umulh(x >> 2, 0x28F5C28F5C28F5C3u) >> 2;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t div1e8(const uint64_t x) {
   return umulh(x, 0xABCC77118461CEFDu) >> 26;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t div1e9(const uint64_t x) {
   return umulh(x >> 9, 0x44B82FA09B5A53u) >> 11;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t mod1e9(const uint64_t x) {
   // Avoid 64-bit math as much as possible.
   // Returning (uint32_t) (x - 1000000000 * div1e9(x)) would
@@ -566,32 +593,39 @@ static inline uint32_t mod1e9(const uint64_t x) {
 
 #else // defined(RYU_32_BIT_PLATFORM)
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t div5(const uint64_t x) {
   return x / 5;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t div10(const uint64_t x) {
   return x / 10;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t div100(const uint64_t x) {
   return x / 100;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t div1e8(const uint64_t x) {
   return x / 100000000;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t div1e9(const uint64_t x) {
   return x / 1000000000;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t mod1e9(const uint64_t x) {
   return (uint32_t) (x - 1000000000 * div1e9(x));
 }
 
 #endif // defined(RYU_32_BIT_PLATFORM)
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t pow5Factor(uint64_t value) {
   uint32_t count = 0;
   for (;;) {
@@ -608,12 +642,14 @@ static inline uint32_t pow5Factor(uint64_t value) {
 }
 
 // Returns true if value is divisible by 5^p.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline bool multipleOfPowerOf5(const uint64_t value, const uint32_t p) {
   // I tried a case distinction on p, but there was no performance difference.
   return pow5Factor(value) >= p;
 }
 
 // Returns true if value is divisible by 2^p.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline bool multipleOfPowerOf2(const uint64_t value, const uint32_t p) {
   //assert(value != 0);
   //assert(p < 64);
@@ -624,6 +660,7 @@ static inline bool multipleOfPowerOf2(const uint64_t value, const uint32_t p) {
 
 // A table of all two-digit numbers. This is used to speed up decimal digit
 // generation by copying pairs of digits into the final output.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static const char DIGIT_TABLE[200] = {
   '0','0','0','1','0','2','0','3','0','4','0','5','0','6','0','7','0','8','0','9',
   '1','0','1','1','1','2','1','3','1','4','1','5','1','6','1','7','1','8','1','9',
@@ -637,6 +674,7 @@ static const char DIGIT_TABLE[200] = {
   '9','0','9','1','9','2','9','3','9','4','9','5','9','6','9','7','9','8','9','9'
 };
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline int copy_special_str(char * const result, const bool sign, const bool exponent, const bool mantissa) {
   if (mantissa) {
     memcpy(result, "NaN", 3);
@@ -654,12 +692,14 @@ static inline int copy_special_str(char * const result, const bool sign, const b
 }
 
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t float_to_bits(const float f) {
   uint32_t bits = 0;
   memcpy(&bits, &f, sizeof(float));
   return bits;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t double_to_bits(const double d) {
   uint64_t bits = 0;
   memcpy(&bits, &d, sizeof(double));
@@ -667,6 +707,7 @@ static inline uint64_t double_to_bits(const double d) {
 }
 
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline int to_chars(const floating_decimal_32 v, const bool sign, char* const result) {
   // Step 5: Print the decimal representation.
   int index = 0;
@@ -745,6 +786,7 @@ static inline int to_chars(const floating_decimal_32 v, const bool sign, char* c
   return index;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 int f2s_buffered_n(float f, char* result) {
   // Step 1: Decode the floating-point number, and unify normalized and subnormal cases.
   const uint32_t bits = float_to_bits(f);
@@ -772,6 +814,7 @@ int f2s_buffered_n(float f, char* result) {
 }
 
 // result: 16bytes for float
+NANOSTL_HOST_AND_DEVICE_QUAL
 void f2s_buffered(float f, char* result) {
   const int index = f2s_buffered_n(f, result);
 
@@ -788,6 +831,7 @@ typedef struct floating_decimal_64 {
   int32_t exponent;
 } floating_decimal_64;
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t mulShift64(const uint64_t m, const uint64_t* const mul, const int32_t j) {
   // m is maximum 55 bits
   uint64_t high1;                                   // 128
@@ -802,6 +846,7 @@ static inline uint64_t mulShift64(const uint64_t m, const uint64_t* const mul, c
 }
 
 // This is faster if we don't have a 64x64->128-bit multiplication.
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint64_t mulShiftAll64(uint64_t m, const uint64_t* const mul, const int32_t j,
   uint64_t* const vp, uint64_t* const vm, const uint32_t mmShift) {
   m <<= 1;
@@ -836,6 +881,7 @@ static inline uint64_t mulShiftAll64(uint64_t m, const uint64_t* const mul, cons
 }
 
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline floating_decimal_64 d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent) {
   int32_t e2;
   uint64_t m2;
@@ -1060,6 +1106,7 @@ static inline floating_decimal_64 d2d(const uint64_t ieeeMantissa, const uint32_
 }
 
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline int to_chars(const floating_decimal_64 v, const bool sign, char* const result) {
   // Step 5: Print the decimal representation.
   int index = 0;
@@ -1168,6 +1215,7 @@ static inline int to_chars(const floating_decimal_64 v, const bool sign, char* c
   return index;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline bool d2d_small_int(const uint64_t ieeeMantissa, const uint32_t ieeeExponent,
   floating_decimal_64* const v) {
   const uint64_t m2 = (1ull << RYU_DOUBLE_MANTISSA_BITS) | ieeeMantissa;
@@ -1201,6 +1249,7 @@ static inline bool d2d_small_int(const uint64_t ieeeMantissa, const uint32_t iee
 }
 
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 int d2s_buffered_n(double f, char* result) {
   // Step 1: Decode the floating-point number, and unify normalized and subnormal cases.
   const uint64_t bits = double_to_bits(f);
@@ -1246,6 +1295,7 @@ int d2s_buffered_n(double f, char* result) {
 }
 
 // bufsize max: 25
+NANOSTL_HOST_AND_DEVICE_QUAL
 void d2s_buffered(double f, char* result) {
   const int index = d2s_buffered_n(f, result);
 
@@ -1268,6 +1318,7 @@ enum RyuStatus {
 // Simple clz implementation
 // https://stackoverflow.com/questions/23856596/how-to-count-leading-zeros-in-a-32-bit-unsigned-integer
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 int __myclzi(uint32_t x)
 {
   if (!x) return 32;
@@ -1284,6 +1335,7 @@ int __myclzi(uint32_t x)
 
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 inline uint32_t floor_log2(const uint32_t value) {
   if (value == 0) return 32;
 
@@ -1291,16 +1343,19 @@ inline uint32_t floor_log2(const uint32_t value) {
 }
 
 // The max function is already defined on Windows.
-static inline int32_t max32(int32_t a, int32_t b) {
+NANOSTL_HOST_AND_DEVICE_QUAL
+inline int32_t max32(int32_t a, int32_t b) {
   return a < b ? b : a;
 }
 
-static inline float int32Bits2Float(uint32_t bits) {
+NANOSTL_HOST_AND_DEVICE_QUAL
+inline float int32Bits2Float(uint32_t bits) {
   float f;
   memcpy(&f, &bits, sizeof(float));
   return f;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 enum RyuStatus s2f_n(const char * buffer, const int len, float * result) {
   if (len == 0) {
     return RYU_INPUT_TOO_SHORT;
@@ -1495,6 +1550,7 @@ enum RyuStatus s2f_n(const char * buffer, const int len, float * result) {
 
 // naiive implementation of __clzll
 // http://rapidjson.org/clzll_8h_source.html
+NANOSTL_HOST_AND_DEVICE_QUAL
 inline uint32_t __myclzll(uint64_t x)
 {
   if (x == 0) return 64;
@@ -1508,18 +1564,21 @@ inline uint32_t __myclzll(uint64_t x)
   return r;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 static inline uint32_t floor_log2(const uint64_t value) {
   // assume value != 0
-  return 63 - __builtin_clzll(value);
+  return 63 - __myclzll(value);
 }
 
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 inline double int64Bits2Double(uint64_t bits) {
   double f;
   memcpy(&f, &bits, sizeof(double));
   return f;
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
 enum RyuStatus s2d_n(const char * buffer, const int len, double * result) {
   if (len == 0) {
     return RYU_INPUT_TOO_SHORT;

@@ -22,6 +22,10 @@ Eearly testing stage. Not ready for the production use.
 
 * vector
 * string
+  * [x] `to_string(float)`(using ryu)
+  * [x] `to_string(double)`(using ryu)
+  * [x] `stof`(string to float. using ryu_parse)
+  * [x] `stod`(string to double. using ryu_parse)
 * algorithm
 * limits
 * map
@@ -32,6 +36,31 @@ Be careful! Not all C++ STL functions are supported for each module.
 
 * math : Approximate math functions. Please keep in mind this is basically not be IEEE-754 compliant and does not consier a processor's rounding mode.
 * valarray
+* cstring
+  * [x] memcpy
+  * [ ] memmove
+  * [ ] strcpy
+  * [ ] strncpy
+  * [ ] strcat
+  * [ ] strncat
+  * [ ] memcmp
+  * [ ] strcmp
+  * [ ] strcoll
+  * [ ] strncmp
+  * [ ] strxfrm
+  * [ ] memchr
+  * [ ] strchr
+  * [ ] strcspn
+  * [ ] strpbrk
+  * [ ] strrchr
+  * [ ] strspn
+  * [ ] strstr
+  * [ ] strtok
+  * [ ] memset
+  * [ ] strerror
+  * [ ] strlen
+  * [ ] NULL
+  * [x] `size_t`
 
 #### math functions
 
@@ -53,6 +82,12 @@ Be careful! Not all C++ STL functions are supported for each module.
 * [x] erf(float)
 * [x] erfc(float)
 * [x] ierf(float)
+
+## Other list of implementation status
+
+* cassert
+  * [ ] assert
+* To be filled...
 
 ## Supported architectures
 

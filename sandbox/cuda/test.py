@@ -14,11 +14,22 @@ mod = SourceModule("""
 #include <nanomap.h>
 #include <nanostring.h>
 #include <nanolimits.h>
+#include <nanosstream.h>
 //#include <vector>
 
 extern "C" {
 __global__ void multiply_them(float *dest, float *a, float *b)
 {
+
+  nanostl::stringstream ss;
+
+  ss << "bora\\n";
+
+  printf("msg = %s\\n", ss.str().c_str());
+
+  nanostl::string aa = nanostl::to_string(1.0f);
+  printf("val = %s\\n", aa.c_str());
+
   float infval = nanostl::numeric_limits<float>::infinity();
   float minval = nanostl::numeric_limits<float>::min();
   float denorm_minval = nanostl::numeric_limits<float>::denorm_min();
