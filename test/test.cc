@@ -64,10 +64,10 @@ static bool float_equals_by_eps(T x, T y, T eps) {
 }
 
 // Ulps based equality check
+// TODO(LTE): Support double
 // TODO(LTE): Consider nan, inf case.
 // Based on this blog post: https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
-template <typename T>
-static bool float_equals_by_ulps(T x, T y, int max_ulp_diffs) {
+static bool float_equals_by_ulps(float x, float y, int max_ulp_diffs) {
   nanostl::IEEE754Float flt_x;
   nanostl::IEEE754Float flt_y;
 
@@ -87,6 +87,38 @@ static bool float_equals_by_ulps(T x, T y, int max_ulp_diffs) {
   }
 
   int diff = int(flt_x.ui) - int(flt_y.ui);
+
+  // abs
+  diff = (diff < 0) ? -diff : diff;
+
+  if (diff <= max_ulp_diffs) {
+    return true;
+  }
+  std::cout << "x: " << x << ", y: " << y << ", diff_ulps = " << diff << std::endl;
+
+  return false;
+}
+
+static bool double_equals_by_ulps(double x, double y, int max_ulp_diffs) {
+  nanostl::IEEE754Double flt_x;
+  nanostl::IEEE754Double flt_y;
+
+  flt_x.f = x;
+  flt_y.f = y;
+
+  if (flt_x.bits.sign != flt_y.bits.sign) {
+    // Check if +0/-0
+    if ((flt_x.bits.exponent == 0) &&
+        (flt_y.bits.exponent == 0) &&
+        (flt_x.bits.mantissa == 0) &&
+        (flt_y.bits.mantissa == 0)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  int diff = int(flt_x.ull) - int(flt_y.ull);
 
   // abs
   diff = (diff < 0) ? -diff : diff;
@@ -217,6 +249,16 @@ static void test_string(void) {
 
   TEST_CHECK(s[0] == 'a');
   TEST_CHECK(s.at(0) == 'a');
+
+  TEST_CHECK(nanostl::string("").size() == std::string("").size());
+  TEST_CHECK(nanostl::string("a").size() == std::string("a").size());
+  TEST_CHECK(nanostl::string("1.0").size() == std::string("1.0").size());
+  TEST_CHECK(nanostl::string("\0").size() == std::string("\0").size());
+
+  TEST_CHECK(nanostl::string("").length() == std::string("").length());
+  TEST_CHECK(nanostl::string("a").length() == std::string("a").length());
+  TEST_CHECK(nanostl::string("1.0").length() == std::string("1.0").length());
+  TEST_CHECK(nanostl::string("\0").length() == std::string("\0").length());
 }
 
 static void test_map(void) {
@@ -561,6 +603,14 @@ static void test_to_string(void) {
   }
 }
 
+static void test_stof(void) {
+  TEST_CHECK(float_equals_by_ulps(nanostl::stof("1.0"), 1.0f, 0));
+}
+
+static void test_stod(void) {
+  TEST_CHECK(double_equals_by_ulps(nanostl::stod("1.0"), 1.0, 0));
+}
+
 extern "C" void test_valarray(void);
 
 TEST_LIST = {{"test-vector", test_vector},
@@ -584,6 +634,7 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-double-nan", test_double_nan},
              {"test-digits10", test_digits10},
              {"test-to_string", test_to_string},
+             {"test-stof", test_stof},
              {nullptr, nullptr}};
 
 // TEST_MAIN();

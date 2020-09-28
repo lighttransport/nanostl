@@ -90,10 +90,17 @@ class basic_string {
   bool empty() const { return data_.size() == 0; }
 
   NANOSTL_HOST_AND_DEVICE_QUAL
-  size_type size() const { return data_.size(); }
+  size_type size() const {
+    // -1 for '\0'
+    return data_.size() - 1;
+  }
 
   NANOSTL_HOST_AND_DEVICE_QUAL
-  size_type length() const { return data_.size(); }
+  size_type length() const {
+    // -1 for '\0'
+    return data_.size() - 1;
+  }
+
 
   NANOSTL_HOST_AND_DEVICE_QUAL
   void clear() { data_.clear(); }
@@ -195,13 +202,50 @@ basic_string<charT> &basic_string<charT>::operator+=(
 typedef basic_string<char> string;
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-static string to_string(float value) {
+string to_string(float value) {
   char buf[16];
-  f2s_buffered(value, buf);
+  ryu::f2s_buffered(value, buf);
 
   return string(buf);
 }
 
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(double value) {
+  char buf[25];
+  ryu::d2s_buffered(value, buf);
+
+  return string(buf);
+}
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+float stof(const nanostl::string &str, nanostl::size_t *idx = nullptr)
+{
+  (void)idx; // TODO(LTE):
+  float value;
+  ryu::RyuStatus ret = ryu::s2f_n(str.c_str(), str.size(), &value);
+
+  if (ret != ryu::RYU_SUCCESS) {
+    // TODO(LTE): Report an error
+    return nanostl::numeric_limits<float>::signaling_NaN();
+  }
+
+  return value;
+}
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+float stod(const nanostl::string &str, nanostl::size_t *idx = nullptr)
+{
+  (void)idx; // TODO(LTE):
+  double value;
+  ryu::RyuStatus ret = ryu::s2d_n(str.c_str(), str.size(), &value);
+
+  if (ret != ryu::RYU_SUCCESS) {
+    // TODO(LTE): Report an error
+    return nanostl::numeric_limits<double>::signaling_NaN();
+  }
+
+  return value;
+}
 
 }  // namespace nanostl
 

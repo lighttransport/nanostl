@@ -76,6 +76,8 @@ union IEEE754Double {
   } bits;
 };
 
+using size_t = unsigned long long;
+
 } // namespace
 
 }  // namespace nanostl
