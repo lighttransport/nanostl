@@ -28,6 +28,18 @@ Eearly testing stage. Not ready for the production use.
   * [x] `stod`(string to double. using ryu_parse)
 * algorithm
 * limits
+  * [x] `numeric_limits<T>::min`
+  * [x] `numeric_limits<T>::max`
+  * [x] `numeric_limits<T>::epsilon()`
+  * [x] `numeric_limits<T>::digits10`
+  * [x] `numeric_limits<float>::denorm_min()`
+  * [x] `numeric_limits<double>::denorm_min()`
+  * [x] `numeric_limits<float>::inifinity()`
+  * [x] `numeric_limits<float>::quiet_NaN()`
+  * [x] `numeric_limits<float>::signaling_NaN()`
+  * [x] `numeric_limits<double>::inifinity()`
+  * [x] `numeric_limits<double>::quiet_NaN()`
+  * [x] `numeric_limits<double>::signaling_NaN()`
 * map
 
 Be careful! Not all C++ STL functions are supported for each module.
