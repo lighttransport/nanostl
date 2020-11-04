@@ -39,6 +39,9 @@
 #define NANOSTL_CONSTANT_QUAL
 #endif
 
+// TODO(LTE): Implement
+#define _NANOSTL_TEMPLATE_VIS
+
 namespace nanostl {
 
 // In BigEndian architecture, must define NANOSTL_BIG_ENDIAN explicitly at the
