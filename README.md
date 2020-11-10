@@ -105,7 +105,7 @@ Be careful! Not all C++ STL functions are supported for each module.
 
 ## Supported architectures
 
-* 64bit and 32bit machine.
+* 64bit arctecture only.
 * Big endian and little endian
   * Some math functions may not run on big endian machine.
 * CUDA device.
@@ -132,6 +132,7 @@ NanoSTL assumes following type definitions.
 ## Compiler macros
 
 * `NANOSTL_BIG_ENDIAN` Set endianness to big endian. Considering to support various compilers, user must explicitly specify endianness to the compiler. Default is little endian.
+* `NANOSTL_NO_IO` Disable all I/O operation(e.g. iostream). Useful for embedded devices.
 
 ## Differences compared to (full featured) C++ STL
 
@@ -191,3 +192,4 @@ Some functions in nanomath is licenced under modified BSD license.
 * acutest : MIT license.
 * faster math functions: Some math functions implemented in nanomath is grabbed from OpenImageIO fmath.h, which is licensed under modified BSD license. https://github.com/OpenImageIO/oiio/
 * ryu(floating point <-> string converter). NanoSTL choose Boost 1.0 license. https://github.com/ulfjack/ryu
+* libc++: Apache License v2.0 with LLVM Exceptions
