@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017 Light Transport Entertainment, Inc.
+ * Copyright (c) 2020 Light Transport Entertainment, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,48 +22,21 @@
  * THE SOFTWARE.
  */
 
-#ifndef NANOSTL_UTILITY_H_
-#define NANOSTL_UTILITY_H_
-
-#include "nanotype_traits.h"
+#ifndef NANOSTL_IOSFWD_H_
+#define NANOSTL_IOSFWD_H_
 
 namespace nanostl {
 
-template <class T1, class T2>
-struct pair {
-  T1 first;
-  T2 second;
-  pair() {}
-  pair(const T1& a, const T2& b) : first(a), second(b) {}
-};
+template<class CharT> struct char_traits;
 
-template <class T1, class T2>
-inline bool operator==(const pair<T1, T2>& x, const pair<T1, T2>& y) {
-  return x.first == y.first && x.second == y.second;
-}
+  template<> struct char_traits<char>;
+  //template<> struct char_traits<char8_t>;
+  template<> struct char_traits<char16_t>;
+  template<> struct char_traits<char32_t>;
+  template<> struct char_traits<wchar_t>;
 
-template <class T1, class T2>
-inline bool operator<(const pair<T1, T2>& x, const pair<T1, T2>& y) {
-  return x.first < y.first || (!(y.first < x.first) && x.second < y.second);
-}
+template <class charT, class traits = char_traits<charT> > class basic_streambuf;
 
-template <class T1, class T2>
-inline pair<T1, T2> make_pair(const T1& x, const T2& y) {
-  return pair<T1, T2>(x, y);
-}
+} // namespace nanostl
 
-// limited implementation of swap
-template <class T>
-inline void swap(T &a, T &b) noexcept
-{
-  T tmp;
-  tmp = a;
-  a = b;
-  b = tmp;
-}
-
-//template <class T> typename add_rvalue_reference<T>::type declval() noexcept;
-
-}  // namespace nanostl
-
-#endif  // NANOSTL_UTILITY_H_
+#endif // NANOSTL_IOSFWD_H_

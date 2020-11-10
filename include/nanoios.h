@@ -110,9 +110,9 @@ public:
     explicit operator bool() const {return !fail();}
 
     inline bool operator!() const    {return  fail();}
-    inline iostate rdstate() const   {return ios_base::rdstate();}
-    inline void clear(iostate __state = goodbit) {ios_base::clear(__state);}
-    inline void setstate(iostate __state) {ios_base::setstate(__state);}
+    //inline iostate rdstate() const   {return ios_base::rdstate();}
+    //inline void clear(iostate __state = goodbit) {ios_base::clear(__state);}
+    //inline void setstate(iostate __state) {ios_base::setstate(__state);}
     inline bool good() const {return ios_base::good();}
     inline bool eof() const  {return ios_base::eof();}
     inline bool fail() const {return ios_base::fail();}

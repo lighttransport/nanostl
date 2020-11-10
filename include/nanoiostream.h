@@ -25,6 +25,10 @@
 #ifndef NANOSTL_IOSTREAM_H_
 #define NANOSTL_IOSTREAM_H_
 
+#include "nanoios.h"
+#include "nanostreambuf.h"
+#include "nanocommon.h"
+
 namespace nanostl {
 
 // Based on libcxx ----------------------
@@ -40,6 +44,35 @@ public:
     typedef typename traits_type::int_type int_type;
     typedef typename traits_type::pos_type pos_type;
     typedef typename traits_type::off_type off_type;
+
+
+    basic_ostream& operator<<(bool __n);
+    basic_ostream& operator<<(short __n);
+    basic_ostream& operator<<(unsigned short __n);
+    basic_ostream& operator<<(int __n);
+    basic_ostream& operator<<(unsigned int __n);
+    basic_ostream& operator<<(long __n);
+    basic_ostream& operator<<(unsigned long __n);
+    basic_ostream& operator<<(long long __n);
+    basic_ostream& operator<<(unsigned long long __n);
+    basic_ostream& operator<<(float __f);
+    basic_ostream& operator<<(double __f);
+    basic_ostream& operator<<(long double __f);
+    basic_ostream& operator<<(const void* __p);
+
+    basic_ostream& operator<<(basic_streambuf<char_type, traits_type>* __sb);
+
+    inline
+    basic_ostream& operator<<(nullptr_t)
+    { return *this << "nullptr"; }
+
+    // 27.7.2.7 Unformatted output:
+    basic_ostream& put(char_type __c);
+    basic_ostream& write(const char_type* __s, streamsize __n);
+    basic_ostream& flush();
+
+protected:
+    basic_ostream() {}
 
 };
 
