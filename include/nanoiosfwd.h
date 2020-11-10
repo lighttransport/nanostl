@@ -27,16 +27,32 @@
 
 namespace nanostl {
 
-template<class CharT> struct char_traits;
+template <class CharT>
+struct char_traits;
 
-  template<> struct char_traits<char>;
-  //template<> struct char_traits<char8_t>;
-  template<> struct char_traits<char16_t>;
-  template<> struct char_traits<char32_t>;
-  template<> struct char_traits<wchar_t>;
+template <>
+struct char_traits<char>;
+// template<> struct char_traits<char8_t>;
+template <>
+struct char_traits<char16_t>;
+template <>
+struct char_traits<char32_t>;
+template <>
+struct char_traits<wchar_t>;
 
-template <class charT, class traits = char_traits<charT> > class basic_streambuf;
+template <class charT, class traits = char_traits<charT> >
+class basic_streambuf;
+template <class _CharT, class _Traits = char_traits<_CharT> >
+class basic_ostream;
 
-} // namespace nanostl
+typedef basic_streambuf<char> streambuf;
+typedef basic_ostream<char> ostream;
 
-#endif // NANOSTL_IOSFWD_H_
+template <class _State>             class fpos;
+
+// TODO: Use mbstate_t
+typedef fpos<long long>    streampos;
+
+}  // namespace nanostl
+
+#endif  // NANOSTL_IOSFWD_H_

@@ -191,7 +191,7 @@ static inline uint32_t mulShift32(const uint32_t m, const uint64_t factor, const
 #else // RYU_32_BIT_PLATFORM
   const uint64_t sum = (bits0 >> 32) + bits1;
   const uint64_t shiftedSum = sum >> (shift - 32);
-  assert(shiftedSum <= UINT32_MAX);
+  assert(shiftedSum <= 4294967295); // UINT32_MAX
   return (uint32_t) shiftedSum;
 #endif // RYU_32_BIT_PLATFORM
 }
@@ -788,7 +788,7 @@ static inline int to_chars(const floating_decimal_32 v, const bool sign, char* c
 }
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-int f2s_buffered_n(float f, char* result) {
+static int f2s_buffered_n(float f, char* result) {
   // Step 1: Decode the floating-point number, and unify normalized and subnormal cases.
   const uint32_t bits = float_to_bits(f);
 
@@ -816,7 +816,7 @@ int f2s_buffered_n(float f, char* result) {
 
 // result: 16bytes for float
 NANOSTL_HOST_AND_DEVICE_QUAL
-void f2s_buffered(float f, char* result) {
+static void f2s_buffered(float f, char* result) {
   const int index = f2s_buffered_n(f, result);
 
   // Terminate the string.
@@ -1251,7 +1251,7 @@ static inline bool d2d_small_int(const uint64_t ieeeMantissa, const uint32_t iee
 
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-int d2s_buffered_n(double f, char* result) {
+static int d2s_buffered_n(double f, char* result) {
   // Step 1: Decode the floating-point number, and unify normalized and subnormal cases.
   const uint64_t bits = double_to_bits(f);
 
@@ -1297,7 +1297,7 @@ int d2s_buffered_n(double f, char* result) {
 
 // bufsize max: 25
 NANOSTL_HOST_AND_DEVICE_QUAL
-void d2s_buffered(double f, char* result) {
+static void d2s_buffered(double f, char* result) {
   const int index = d2s_buffered_n(f, result);
 
   // Terminate the string.
@@ -1320,7 +1320,7 @@ enum RyuStatus {
 // https://stackoverflow.com/questions/23856596/how-to-count-leading-zeros-in-a-32-bit-unsigned-integer
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-int __myclzi(uint32_t x)
+inline int __myclzi(uint32_t x)
 {
   if (!x) return 32;
 
@@ -1357,7 +1357,7 @@ inline float int32Bits2Float(uint32_t bits) {
 }
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-enum RyuStatus s2f_n(const char * buffer, const int len, float * result) {
+static enum RyuStatus s2f_n(const char * buffer, const int len, float * result) {
   if (len == 0) {
     return RYU_INPUT_TOO_SHORT;
   }
@@ -1580,7 +1580,7 @@ inline double int64Bits2Double(uint64_t bits) {
 }
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-enum RyuStatus s2d_n(const char * buffer, const int len, double * result) {
+static enum RyuStatus s2d_n(const char * buffer, const int len, double * result) {
   if (len == 0) {
     return RYU_INPUT_TOO_SHORT;
   }
@@ -1697,7 +1697,7 @@ enum RyuStatus s2d_n(const char * buffer, const int len, double * result) {
     double_computePow5(e10, pow5);
     m2 = mulShift64(m10, pow5, j);
 #else
-    assert(e10 < DOUBLE_POW5_TABLE_SIZE);
+    assert(e10 < RYU_DOUBLE_POW5_TABLE_SIZE);
     m2 = mulShift64(m10, DOUBLE_POW5_SPLIT[e10], j);
 #endif
     // We also compute if the result is exact, i.e.,

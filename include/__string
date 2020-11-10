@@ -1,0 +1,33 @@
+// based on libcxx
+#pragma once
+
+namespace nanostl {
+
+// streamoff is unspeficied, but usually long long
+typedef long long streamoff;
+
+template <class _CharT>
+struct char_traits
+{
+    typedef _CharT    char_type;
+    typedef int       int_type;
+    typedef streamoff off_type;
+    typedef streampos pos_type;
+    //typedef mbstate_t state_type;
+
+    // TODO: Implement
+};
+
+template <>
+struct char_traits<char>
+{
+    typedef char      char_type;
+    typedef int       int_type;
+    typedef streamoff off_type;
+    typedef streampos pos_type;
+    //typedef mbstate_t state_type;
+
+    // TODO: Implement
+};
+
+} // namespace nanostl

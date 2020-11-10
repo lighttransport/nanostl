@@ -73,6 +73,7 @@ Be careful! Not all C++ STL functions are supported for each module.
   * [ ] strlen
   * [ ] NULL
   * [x] `size_t`
+* [ ] iostream
 
 #### math functions
 
@@ -146,7 +147,9 @@ NanoSTL assumes following type definitions.
 
 ## TODO
 
-* [ ] iostream, fstream(stdout/stdin, file IO)
+* [ ] iostream(stdout/stdin)
+* [ ] fstream(file IO)
+* [ ] Move implementation to `.cc` as much as possible.
 * [ ] Math complex type
 * [x] CUDA support(experimental)
 * [x] isnan/isinf/isfinite support

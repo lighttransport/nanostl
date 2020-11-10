@@ -25,9 +25,14 @@
 #ifndef NANOSTL_IOS_H_
 #define NANOSTL_IOS_H_
 
+#include "nanoiosfwd.h"
 #include "nanotype_traits.h"
+#include "__string"
 
 namespace nanostl {
+
+// ptrdiff_t is implementation dependent, but usually `long int`(int64 for 64bit system)
+typedef long int streamsize;
 
 class ios_base {
  public:
@@ -67,6 +72,8 @@ class ios_base {
 
   enum seekdir { beg, cur, end };
 
+  class Init;
+
   // destructor
   virtual ~ios_base();
 
@@ -100,7 +107,7 @@ public:
     typedef _Traits traits_type;
 
     typedef typename traits_type::int_type int_type;
-    typedef typename traits_type::pos_type pos_type;
+    //typedef typename traits_type::pos_type pos_type; // TODO
     typedef typename traits_type::off_type off_type;
 
     static_assert((is_same<_CharT, typename traits_type::char_type>::value),
@@ -119,6 +126,14 @@ public:
     inline bool bad() const  {return ios_base::bad();}
 
 };
+
+class ios_base::Init
+{
+public:
+    Init();
+    ~Init();
+};
+
 
 }  // namespace nanostl
 

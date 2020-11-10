@@ -31,7 +31,7 @@ namespace nanostl {
 
 // Naiive implementation of memcpy
 NANOSTL_HOST_AND_DEVICE_QUAL
-void *memcpy(void *dest, const void *src, unsigned long long num)
+inline void *memcpy(void *dest, const void *src, unsigned long long num)
 {
   unsigned char *d_ptr = reinterpret_cast<unsigned char *>(dest);
   const unsigned char *s_ptr = reinterpret_cast<const unsigned char *>(src);

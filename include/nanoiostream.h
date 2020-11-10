@@ -25,9 +25,10 @@
 #ifndef NANOSTL_IOSTREAM_H_
 #define NANOSTL_IOSTREAM_H_
 
+#include "nanoiosfwd.h"
 #include "nanoios.h"
-#include "nanostreambuf.h"
-#include "nanocommon.h"
+#include "nanosstream.h"
+#include "__nullptr"
 
 namespace nanostl {
 
@@ -72,13 +73,33 @@ public:
     basic_ostream& flush();
 
 protected:
-    basic_ostream() {}
+    // TODO: Uncomment
+    //basic_ostream() {}
+
+private:
+    // FIXME
+    stringstream _ss;
 
 };
 
+template <class _CharT, class _Traits>
+basic_ostream<_CharT, _Traits>&
+basic_ostream<_CharT, _Traits>::operator<<(int __n)
+{
+
+  _ss << nanostl::to_string(__n);
+
+  return *this;
+}
+
+
+
 // --------------------------------------
 
+// Need to link with iostream.cc
 extern ostream cout;
 extern ostream cerr;
 
 } // namespace nanostl
+
+#endif // NANOSTL_IOSTREAM_H_

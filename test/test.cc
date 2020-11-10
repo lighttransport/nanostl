@@ -601,6 +601,21 @@ static void test_to_string(void) {
     std::string str(s);
     TEST_CHECK(str.compare("1E0") == 0);
   }
+
+  // int
+  {
+    nanostl::string ns = nanostl::to_string(1);
+    const char *s = ns.c_str();
+    std::string str(s);
+    TEST_CHECK(str.compare("1") == 0);
+  }
+
+  {
+    nanostl::string ns = nanostl::to_string(-133445923);
+    const char *s = ns.c_str();
+    std::string str(s);
+    TEST_CHECK(str.compare("-133445923") == 0);
+  }
 }
 
 static void test_stof(void) {
