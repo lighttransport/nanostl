@@ -40,7 +40,9 @@
 #endif
 
 // TODO(LTE): Implement
+#ifndef _NANOSTL_TEMPLATE_VIS
 #define _NANOSTL_TEMPLATE_VIS
+#endif
 
 namespace nanostl {
 

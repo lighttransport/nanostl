@@ -142,6 +142,13 @@ class vector {
 
   inline iterator end(void) const { return elements_ + size_; }
 
+  inline void pop_back() {
+    if (size_ < 1) {
+      // this should be undefined behavior
+    }
+    size_--;
+  }
+
   inline iterator erase(iterator pos) {
     while ((pos + 1) != end()) {
       (*pos) = *(pos + 1);

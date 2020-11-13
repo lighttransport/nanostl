@@ -18,6 +18,18 @@ Eearly testing stage. Not ready for the production use.
 * Experimental CUDA support. You can use NanoSTL on device functions.
   * See `sandbox/cuda/`
 
+## Example
+
+NanoSTL is header-only library. No need to compile/link with `.cc`
+Some function(e.g. `std::to_string`) requires the implementation, thus must define `NANOSTL_IMPLEMENTATION` in **single** `*.cc` file.
+
+```
+#define NANOSTL_IMPLEMENTATION
+#include <nanosring.h>
+
+...
+```
+
 ## Supported features
 
 * vector
@@ -130,10 +142,24 @@ NanoSTL assumes following type definitions.
 * float : 32bit IEEE754 floating point.
 * double : 64bit IEEE754 floating point.
 
+`long` and `int long` is not recommended to use.
+
 ## Compiler macros
 
 * `NANOSTL_BIG_ENDIAN` Set endianness to big endian. Considering to support various compilers, user must explicitly specify endianness to the compiler. Default is little endian.
 * `NANOSTL_NO_IO` Disable all I/O operation(e.g. iostream). Useful for embedded devices.
+
+### header-only mode
+
+You can define `NANOSTL_IMPLEMENTATION` to define the implementation of some STL functions.
+This is useful if you want to use NanoSTL as a header-only library
+(No need to compile/add `.cc`)
+
+```
+#define NANOSTL_IMPLEMENTATION
+#include <nanostl.h>
+```
+
 
 ## Differences compared to (full featured) C++ STL
 
@@ -147,9 +173,9 @@ NanoSTL assumes following type definitions.
 
 ## TODO
 
-* [ ] iostream(stdout/stdin)
+* [ ] iostream(stdout)
+* [ ] iostream: Custom output/input sink.
 * [ ] fstream(file IO)
-* [ ] Move implementation to `.cc` as much as possible.
 * [ ] Math complex type
 * [x] CUDA support(experimental)
 * [x] isnan/isinf/isfinite support
@@ -168,6 +194,19 @@ NanoSTL assumes following type definitions.
 ```
 $ python scripts/generateSingleHeader.py
 ```
+
+Each `.h` must have wrapped with like this:
+
+```
+#ifndef NANOSTL_*_H_`
+#define NANOSTL_*_H_`
+
+// comment after `#endif` is required!
+#endif // NANOSTL_*_H_
+```
+
+to extract codes for single header generation.
+(no `#pragma once`)
 
 ### Unit tests
 

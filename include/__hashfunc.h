@@ -1,7 +1,8 @@
 //
 // We use SipHash for std::hash
 //
-#pragma once
+#ifndef NANOSTL___HASHFUNC_H_
+#define NANOSTL___HASHFUNC_H_
 
 #include "nanocassert.h"
 #include "nanocstdint.h"
@@ -169,3 +170,5 @@ int siphash(const uint8_t *in, const size_t inlen, const uint8_t *k,
 }
 
 } // namespace nanostl
+
+#endif // NANOSTL___HASHFUNC_H_

@@ -22,8 +22,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef NANOSTL_STRUTIL_H_
-#define NANOSTL_STRUTIL_H_
+#ifndef NANOSTL___STRUTIL_H_
+#define NANOSTL___STRUTIL_H_
 
 #include "nanocommon.h"
 #include "nanocstdint.h"
@@ -68,7 +68,7 @@ namespace ryu {
 
 #if defined(RYU_OPTIMIZE_SIZE)
 #error
-#include "ryu/d2s_small_table.h"
+/* "ryu/d2s_small_table.h" */
 #else
 #include "ryu/d2s_full_table.h"
 #endif
@@ -1780,5 +1780,5 @@ static enum RyuStatus s2d_n(const char * buffer, const int len, double * result)
 } // namespace nanostl
 
 
-#endif // NANOSTL_STRUTIL_H_
+#endif // NANOSTL___STRUTIL_H_
 

@@ -1,5 +1,6 @@
 // based on libcxx
-#pragma once
+#ifndef NANOSTL___STRING_H_
+#define NANOSTL___STRING_H_
 
 namespace nanostl {
 
@@ -31,3 +32,5 @@ struct char_traits<char>
 };
 
 } // namespace nanostl
+
+#endif // NANOSTL___STRING_H_

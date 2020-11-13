@@ -58,13 +58,17 @@ class basic_string {
   typedef const_pointer const_iterator;
 
   NANOSTL_HOST_AND_DEVICE_QUAL
-  basic_string() {}
+  basic_string() {
+    data_.resize(1);
+    data_[0] = '\0';
+  }
 
   NANOSTL_HOST_AND_DEVICE_QUAL
   basic_string(const basic_string &s) { data_ = s.data_; }
 
   NANOSTL_HOST_AND_DEVICE_QUAL
   basic_string(const charT *s) {
+    data_.clear();
     while (s && (*s) != '\0') {
       data_.push_back(*s);
       s++;
@@ -104,7 +108,10 @@ class basic_string {
   }
 
   NANOSTL_HOST_AND_DEVICE_QUAL
-  void clear() { data_.clear(); }
+  void clear() { data_.clear();
+    data_.resize(1);
+    data_[0] = '\0';
+  }
 
   NANOSTL_HOST_AND_DEVICE_QUAL
   const charT *c_str() const { return &data_.at(0); }
@@ -139,7 +146,10 @@ class basic_string {
   basic_string &operator+=(const basic_string &s);
 
   NANOSTL_HOST_AND_DEVICE_QUAL
-  basic_string &operator=(const basic_string &s);
+  basic_string &operator=(const basic_string &s) {
+    this->data_ = s.data_;
+    return (*this);
+  }
 
   NANOSTL_HOST_AND_DEVICE_QUAL
   bool operator==(const basic_string &str) const { return compare(str) == 0; }
@@ -190,12 +200,26 @@ basic_string<charT> basic_string<charT>::operator+(
 template <class charT>
 basic_string<charT> &basic_string<charT>::operator+=(
     const basic_string<charT> &s) {
+  // remove '\0'
+  if (data_.size() < 1) {
+    // this should not be happen
+  } else {
+    data_.pop_back();
+  }
+
   const_iterator first = s.data_.begin();
-  const_iterator last = s.data_.end();
+  const_iterator last = s.data_.end(); // this contains `\0`
 
   for (; first != last; ++first) {
+#ifdef NANOSTL_DEBUG
+    printf("first = %c\n", *first);
+#endif
     data_.push_back(*first);
   }
+
+#ifdef NANOSTL_DEBUG
+  printf("data_ = %s\n", &data_.at(0));
+#endif
 
   return (*this);
 }
@@ -203,7 +227,39 @@ basic_string<charT> &basic_string<charT>::operator+=(
 typedef basic_string<char> string;
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-static string to_string(int value) {
+string to_string(int value);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(unsigned int value);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(int64_t value);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(uint64_t value);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(float value);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(double value);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+float stof(const nanostl::string &str, nanostl::size_t *idx = nullptr);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+float stod(const nanostl::string &str, nanostl::size_t *idx = nullptr);
+
+#if defined(NANOSTL_IMPLEMENTATION)
+#ifndef NANOSTL_STRING_IMPLEMENTATION
+#define NANOSTL_STRING_IMPLEMENTATION
+#endif
+#endif
+
+#if defined(NANOSTL_STRING_IMPLEMENTATION)
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(int value) {
   // naiive implementation of base-10 int to ascii
   // based on https://www.techiedelight.com/implement-itoa-function-in-c/
 
@@ -246,7 +302,7 @@ static string to_string(int value) {
 }
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-static string to_string(int64_t value) {
+string to_string(int64_t value) {
   // naiive implementation of base-10 int to ascii
   // based on https://www.techiedelight.com/implement-itoa-function-in-c/
 
@@ -290,7 +346,7 @@ static string to_string(int64_t value) {
 
 // TODO: Move implementation to .cc and remove `static`
 NANOSTL_HOST_AND_DEVICE_QUAL
-static string to_string(float value) {
+string to_string(float value) {
   char buf[16];
   ryu::f2s_buffered(value, buf);
 
@@ -298,7 +354,7 @@ static string to_string(float value) {
 }
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-static string to_string(double value) {
+string to_string(double value) {
   char buf[25];
   ryu::d2s_buffered(value, buf);
 
@@ -306,7 +362,7 @@ static string to_string(double value) {
 }
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-static float stof(const nanostl::string &str, nanostl::size_t *idx = nullptr) {
+float stof(const nanostl::string &str, nanostl::size_t *idx) {
   (void)idx;  // TODO(LTE):
   float value;
   ryu::RyuStatus ret = ryu::s2f_n(str.c_str(), str.size(), &value);
@@ -320,7 +376,7 @@ static float stof(const nanostl::string &str, nanostl::size_t *idx = nullptr) {
 }
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-static float stod(const nanostl::string &str, nanostl::size_t *idx = nullptr) {
+float stod(const nanostl::string &str, nanostl::size_t *idx) {
   (void)idx;  // TODO(LTE):
   double value;
   ryu::RyuStatus ret = ryu::s2d_n(str.c_str(), str.size(), &value);
@@ -332,6 +388,7 @@ static float stod(const nanostl::string &str, nanostl::size_t *idx = nullptr) {
 
   return value;
 }
+#endif
 
 }  // namespace nanostl
 

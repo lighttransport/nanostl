@@ -34,12 +34,24 @@ namespace nanostl {
 
 // Work in progress.
 // TODO(LTE): Implement
+// TODO(LTE): Inherit ostream
 #if 1
 class stringstream
 {
   typedef unsigned long long size_type;
 
   public:
+    NANOSTL_HOST_AND_DEVICE_QUAL
+    stringstream& operator=(const stringstream&) = delete; // disable copy
+
+    NANOSTL_HOST_AND_DEVICE_QUAL
+    stringstream& operator=(stringstream&& other) {
+      str_ = other.str_;
+      other.str_ = string();
+
+      return (*this);
+    }
+
     NANOSTL_HOST_AND_DEVICE_QUAL
     stringstream() {}
 
@@ -55,8 +67,14 @@ class stringstream
     // TODO(LTE): Use stringbuf or streambuf
     NANOSTL_HOST_AND_DEVICE_QUAL
     stringstream& operator<<(const nanostl::string &s) {
+
       str_ += s;
       return (*this);
+    }
+
+    // TODO(LTE): Inherit ios
+    void clear() {
+      str_ = string();
     }
 
  private:

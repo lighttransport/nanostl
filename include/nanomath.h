@@ -35,14 +35,14 @@
 // some precision, don't work well depending on CPU's rounding-mode.
 //
 
-/* we need to import the definition from math.h
-#define FP_NAN (0)
-#define FP_INFINITE (1)
-#define FP_ZERO (2)
-#define FP_SUBNORMAL (3)
-#define FP_NORMAL (4)
-#define NANOSTL_FP_UNKNOWN  (5)
-*/
+// we need to import the definition from math.h
+//#define FP_NAN (0)
+//#define FP_INFINITE (1)
+//#define FP_ZERO (2)
+//#define FP_SUBNORMAL (3)
+//#define FP_NORMAL (4)
+//#define NANOSTL_FP_UNKNOWN  (5)
+
 
 namespace nanostl {
 
@@ -201,8 +201,8 @@ static inline bool isnormal(double x) {
 template <typename T>
 static inline T fmin(T x, T y) {
   // https://en.cppreference.com/w/cpp/numeric/math/fmin
-  // If one of the two arguments is NaN, the value of the other argument is returned 
-  // Only if both arguments are NaN, NaN is returned 
+  // If one of the two arguments is NaN, the value of the other argument is returned
+  // Only if both arguments are NaN, NaN is returned
 
   if (isnan(x) && isnan(y)) {
     // TODO(LTE): Consider signaling_NaN and quiet_NaN?
@@ -223,8 +223,8 @@ static inline T fmin(T x, T y) {
 template <typename T>
 static inline T fmax(T x, T y) {
   // https://en.cppreference.com/w/cpp/numeric/math/fmin
-  // If one of the two arguments is NaN, the value of the other argument is returned 
-  // Only if both arguments are NaN, NaN is returned 
+  // If one of the two arguments is NaN, the value of the other argument is returned
+  // Only if both arguments are NaN, NaN is returned
 
   if (isnan(x) && isnan(y)) {
     // TODO(LTE): Consider signaling_NaN and quiet_NaN?

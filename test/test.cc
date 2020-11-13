@@ -4,6 +4,7 @@
 #endif
 #endif
 
+#define NANOSTL_IMPLEMENTATION
 #include "nanoalgorithm.h"
 #include "nanolimits.h"
 #include "nanomap.h"

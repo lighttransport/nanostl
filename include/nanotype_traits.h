@@ -27,7 +27,6 @@
 //
 #ifndef NANOSTL_TYPE_TRAITS_H_
 #define NANOSTL_TYPE_TRAITS_H_
-#pragma once
 
 #include "nanocommon.h"
 
@@ -85,22 +84,13 @@ using enable_if_t = typename enable_if<b, T>::type;  // C++14
 
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS remove_const            {typedef _Tp type;};
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS remove_const<const _Tp> {typedef _Tp type;};
-#if _LIBCPP_STD_VER > 11
-//template <class _Tp> using remove_const_t = typename remove_const<_Tp>::type;
-#endif
 
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS remove_volatile               {typedef _Tp type;};
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS remove_volatile<volatile _Tp> {typedef _Tp type;};
-#if _LIBCPP_STD_VER > 11
-//template <class _Tp> using remove_volatile_t = typename remove_volatile<_Tp>::type;
-#endif
 
 
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS remove_cv
 {typedef typename remove_volatile<typename remove_const<_Tp>::type>::type type;};
-#if _LIBCPP_STD_VER > 11
-//template <class _Tp> using remove_cv_t = typename remove_cv<_Tp>::type;
-#endif
 
 
 template <bool, class T> struct _NANOSTL_TEMPLATE_VIS enable_if {};
@@ -118,10 +108,6 @@ struct _NANOSTL_TEMPLATE_VIS integral_constant
   typedef _Tp               value_type;
   typedef integral_constant type;
   constexpr operator value_type() const noexcept {return value;}
-#if _LIBCPP_STD_VER > 11
-  //_LIBCPP_INLINE_VISIBILITY
-  //constexpr value_type operator ()() const _NOEXCEPT {return value;}
-#endif
 };
 
 template <class _Tp, _Tp __v>
@@ -143,4 +129,4 @@ template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_floating_point
 
 }  // namespace nanostl
 
-#endif
+#endif // NANOSTL_TYPE_TRAITS_H_

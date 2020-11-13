@@ -10,12 +10,12 @@ from pycuda.compiler import SourceModule
 include_dirs = [os.path.join(os.getcwd(), "../../include")]
 
 mod = SourceModule("""
+#define NANOSTL_IMPLEMENTATION
 #include <nanovector.h>
 #include <nanomap.h>
 #include <nanostring.h>
 #include <nanolimits.h>
 #include <nanosstream.h>
-//#include <vector>
 
 extern "C" {
 __global__ void multiply_them(float *dest, float *a, float *b)
