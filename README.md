@@ -86,6 +86,8 @@ Be careful! Not all C++ STL functions are supported for each module.
   * [ ] NULL
   * [x] `size_t`
 * [ ] iostream
+* [x] hash: Basic type
+* [ ] hash: string
 
 #### math functions
 
