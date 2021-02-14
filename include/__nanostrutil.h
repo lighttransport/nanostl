@@ -191,7 +191,7 @@ static inline uint32_t mulShift32(const uint32_t m, const uint64_t factor, const
 #else // RYU_32_BIT_PLATFORM
   const uint64_t sum = (bits0 >> 32) + bits1;
   const uint64_t shiftedSum = sum >> (shift - 32);
-  assert(shiftedSum <= UINT32_MAX);
+  assert(shiftedSum <= uint32_t(4294967295u));
   return (uint32_t) shiftedSum;
 #endif // RYU_32_BIT_PLATFORM
 }
@@ -1697,7 +1697,7 @@ enum RyuStatus s2d_n(const char * buffer, const int len, double * result) {
     double_computePow5(e10, pow5);
     m2 = mulShift64(m10, pow5, j);
 #else
-    assert(e10 < DOUBLE_POW5_TABLE_SIZE);
+    assert(e10 < RYU_DOUBLE_POW5_TABLE_SIZE);
     m2 = mulShift64(m10, DOUBLE_POW5_SPLIT[e10], j);
 #endif
     // We also compute if the result is exact, i.e.,
