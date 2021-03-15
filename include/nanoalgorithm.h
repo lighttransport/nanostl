@@ -25,31 +25,48 @@
 #ifndef NANOSTL_ALGORITHM_H_
 #define NANOSTL_ALGORITHM_H_
 
+#include "nanocommon.h"
+
 namespace nanostl {
 
 template <class T>
-const T& min(const T& a, const T& b) {
+NANOSTL_HOST_AND_DEVICE_QUAL const T& min(const T& a, const T& b) {
   return !(b < a) ? a : b;
 }
 
 template <class T>
-const T& max(const T& a, const T& b) {
+NANOSTL_HOST_AND_DEVICE_QUAL const T& max(const T& a, const T& b) {
   return !(b > a) ? a : b;
 }
 
-template<class ForwardIt>
-ForwardIt max_element(ForwardIt first, ForwardIt last)
-{
-    if (first == last) return last;
+template <class ForwardIt>
+NANOSTL_HOST_AND_DEVICE_QUAL ForwardIt max_element(ForwardIt first,
+                                                   ForwardIt last) {
+  if (first == last) return last;
 
-    ForwardIt largest = first;
-    ++first;
-    for (; first != last; ++first) {
-        if (*largest < *first) {
-            largest = first;
-        }
+  ForwardIt largest = first;
+  ++first;
+  for (; first != last; ++first) {
+    if (*largest < *first) {
+      largest = first;
     }
-    return largest;
+  }
+  return largest;
+}
+
+template <class ForwardIt>
+NANOSTL_HOST_AND_DEVICE_QUAL ForwardIt min_element(ForwardIt first,
+                                                   ForwardIt last) {
+  if (first == last) return last;
+
+  ForwardIt smallest = first;
+  ++first;
+  for (; first != last; ++first) {
+    if (*smallest > *first) {
+      smallest = first;
+    }
+  }
+  return smallest;
 }
 
 }  // namespace nanostl
