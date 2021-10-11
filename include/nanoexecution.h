@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017 - 2019 Light Transport Entertainment, Inc.
+ * Copyright (c) 2021 Light Transport Entertainment, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,51 +22,30 @@
  * THE SOFTWARE.
  */
 
-#ifndef NANOSTL_ALGORITHM_H_
-#define NANOSTL_ALGORITHM_H_
-
-namespace nanostl {
-
-template <class T>
-const T& min(const T& a, const T& b) {
-  return !(b < a) ? a : b;
-}
-
-template <class T>
-const T& max(const T& a, const T& b) {
-  return !(b > a) ? a : b;
-}
-
-template <class ForwardIt>
-ForwardIt max_element(ForwardIt first, ForwardIt last) {
-  if (first == last) return last;
-
-  ForwardIt largest = first;
-  ++first;
-  for (; first != last; ++first) {
-    if (*largest < *first) {
-      largest = first;
-    }
-  }
-  return largest;
-}
-
-template <class ForwardIterator, class T>
-void fill(ForwardIterator first, ForwardIterator last, const T& value) {
-  while (first != last) *first++ = value;
-}
+#ifndef NANOSTL_EXECUTION_H_
+#define NANOSTL_EXECUTION_H_
 
 #if defined(NANOSTL_PSTL)
-template <class ExecutionPolicy, class ForwardIterator, class T>
-void fill(ExecutionPolicy&& exec, ForwardIterator first, ForwardIterator last,
-          const T& value) {
-  // TODO: Implement
-  (void)exec;
 
-  fill(first, last, value);
-  }
-#endif
+namespace nanostl {
+namespace execution {
 
-}  // namespace nanostl
+class parallel_policy
+{
+  public:
+};
 
-#endif  // NANOSTL_ALGORITHM_H_
+class parallel_unsequenced_policy
+{
+  public:
+};
+
+inline constexpr parallel_policy par{};
+inline constexpr parallel_policy par_unseq{};
+
+} // namespace execution
+} // namespace nanostl
+
+#endif // NANOSTL_PSTL
+
+#endif // NANOSTL_EXECUTION_H_

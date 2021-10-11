@@ -133,6 +133,13 @@ Even though NanoSTL should be compilable with older and various C++ compilers, a
   * NanoSTL itself can be compilable with gcc 4.2.4(fails to compile Catch unit test code)
 * clang 3.4+
 
+## Supported threading library
+
+For `thread` and parallel STL feature, threading library is required.
+
+* pthread(non-Windows)
+* Win32 thread(Windows)
+
 ## Types
 
 NanoSTL assumes following type definitions.
@@ -144,12 +151,14 @@ NanoSTL assumes following type definitions.
 * float : 32bit IEEE754 floating point.
 * double : 64bit IEEE754 floating point.
 
-`long` and `int long` is not recommended to use.
+`long` and `int long` is not recommended to use.  Please use `cstdint` typedefs.
 
 ## Compiler macros
 
 * `NANOSTL_BIG_ENDIAN` Set endianness to big endian. Considering to support various compilers, user must explicitly specify endianness to the compiler. Default is little endian.
 * `NANOSTL_NO_IO` Disable all I/O operation(e.g. iostream). Useful for embedded devices.
+* `NANOSTL_NO_THREAD` Disable `thread`, `atomic` and `mutex` feature.
+* `NANOSTL_PSTL` Enable parallel STL feature. Requires C++17 compiler. This also undefine `NANOSTL_NO_THREAD`
 
 ### header-only mode
 
@@ -188,6 +197,7 @@ This is useful if you want to use NanoSTL as a header-only library
 * [ ] Backport of some C++11 features(e.g. `unordered_map`)
 * [ ] Replace oiio math functions so that we can have clean MIT licensed code.
 * [ ] FLOAT16 and BFLOAT16 support.
+* [ ] C++17 parallel STL
 
 ## Developer note
 
@@ -237,3 +247,4 @@ Some functions in nanomath is licenced under modified BSD license.
 * faster math functions: Some math functions implemented in nanomath is grabbed from OpenImageIO fmath.h, which is licensed under modified BSD license. https://github.com/OpenImageIO/oiio/
 * ryu(floating point <-> string converter). NanoSTL choose Boost 1.0 license. https://github.com/ulfjack/ryu
 * libc++: Apache License v2.0 with LLVM Exceptions
+* `mattiasgustavsson/libs`: MIT license. https://github.com/mattiasgustavsson/libs
