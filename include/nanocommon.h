@@ -39,6 +39,13 @@
 #define NANOSTL_CONSTANT_QUAL
 #endif
 
+#if defined(NANOSTL_ENABLE_EXCEPTION)
+#define __NANOSTL_NOEXCEPT noexcept
+#else
+#define __NANOSTL_NOEXCEPT
+#endif
+
+
 // TODO(LTE): Implement
 #ifndef _NANOSTL_TEMPLATE_VIS
 #define _NANOSTL_TEMPLATE_VIS

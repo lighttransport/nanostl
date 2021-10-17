@@ -157,6 +157,7 @@ NanoSTL assumes following type definitions.
 
 * `NANOSTL_BIG_ENDIAN` Set endianness to big endian. Considering to support various compilers, user must explicitly specify endianness to the compiler. Default is little endian.
 * `NANOSTL_NO_IO` Disable all I/O operation(e.g. iostream). Useful for embedded devices.
+* `NANOSTL_USE_EXCEPTION` Enable exception feature(may not be available for all STL functions)
 * `NANOSTL_NO_THREAD` Disable `thread`, `atomic` and `mutex` feature.
 * `NANOSTL_PSTL` Enable parallel STL feature. Requires C++17 compiler. This also undefine `NANOSTL_NO_THREAD`
 
@@ -177,7 +178,8 @@ This is useful if you want to use NanoSTL as a header-only library
 * **No thread safety** Currently NanoSTL is not thread safe
   * Application must care about the thread safety
   * For example, need to use mutex or lock for `nanostl::vector::push_back()` operation if you are accesing `nanostl::vector` object from multiple threads.
-* RTTI and exception is not supported.
+* RTTI and exception is basically not supported.
+  * some API may support it through `NANOSTL_USE_EXCEPTION`
 * Returns `NULL` when memory allocation failed(no `bad_alloc`)
 * stof, stod
   * Return (signaling) NaN for invalid input

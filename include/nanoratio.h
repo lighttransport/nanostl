@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2019 Light Transport Entertainment, Inc.
+ * Copyright (c) 2021 Light Transport Entertainment, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,29 +22,33 @@
  * THE SOFTWARE.
  */
 
-#ifndef NANOSTL_CSTDINT_H_
-#define NANOSTL_CSTDINT_H_
+#ifndef NANOSTL_RATIO_H_
+#define NANOSTL_RATIO_H_
+
+#include "nanocommon.h"
 
 namespace nanostl {
 
-// Assume LLP64 or LP64 data model.
-// Assume compiler interprets 'int' as 32bit
-// Assume compiler interprets 'long long' as 64bit
+template<intmax_t N, intmax_t D = 1>
+class ratio {
+ public:
 
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned int uint32_t;
-typedef unsigned long long uint64_t;
+  using type = ratio<num, den>;
+  static constexpr intmax_t num;
+  static constexpr intmax_t den;
 
-typedef char int8_t;
-typedef short int16_t;
-typedef int int32_t;
-typedef long long int64_t;
+};
 
-// Assume 64bit
-typedef long long intmax_t;
-typedef unsigned long long uintmax_t;
+namespace chrono {
 
-}  // namespace nanostl
+template <class Rep, class Period = ratio<1>>
+duration;
 
-#endif  // NANOSTL_CSTDINT_H_
+
+};
+
+} // namespace chrono
+
+} // namespace nanostl
+
+#endif // NANOSTL_CHRONO_H_

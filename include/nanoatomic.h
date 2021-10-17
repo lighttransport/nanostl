@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2019 Light Transport Entertainment, Inc.
+ * Copyright (c) 2021 Light Transport Entertainment, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,29 +22,18 @@
  * THE SOFTWARE.
  */
 
-#ifndef NANOSTL_CSTDINT_H_
-#define NANOSTL_CSTDINT_H_
+#ifndef NANOSTL_ATOMIC_H_
+#define NANOSTL_ATOMIC_H_
+
+#if !defined(NANOSTL_NO_THREAD)
 
 namespace nanostl {
 
-// Assume LLP64 or LP64 data model.
-// Assume compiler interprets 'int' as 32bit
-// Assume compiler interprets 'long long' as 64bit
+template<class T>
+struct atomic
 
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned int uint32_t;
-typedef unsigned long long uint64_t;
+} // namespace nanostl
 
-typedef char int8_t;
-typedef short int16_t;
-typedef int int32_t;
-typedef long long int64_t;
+#endif // NANOSTL_NO_THREAD
 
-// Assume 64bit
-typedef long long intmax_t;
-typedef unsigned long long uintmax_t;
-
-}  // namespace nanostl
-
-#endif  // NANOSTL_CSTDINT_H_
+#endif // NANOSTL_ATOMIC_H_
