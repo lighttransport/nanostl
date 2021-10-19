@@ -18,6 +18,7 @@
 #include "nanomemory.h"
 #include "nanotype_traits.h"
 #include "nanoutility.h"
+#include "nanofunctional.h"
 
 //namespace std = nanostl;
 

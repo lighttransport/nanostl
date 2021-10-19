@@ -14,6 +14,7 @@
 #include "nanoutility.h"
 #include "nanovector.h"
 #include "nanovalarray.h"
+#include "nanomemory.h"
 #include "__nanostrutil.h"
 
 #include <cstdio>

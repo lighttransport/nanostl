@@ -88,6 +88,11 @@ Be careful! Not all C++ STL functions are supported for each module.
 * [ ] iostream
 * [x] hash: Basic type
 * [ ] hash: string
+* [ ] thread
+* [ ] atomic
+* [ ] mutex
+* [ ] ratio
+* [ ] chrono
 
 #### math functions
 
@@ -250,3 +255,4 @@ Some functions in nanomath is licenced under modified BSD license.
 * ryu(floating point <-> string converter). NanoSTL choose Boost 1.0 license. https://github.com/ulfjack/ryu
 * libc++: Apache License v2.0 with LLVM Exceptions
 * `mattiasgustavsson/libs`: MIT license. https://github.com/mattiasgustavsson/libs
+* taocpp/tuple : MIT license. https://github.com/taocpp/tuple

@@ -190,6 +190,109 @@ template <class _Tp> struct __libcpp_is_unsigned<_Tp, false> : public false_type
 
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_unsigned : public __libcpp_is_unsigned<_Tp> {};
 
+// since libcxx uses compiler's intrinsic function __is_abstract, use boost's one instead.
+//
+//  (C) Copyright John Maddock 2015.
+//  Use, modification and distribution are subject to the Boost Software License,
+//  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt).
+//
+//  See http://www.boost.org/libs/type_traits for most recent version including documentation.
+
+template<class T>
+struct is_abstract_imp2
+{
+   // Deduction fails if T is void, function type,
+   // reference type (14.8.2/2)or an abstract class type
+   // according to review status issue #337
+   //
+   template<class U>
+   static type_traits::no_type check_sig(U (*)[1]);
+   template<class U>
+   static type_traits::yes_type check_sig(...);
+   //
+   // T must be a complete type, further if T is a template then
+   // it must be instantiated in order for us to get the right answer:
+   //
+   static_assert(sizeof(T) != 0);
+
+   // GCC2 won't even parse this template if we embed the computation
+   // of s1 in the computation of value.
+#ifdef __GNUC__
+   BOOST_STATIC_CONSTANT(std::size_t, s1 = sizeof(is_abstract_imp2<T>::template check_sig<T>(0)));
+#else
+#if BOOST_WORKAROUND(BOOST_MSVC_FULL_VER, >= 140050000)
+#pragma warning(push)
+#pragma warning(disable:6334)
+#endif
+   BOOST_STATIC_CONSTANT(std::size_t, s1 = sizeof(check_sig<T>(0)));
+#if BOOST_WORKAROUND(BOOST_MSVC_FULL_VER, >= 140050000)
+#pragma warning(pop)
+#endif
+#endif
+
+   BOOST_STATIC_CONSTANT(bool, value =
+      (s1 == sizeof(type_traits::yes_type)));
+};
+
+template <bool v>
+struct is_abstract_select
+{
+   template <class T>
+   struct rebind
+   {
+      typedef is_abstract_imp2<T> type;
+   };
+};
+template <>
+struct is_abstract_select<false>
+{
+   template <class T>
+   struct rebind
+   {
+      typedef false_type type;
+   };
+};
+
+template <class T>
+struct is_abstract_imp
+{
+   typedef is_abstract_select< ::boost::is_class<T>::value> selector;
+   typedef typename selector::template rebind<T> binder;
+   typedef typename binder::type type;
+
+   BOOST_STATIC_CONSTANT(bool, value = type::value);
+};
+
+// -----------------------------------
+
+
+// is_abstract
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_abstract
+    : public integral_constant<bool, __is_abstract(_Tp)> {};
+
+//#if _LIBCPP_STD_VER > 14
+//template <class _Tp>
+//inline constexpr bool is_abstract_v = is_abstract<_Tp>::value;
+//#endif
+
+// is_final
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS __libcpp_is_final
+    : public integral_constant<bool, __is_final(_Tp)> {};
+
+//#if _LIBCPP_STD_VER > 11
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS
+is_final : public integral_constant<bool, __is_final(_Tp)> {};
+//#endif
+//
+//#if _LIBCPP_STD_VER > 14
+//template <class _Tp>
+//inline constexpr bool is_final_v = is_final<_Tp>::value;
+//#endif
+
+
 // remove_reference
 
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS remove_reference        {typedef _Tp type;};
@@ -779,6 +882,93 @@ struct _NANOSTL_TEMPLATE_VIS is_nothrow_assignable
     : public __libcpp_is_nothrow_assignable<is_assignable<_Tp, _Arg>::value, _Tp, _Arg>
 {
 };
+
+// add_lvalue_reference
+
+template <class _Tp, bool = __is_referenceable<_Tp>::value> struct __add_lvalue_reference_impl            { typedef /*_LIBCPP_NODEBUG*/ _Tp  type; };
+template <class _Tp                                       > struct __add_lvalue_reference_impl<_Tp, true> { typedef /*_LIBCPP_NODEBUG*/ _Tp& type; };
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS add_lvalue_reference
+{typedef /*_LIBCPP_NODEBUG*/ typename  __add_lvalue_reference_impl<_Tp>::type type;};
+
+//#if _LIBCPP_STD_VER > 11
+//template <class _Tp> using add_lvalue_reference_t = typename add_lvalue_reference<_Tp>::type;
+//#endif
+
+// add_rvalue_reference
+
+template <class _Tp, bool = __is_referenceable<_Tp>::value> struct __add_rvalue_reference_impl            { typedef /*_LIBCPP_NODEBUG*/ _Tp   type; };
+template <class _Tp                                       > struct __add_rvalue_reference_impl<_Tp, true> { typedef /*_LIBCPP_NODEBUG*/ _Tp&& type; };
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS add_rvalue_reference
+{typedef /*_LIBCPP_NODEBUG*/ typename __add_rvalue_reference_impl<_Tp>::type type;};
+
+//#if _LIBCPP_STD_VER > 11
+//template <class _Tp> using add_rvalue_reference_t = typename add_rvalue_reference<_Tp>::type;
+//#endif
+
+// add_const
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS add_const {
+  typedef /*_LIBCPP_NODEBUG*/ const _Tp type;
+};
+
+// is_copy_constructible
+
+template <class _Tp>
+struct _NANOSTL_TEMPLATE_VIS is_copy_constructible
+    : public is_constructible<_Tp,
+                  typename add_lvalue_reference<typename add_const<_Tp>::type>::type> {};
+
+//#if _LIBCPP_STD_VER > 14
+//template <class _Tp>
+//inline constexpr bool is_copy_constructible_v = is_copy_constructible<_Tp>::value;
+//#endif
+
+// is_move_constructible
+
+template <class _Tp>
+struct _NANOSTL_TEMPLATE_VIS is_move_constructible
+    : public is_constructible<_Tp, typename add_rvalue_reference<_Tp>::type>
+    {};
+
+
+// is_copy_assignable
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_copy_assignable
+    : public is_assignable<typename add_lvalue_reference<_Tp>::type,
+                  typename add_lvalue_reference<typename add_const<_Tp>::type>::type> {};
+
+//#if _LIBCPP_STD_VER > 14
+//template <class _Tp>
+//inline constexpr bool is_copy_assignable_v = is_copy_assignable<_Tp>::value;
+//#endif
+
+
+// is_move_assignable
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_move_assignable
+    : public is_assignable<typename add_lvalue_reference<_Tp>::type,
+                           typename add_rvalue_reference<_Tp>::type> {};
+
+
+// is_nothrow_copy_constructible
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_nothrow_copy_constructible
+    : public is_nothrow_constructible<_Tp,
+                  typename add_lvalue_reference<typename add_const<_Tp>::type>::type> {};
+
+//#if _LIBCPP_STD_VER > 14
+//template <class _Tp>
+//inline constexpr bool is_nothrow_copy_constructible_v = is_nothrow_copy_constructible<_Tp>::value;
+//#endif
+
+// is_nothrow_move_constructible
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_nothrow_move_constructible
+    : public is_nothrow_constructible<_Tp, typename add_rvalue_reference<_Tp>::type>
+    {};
+
 
 
 }  // namespace nanostl

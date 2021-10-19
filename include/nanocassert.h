@@ -29,7 +29,9 @@
 #include <assert.h>
 #else
 // TODO(LTE): Delegate `assert` implementation when the backend c library or equivalent library supports it.
+#ifndef assert
 #define assert(x)
+#endif
 #endif
 
 

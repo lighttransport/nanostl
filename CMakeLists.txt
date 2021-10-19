@@ -6,6 +6,7 @@ project(${NANOSTL_TARGET} CXX)
 
 set(NANOSTL_SOURCES
   src/nanothread.cc
+  src/hash.cc
   )
 
 if (WIN32)
@@ -17,6 +18,11 @@ endif ()
 add_library(${NANOSTL_TARGET} STATIC ${NANOSTL_SOURCES})
 
 target_include_directories(${NANOSTL_TARGET} PRIVATE ${PROJECT_SOURCE_DIR}/include)
+
+# Disable standard stl
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_options(${NANOSTL_TARGET} PRIVATE "-nostdinc++")
+endif ()
 
 if (WIN32)
   target_link_libraries(${NANOSTL_TARGET} PUBLIC Threads::Threads)
