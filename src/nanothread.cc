@@ -3,7 +3,7 @@
 #include <string.h>
 
 #if defined(WIN32)
-#include <sysinfoapi.h>
+#include <windows.h>
 #else
 // Assume posix environment
 #include <unistd.h>

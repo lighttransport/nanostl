@@ -56,7 +56,10 @@ class thread {
   };
 
   thread() __NANOSTL_NOEXCEPT;
-  template <class F, class ...Args> explicit thread(F&& f, Args&&... args);
+
+  template <class F, class ...Args>
+  explicit thread(F&& f, Args&&... args);
+
   ~thread();
 
   thread(const thread&) = delete;
