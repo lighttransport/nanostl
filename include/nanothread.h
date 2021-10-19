@@ -28,6 +28,7 @@
 #if !defined(NANOSTL_NO_THREAD)
 
 #include "nanocommon.h"
+#include "nanochrono.h"
 
 namespace nanostl {
 
@@ -84,6 +85,13 @@ class thread {
   // opeque pointer
   void *thread_handle_{nullptr};
 };
+
+namespace this_thread
+{
+
+void sleep_for(const chrono::nanoseconds &ns);
+
+} // namespace this_thread
 
 } // namespace nanostl
 
