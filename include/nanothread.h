@@ -30,6 +30,8 @@
 #include "nanocommon.h"
 #include "nanochrono.h"
 
+#include "tao/tuple/tuple.hpp"
+
 namespace nanostl {
 
 class thread {

@@ -54,7 +54,7 @@ inline pair<T1, T2> make_pair(const T1& x, const T2& y) {
 
 // limited implementation of swap
 template <class T>
-inline void swap(T &a, T &b) noexcept
+inline void swap(T &a, T &b) __NANOSTL_NOEXCEPT
 {
   T tmp;
   tmp = a;
@@ -62,7 +62,45 @@ inline void swap(T &a, T &b) noexcept
   b = tmp;
 }
 
+template <class _Tp>
+/*_LIBCPP_NODISCARD_EXT*/ inline /*_LIBCPP_INLINE_VISIBILITY*/ constexpr typename remove_reference<_Tp>::type&&
+move(_Tp&& __t) __NANOSTL_NOEXCEPT {
+  typedef /*_LIBCPP_NODEBUG*/ typename remove_reference<_Tp>::type _Up;
+  return static_cast<_Up&&>(__t);
+}
+
+#ifndef _LIBCPP_CXX03_LANG
+template <class _Tp>
+using __move_if_noexcept_result_t =
+    typename conditional<!is_nothrow_move_constructible<_Tp>::value && is_copy_constructible<_Tp>::value, const _Tp&,
+                         _Tp&&>::type;
+#else // _LIBCPP_CXX03_LANG
+template <class _Tp>
+using __move_if_noexcept_result_t = const _Tp&;
+#endif
+
+template <class _Tp>
+/*_LIBCPP_NODISCARD_EXT*/ inline /*_LIBCPP_INLINE_VISIBILITY*/ constexpr __move_if_noexcept_result_t<_Tp>
+move_if_noexcept(_Tp& __x) __NANOSTL_NOEXCEPT {
+  return move(__x);
+}
+
+
 //template <class T> typename add_rvalue_reference<T>::type declval() noexcept;
+
+template <class _Tp>
+/*_LIBCPP_NODISCARD_EXT*/ inline /*_LIBCPP_INLINE_VISIBILITY*/ constexpr _Tp&&
+forward(typename remove_reference<_Tp>::type& __t) __NANOSTL_NOEXCEPT {
+  return static_cast<_Tp&&>(__t);
+}
+
+template <class _Tp>
+/*_LIBCPP_NODISCARD_EXT*/ inline /*_LIBCPP_INLINE_VISIBILITY*/ constexpr _Tp&&
+forward(typename remove_reference<_Tp>::type&& __t) __NANOSTL_NOEXCEPT {
+  static_assert(!is_lvalue_reference<_Tp>::value, "cannot forward an rvalue as an lvalue");
+  return static_cast<_Tp&&>(__t);
+}
+
 
 }  // namespace nanostl
 
