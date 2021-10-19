@@ -11,6 +11,8 @@
 #include "config.hpp"
 #include "integer_sequence.hpp"
 
+namespace std = nanostl;
+
 namespace tao
 {
    namespace seq

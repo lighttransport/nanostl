@@ -12,7 +12,8 @@
 #elif defined( _LIBCPP_VERSION ) && ( __cplusplus >= 201402L )
 #define TAO_SEQ_USE_STD_INTEGER_SEQUENCE
 #elif defined( _MSC_VER )
-#define TAO_SEQ_USE_STD_INTEGER_SEQUENCE
+// Disabled for nanostl
+//#define TAO_SEQ_USE_STD_INTEGER_SEQUENCE
 #endif
 #endif
 
@@ -22,7 +23,8 @@
 #elif defined( _LIBCPP_VERSION ) && ( __cplusplus >= 201402L )
 #define TAO_SEQ_USE_STD_MAKE_INTEGER_SEQUENCE
 #elif defined( _MSC_VER ) && ( _MSC_FULL_VER >= 190023918 )
-#define TAO_SEQ_USE_STD_MAKE_INTEGER_SEQUENCE
+// Disabled for nanostl
+//#define TAO_SEQ_USE_STD_MAKE_INTEGER_SEQUENCE
 #endif
 #endif
 

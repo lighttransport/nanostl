@@ -6,7 +6,10 @@
 
 //#include <cstddef>
 
+#include "nanocstddef.h"
 #include "make_integer_sequence.hpp"
+
+namespace std = nanostl;
 
 namespace tao
 {

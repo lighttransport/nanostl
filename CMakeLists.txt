@@ -24,7 +24,12 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   target_compile_options(${NANOSTL_TARGET} PRIVATE "-nostdinc++")
 endif ()
 
+if (MSVC)
+  target_compile_options(${NANOSTL_TARGET} PRIVATE "/NODEFAULTLIB")
+endif ()
+
 if (WIN32)
+  target_compile_definitions(${NANOSTL_TARGET} PRIVATE "NOMINMAX")
   target_link_libraries(${NANOSTL_TARGET} PUBLIC Threads::Threads)
 endif ()
 

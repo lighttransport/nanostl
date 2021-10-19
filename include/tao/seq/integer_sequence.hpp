@@ -4,12 +4,12 @@
 #ifndef TAO_SEQ_INTEGER_SEQUENCE_HPP
 #define TAO_SEQ_INTEGER_SEQUENCE_HPP
 
-//#include <cstddef>
+#include "nanocstddef.h"
 #include "nanoutility.h"
 
 #include "config.hpp"
 
-namespace std = nanostl;
+//namespace std = nanostl;
 
 namespace tao
 {

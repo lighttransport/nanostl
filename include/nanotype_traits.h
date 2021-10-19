@@ -71,7 +71,7 @@ struct is_pointer;
 // template <class T> struct is_member_function_pointer;
 // template <class T> struct is_enum;
 // template <class T> struct is_union;
-// template <class T> struct is_class;
+template <class T> struct is_class;
 // template <class T> struct is_function;
 
     template <class T> struct remove_const;
@@ -199,6 +199,11 @@ template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_unsigned : public __libcpp_
 //
 //  See http://www.boost.org/libs/type_traits for most recent version including documentation.
 
+typedef char yes_type;
+struct no_type {
+  char padding[8];
+};
+
 template<class T>
 struct is_abstract_imp2
 {
@@ -207,32 +212,32 @@ struct is_abstract_imp2
    // according to review status issue #337
    //
    template<class U>
-   static type_traits::no_type check_sig(U (*)[1]);
+   static no_type check_sig(U (*)[1]);
    template<class U>
-   static type_traits::yes_type check_sig(...);
+   static yes_type check_sig(...);
    //
    // T must be a complete type, further if T is a template then
    // it must be instantiated in order for us to get the right answer:
    //
-   static_assert(sizeof(T) != 0);
+   static_assert(sizeof(T) != 0, "T must be a complete type");
 
    // GCC2 won't even parse this template if we embed the computation
    // of s1 in the computation of value.
 #ifdef __GNUC__
-   BOOST_STATIC_CONSTANT(std::size_t, s1 = sizeof(is_abstract_imp2<T>::template check_sig<T>(0)));
+   static const std::size_t, s1 = sizeof(is_abstract_imp2<T>::template check_sig<T>(0));
 #else
-#if BOOST_WORKAROUND(BOOST_MSVC_FULL_VER, >= 140050000)
-#pragma warning(push)
-#pragma warning(disable:6334)
-#endif
-   BOOST_STATIC_CONSTANT(std::size_t, s1 = sizeof(check_sig<T>(0)));
-#if BOOST_WORKAROUND(BOOST_MSVC_FULL_VER, >= 140050000)
-#pragma warning(pop)
-#endif
+//#if BOOST_WORKAROUND(BOOST_MSVC_FULL_VER, >= 140050000)
+//#pragma warning(push)
+//#pragma warning(disable:6334)
+//#endif
+   static const std::size_t s1 = sizeof(check_sig<T>(0));
+//#if BOOST_WORKAROUND(BOOST_MSVC_FULL_VER, >= 140050000)
+//#pragma warning(pop)
+//#endif
 #endif
 
-   BOOST_STATIC_CONSTANT(bool, value =
-      (s1 == sizeof(type_traits::yes_type)));
+   static const bool value =
+      (s1 == sizeof(type_traits::yes_type));
 };
 
 template <bool v>
@@ -257,11 +262,11 @@ struct is_abstract_select<false>
 template <class T>
 struct is_abstract_imp
 {
-   typedef is_abstract_select< ::boost::is_class<T>::value> selector;
+   typedef is_abstract_select< is_class<T>::value> selector;
    typedef typename selector::template rebind<T> binder;
    typedef typename binder::type type;
 
-   BOOST_STATIC_CONSTANT(bool, value = type::value);
+   static const bool value = type::value;
 };
 
 // -----------------------------------
@@ -676,27 +681,27 @@ template <class T>                struct is_default_constructible;
       struct is_constructible_imp
       {
          template<typename T, typename ...TheArgs, typename = decltype(T(declval<TheArgs>()...))>
-         static true_type test(int);
+         static yes_type test(int);
          template<typename, typename...>
-         static false_type test(...);
+         static no_type test(...);
 
          template<typename T, typename Arg, typename = decltype(::new T(declval<Arg>()))>
-         static true_type test1(int);
+         static yes_type test1(int);
          template<typename, typename>
-         static false_type test1(...);
+         static no_type test1(...);
 
          template <typename T>
-         static true_type ref_test(T);
+         static yes_type ref_test(T);
          template <typename T>
-         static false_type ref_test(...);
+         static no_type ref_test(...);
       };
 
    }
 
-   template <class T, class ...Args> struct is_constructible : public integral_constant<bool, sizeof(detail::is_constructible_imp::test<T, Args...>(0)) == sizeof(true_type)>{};
-   template <class T, class Arg> struct is_constructible<T, Arg> : public integral_constant<bool, is_destructible<T>::value && sizeof(detail::is_constructible_imp::test1<T, Arg>(0)) == sizeof(true_type)>{};
-   template <class Ref, class Arg> struct is_constructible<Ref&, Arg> : public integral_constant<bool, sizeof(detail::is_constructible_imp::ref_test<Ref&>(declval<Arg>())) == sizeof(true_type)>{};
-   template <class Ref, class Arg> struct is_constructible<Ref&&, Arg> : public integral_constant<bool, sizeof(detail::is_constructible_imp::ref_test<Ref&&>(declval<Arg>())) == sizeof(true_type)>{};
+   template <class T, class ...Args> struct is_constructible : public integral_constant<bool, sizeof(detail::is_constructible_imp::test<T, Args...>(0)) == sizeof(yes_type)>{};
+   template <class T, class Arg> struct is_constructible<T, Arg> : public integral_constant<bool, is_destructible<T>::value && sizeof(detail::is_constructible_imp::test1<T, Arg>(0)) == sizeof(yes_type)>{};
+   template <class Ref, class Arg> struct is_constructible<Ref&, Arg> : public integral_constant<bool, sizeof(detail::is_constructible_imp::ref_test<Ref&>(declval<Arg>())) == sizeof(yes_type)>{};
+   template <class Ref, class Arg> struct is_constructible<Ref&&, Arg> : public integral_constant<bool, sizeof(detail::is_constructible_imp::ref_test<Ref&&>(declval<Arg>())) == sizeof(yes_type)>{};
 
    template <> struct is_constructible<void> : public false_type{};
    template <> struct is_constructible<void const> : public false_type{};
