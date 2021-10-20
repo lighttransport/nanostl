@@ -10,6 +10,7 @@
 
 #include "nanotype_traits.h"
 #include "nanocommon.h"
+#include "nanofunctional.h"
 
 #include "__nullptr"
 
@@ -975,6 +976,9 @@ operator>=(nullptr_t, const unique_ptr<_T1, _D1>& __x)
 }
 
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS hash;
+
+template <class _Type, class ...>
+using __enable_hash_helper /*_LIBCPP_NODEBUG*/ = _Type;
 
 template <class _Tp, class _Dp>
 //#ifdef _LIBCPP_CXX03_LANG
