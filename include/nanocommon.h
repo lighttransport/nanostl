@@ -41,8 +41,10 @@
 
 #if defined(NANOSTL_ENABLE_EXCEPTION)
 #define __NANOSTL_NOEXCEPT noexcept
+#define __NANOSTL_NOEXCEPT_(x) noexcept(x)
 #else
 #define __NANOSTL_NOEXCEPT
+#define __NANOSTL_NOEXCEPT_(x)
 #endif
 
 

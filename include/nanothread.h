@@ -29,8 +29,7 @@
 
 #include "nanocommon.h"
 #include "nanochrono.h"
-
-#include "tao/tuple/tuple.hpp"
+#include "nanotuple.h"
 
 namespace nanostl {
 
@@ -60,7 +59,10 @@ class thread {
   thread() __NANOSTL_NOEXCEPT;
 
   template <class F, class ...Args>
-  explicit thread(F&& f, Args&&... args);
+  explicit thread(F&& f, Args&&... args) {
+    //typedef unique_ptr<
+    //typedef tuple
+  }
 
   ~thread();
 

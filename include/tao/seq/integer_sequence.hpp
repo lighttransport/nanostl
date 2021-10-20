@@ -9,7 +9,7 @@
 
 #include "config.hpp"
 
-//namespace std = nanostl;
+namespace std = nanostl;
 
 namespace tao
 {

@@ -25,10 +25,12 @@
 #ifndef NANOSTL_TUPLE_H_
 #define NANOSTL_TUPLE_H_
 
-#include "tao/include/tuple.h"
+// Use tao::tuple
+#include "tao/tuple/tuple.hpp"
 
 namespace nanostl {
 
+using tao::tuple;
 
 }
 
