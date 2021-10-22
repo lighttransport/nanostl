@@ -11,7 +11,7 @@
 #endif
 
 #include "nanotype_traits.h"
-namespace std = nanostl;
+//namespace std = nanostl;
 
 namespace tao
 {
@@ -20,12 +20,12 @@ namespace tao
 #ifdef TAO_SEQ_FOLD_EXPRESSIONS
 
       template< bool... Bs >
-      using is_all = std::integral_constant< bool, ( Bs && ... ) >;
+      using is_all = nanostl::integral_constant< bool, ( Bs && ... ) >;
 
 #else
 
       template< bool... Bs >
-      using is_all = std::is_same< integer_sequence< bool, true, Bs... >, integer_sequence< bool, Bs..., true > >;
+      using is_all = nanostl::is_same< integer_sequence< bool, true, Bs... >, integer_sequence< bool, Bs..., true > >;
 
 #endif
 

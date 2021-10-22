@@ -36,6 +36,7 @@
 typedef void* thread_tls_t;
 extern void* thread_tls_get( thread_tls_t tls );
 extern thread_tls_t thread_tls_create( void );
+extern void thread_tls_set(thread_tls_t tls, void *value);
 
 namespace nanostl {
 
@@ -141,7 +142,7 @@ __thread_specific_ptr<_Tp>::set_pointer(pointer __p)
 {
     _LIBCPP_ASSERT(get() == nullptr,
                    "Attempting to overwrite thread local data");
-    __libcpp_tls_set(__key_, __p);
+    thread_tls_set(__key_, __p);
 }
 
 

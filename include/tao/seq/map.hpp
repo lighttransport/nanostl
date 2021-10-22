@@ -17,7 +17,7 @@ namespace tao
       template< typename, typename >
       struct map;
 
-      template< std::size_t... Ns, typename M >
+      template< nanostl::size_t... Ns, typename M >
       struct map< index_sequence< Ns... >, M >
       {
          using type = integer_sequence< typename M::value_type, select< Ns, M >::value... >;

@@ -9,7 +9,7 @@
 
 #include "config.hpp"
 
-namespace std = nanostl;
+//namespace std = nanostl;
 
 namespace tao
 {
@@ -17,8 +17,8 @@ namespace tao
    {
 #ifdef TAO_SEQ_USE_STD_INTEGER_SEQUENCE
 
-      using std::index_sequence;
-      using std::integer_sequence;
+      using nanostl::index_sequence;
+      using nanostl::integer_sequence;
 
 #else
 
@@ -27,14 +27,14 @@ namespace tao
       {
          using value_type = T;
 
-         static constexpr std::size_t size() noexcept
+         static constexpr size_t size() noexcept
          {
             return sizeof...( Ns );
          }
       };
 
-      template< std::size_t... Ns >
-      using index_sequence = integer_sequence< std::size_t, Ns... >;
+      template< size_t... Ns >
+      using index_sequence = integer_sequence< size_t, Ns... >;
 
 #endif
 

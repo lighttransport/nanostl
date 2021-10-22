@@ -5,7 +5,7 @@
 #define TAO_SEQ_MINUS_HPP
 
 #include "nanotype_traits.h"
-namespace std = nanostl;
+//namespace std = nanostl;
 
 #include "zip.hpp"
 
@@ -18,7 +18,7 @@ namespace tao
          struct minus
          {
             template< typename T, T A, T B >
-            using apply = std::integral_constant< T, A - B >;
+            using apply = nanostl::integral_constant< T, A - B >;
          };
 
       }  // namespace impl

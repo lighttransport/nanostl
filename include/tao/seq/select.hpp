@@ -14,13 +14,13 @@ namespace tao
 {
    namespace seq
    {
-      template< std::size_t I, typename T, T... Ns >
+      template< nanostl::size_t I, typename T, T... Ns >
       struct select
-         : at_index_t< I, std::integral_constant< T, Ns >... >
+         : at_index_t< I, nanostl::integral_constant< T, Ns >... >
       {
       };
 
-      template< std::size_t I, typename T, T... Ns >
+      template< nanostl::size_t I, typename T, T... Ns >
       struct select< I, integer_sequence< T, Ns... > >
          : select< I, T, Ns... >
       {

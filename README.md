@@ -249,7 +249,7 @@ Some functions in nanomath is licenced under modified BSD license.
 ### Third party licenses
 
 * SipHash: cc0 license. https://www.131002.net/siphash/
-* variant-lite:  Copyright 2016-2018 by Martin Moene. Boost Software License 1.0. https://github.com/martinmoene/variant-lite
+* optional-lie, variant-lite:  Copyright 2016-2018 by Martin Moene. Boost Software License 1.0. https://github.com/martinmoene/variant-lite
 * acutest : MIT license.
 * faster math functions: Some math functions implemented in nanomath is grabbed from OpenImageIO fmath.h, which is licensed under modified BSD license. https://github.com/OpenImageIO/oiio/
 * ryu(floating point <-> string converter). NanoSTL choose Boost 1.0 license. https://github.com/ulfjack/ryu

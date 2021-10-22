@@ -8,7 +8,7 @@
 //#include <utility>
 #include "nanoutility.h"
 
-namespace std = nanostl;
+//namespace std = nanostl;
 
 #include "make_integer_sequence.hpp"
 #include "sum.hpp"
@@ -19,10 +19,10 @@ namespace tao
    {
       namespace impl
       {
-         template< std::size_t, typename S, typename = make_index_sequence< S::size() > >
+         template< nanostl::size_t, typename S, typename = make_index_sequence< S::size() > >
          struct partial_sum;
 
-         template< std::size_t I, typename T, T... Ns, std::size_t... Is >
+         template< nanostl::size_t I, typename T, T... Ns, nanostl::size_t... Is >
          struct partial_sum< I, integer_sequence< T, Ns... >, index_sequence< Is... > >
             : seq::sum< T, ( ( Is < I ) ? Ns : 0 )... >
          {
@@ -31,13 +31,13 @@ namespace tao
 
       }  // namespace impl
 
-      template< std::size_t I, typename T, T... Ns >
+      template< nanostl::size_t I, typename T, T... Ns >
       struct partial_sum
          : impl::partial_sum< I, integer_sequence< T, Ns... > >
       {
       };
 
-      template< std::size_t I, typename T, T... Ns >
+      template< nanostl::size_t I, typename T, T... Ns >
       struct partial_sum< I, integer_sequence< T, Ns... > >
          : impl::partial_sum< I, integer_sequence< T, Ns... > >
       {

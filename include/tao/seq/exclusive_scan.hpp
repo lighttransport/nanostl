@@ -18,7 +18,7 @@ namespace tao
          template< typename S, typename = make_index_sequence< S::size() > >
          struct exclusive_scan;
 
-         template< typename S, std::size_t... Is >
+         template< typename S, nanostl::size_t... Is >
          struct exclusive_scan< S, index_sequence< Is... > >
          {
             using type = integer_sequence< typename S::value_type, partial_sum< Is, S >::value... >;

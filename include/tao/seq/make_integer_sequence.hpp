@@ -11,7 +11,7 @@
 #include "config.hpp"
 #include "integer_sequence.hpp"
 
-namespace std = nanostl;
+//namespace std = nanostl;
 
 namespace tao
 {
@@ -19,9 +19,9 @@ namespace tao
    {
 #ifdef TAO_SEQ_USE_STD_MAKE_INTEGER_SEQUENCE
 
-      using std::index_sequence_for;
-      using std::make_index_sequence;
-      using std::make_integer_sequence;
+      using nanostl::index_sequence_for;
+      using nanostl::make_index_sequence;
+      using nanostl::make_integer_sequence;
 
 #else
 
@@ -36,14 +36,14 @@ namespace tao
          template<>
          struct generate_sequence< false, true >
          {
-            template< typename T, T M, T N, std::size_t S, T... Ns >
+            template< typename T, T M, T N, nanostl::size_t S, T... Ns >
             using f = integer_sequence< T, Ns... >;
          };
 
          template<>
          struct generate_sequence< true, true >
          {
-            template< typename T, T M, T N, std::size_t S, T... Ns >
+            template< typename T, T M, T N, nanostl::size_t S, T... Ns >
             using f = integer_sequence< T, Ns..., S >;
          };
 
@@ -51,14 +51,14 @@ namespace tao
          template<>
          struct generate_sequence< false, false >
          {
-            template< typename T, T M, T N, std::size_t S, T... Ns >
+            template< typename T, T M, T N, nanostl::size_t S, T... Ns >
             using f = typename generate_sequence< ( N & ( M / 2 ) ) != 0, ( M / 2 ) == 0 >::template f< T, M / 2, N, 2 * S, Ns..., ( Ns + S )... >;
          };
 
          template<>
          struct generate_sequence< true, false >
          {
-            template< typename T, T M, T N, std::size_t S, T... Ns >
+            template< typename T, T M, T N, nanostl::size_t S, T... Ns >
             using f = typename generate_sequence< ( N & ( M / 2 ) ) != 0, ( M / 2 ) == 0 >::template f< T, M / 2, N, 2 * S + 1, Ns..., ( Ns + S )..., 2 * S >;
          };
 
@@ -78,8 +78,8 @@ namespace tao
       template< typename T, T N >
       using make_integer_sequence = typename impl::memoize_sequence< T, N >::type;
 
-      template< std::size_t N >
-      using make_index_sequence = make_integer_sequence< std::size_t, N >;
+      template< nanostl::size_t N >
+      using make_index_sequence = make_integer_sequence< nanostl::size_t, N >;
 
       template< typename... Ts >
       using index_sequence_for = make_index_sequence< sizeof...( Ts ) >;

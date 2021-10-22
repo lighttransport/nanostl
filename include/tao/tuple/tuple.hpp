@@ -70,21 +70,21 @@ namespace nanostl
 
 namespace tao
 {
-   template< std::size_t I, typename... Ts >
+   template< nanostl::size_t I, typename... Ts >
    TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON seq::at_index_t< I, Ts... >& get( tuple< Ts... >& ) noexcept;
 
-   template< std::size_t I, typename... Ts >
+   template< nanostl::size_t I, typename... Ts >
    TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON seq::at_index_t< I, Ts... >&& get( tuple< Ts... >&& ) noexcept;
 
-   template< std::size_t I, typename... Ts >
+   template< nanostl::size_t I, typename... Ts >
    TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON const seq::at_index_t< I, Ts... >& get( const tuple< Ts... >& ) noexcept;
 
-   template< std::size_t I, typename... Ts >
+   template< nanostl::size_t I, typename... Ts >
    TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON const seq::at_index_t< I, Ts... >&& get( const tuple< Ts... >&& ) noexcept;
 
    namespace impl
    {
-      // TODO: std::pair support
+      // TODO: nanostl::pair support
       // TODO: allocator support
 
       using swallow = bool[];
@@ -95,39 +95,39 @@ namespace tao
       {};
 
       template< bool B, typename T = void >
-      using enable_if_t = typename std::enable_if< B, T >::type;
+      using enable_if_t = typename nanostl::enable_if< B, T >::type;
 
       // TODO: this is in namespace impl. is it harmless?
-      using std::swap;
+      using nanostl::swap;
 
       template< typename T >
-      using is_nothrow_swappable = std::integral_constant< bool, noexcept( swap( std::declval< T& >(), std::declval< T& >() ) ) >;
+      using is_nothrow_swappable = nanostl::integral_constant< bool, noexcept( swap( nanostl::declval< T& >(), nanostl::declval< T& >() ) ) >;
 
 #if __cplusplus >= 201402L
       template< typename T >
-      using is_final = std::is_final< T >;
+      using is_final = nanostl::is_final< T >;
 #else
       template< typename T >
-      using is_final = std::integral_constant< bool, __is_final( T ) >;
+      using is_final = nanostl::integral_constant< bool, __is_final( T ) >;
 #endif
 
       template< bool, bool >
       struct uses_alloc_ctor;
 
       template< typename T, typename A, typename... As >
-      using uses_alloc_ctor_t = uses_alloc_ctor< std::uses_allocator< T, A >::value, std::is_constructible< T, std::allocator_arg_t, A, As... >::value >*;
+      using uses_alloc_ctor_t = uses_alloc_ctor< nanostl::uses_allocator< T, A >::value, nanostl::is_constructible< T, nanostl::allocator_arg_t, A, As... >::value >*;
 
-      template< std::size_t I, typename T, bool = std::is_empty< T >::value && !is_final< T >::value >
+      template< nanostl::size_t I, typename T, bool = nanostl::is_empty< T >::value && !is_final< T >::value >
       struct tuple_value
       {
          T value;
 
          TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
          TAO_TUPLE_CUDA_ANNOTATE_COMMON
-         constexpr tuple_value() noexcept( std::is_nothrow_default_constructible< T >::value )
+         constexpr tuple_value() noexcept( nanostl::is_nothrow_default_constructible< T >::value )
             : value()
          {
-            static_assert( !std::is_reference< T >::value, "attempted to default construct a reference element in a tuple" );
+            static_assert( !nanostl::is_reference< T >::value, "attempted to default construct a reference element in a tuple" );
          }
 
          TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
@@ -136,16 +136,16 @@ namespace tao
          tuple_value( uses_alloc_ctor< false, B >*, const A& )
             : value()
          {
-            static_assert( !std::is_reference< T >::value, "attempted to default construct a reference element in a tuple" );
+            static_assert( !nanostl::is_reference< T >::value, "attempted to default construct a reference element in a tuple" );
          }
 
          TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
          template< typename A >
          TAO_TUPLE_CUDA_ANNOTATE_COMMON
          tuple_value( uses_alloc_ctor< true, true >*, const A& a )
-            : value( std::allocator_arg_t(), a )
+            : value( nanostl::allocator_arg_t(), a )
          {
-            static_assert( !std::is_reference< T >::value, "attempted to default construct a reference element in a tuple" );
+            static_assert( !nanostl::is_reference< T >::value, "attempted to default construct a reference element in a tuple" );
          }
 
          TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
@@ -154,22 +154,22 @@ namespace tao
          tuple_value( uses_alloc_ctor< true, false >*, const A& a )
             : value( a )
          {
-            static_assert( !std::is_reference< T >::value, "attempted to default construct a reference element in a tuple" );
+            static_assert( !nanostl::is_reference< T >::value, "attempted to default construct a reference element in a tuple" );
          }
 
          TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
          template< typename U,
-                   typename = impl::enable_if_t< !std::is_same< typename std::decay< U >::type, tuple_value >::value >,
-                   typename = impl::enable_if_t< std::is_constructible< T, U >::value > >
-         TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON explicit tuple_value( U&& v ) noexcept( std::is_nothrow_constructible< T, U >::value )
-            : value( std::forward< U >( v ) )
+                   typename = impl::enable_if_t< !nanostl::is_same< typename nanostl::decay< U >::type, tuple_value >::value >,
+                   typename = impl::enable_if_t< nanostl::is_constructible< T, U >::value > >
+         TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON explicit tuple_value( U&& v ) noexcept( nanostl::is_nothrow_constructible< T, U >::value )
+            : value( nanostl::forward< U >( v ) )
          {}
 
          TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
          template< bool B, typename A, typename U >
          TAO_TUPLE_CUDA_ANNOTATE_COMMON
          tuple_value( uses_alloc_ctor< false, B >*, const A&, U&& v )
-            : value( std::forward< U >( v ) )
+            : value( nanostl::forward< U >( v ) )
          {
             // TODO: Add check for rvalue to lvalue reference
          }
@@ -178,7 +178,7 @@ namespace tao
          template< typename A, typename U >
          TAO_TUPLE_CUDA_ANNOTATE_COMMON
          tuple_value( uses_alloc_ctor< true, true >*, const A& a, U&& v )
-            : value( std::allocator_arg_t(), a, std::forward< U >( v ) )
+            : value( nanostl::allocator_arg_t(), a, nanostl::forward< U >( v ) )
          {
             // TODO: Add check for rvalue to lvalue reference
          }
@@ -187,7 +187,7 @@ namespace tao
          template< typename A, typename U >
          TAO_TUPLE_CUDA_ANNOTATE_COMMON
          tuple_value( uses_alloc_ctor< true, false >*, const A& a, U&& v )
-            : value( std::forward< U >( v ), a )
+            : value( nanostl::forward< U >( v ), a )
          {
             // TODO: Add check for rvalue to lvalue reference
          }
@@ -198,16 +198,16 @@ namespace tao
          tuple_value& operator=( tuple_value&& ) = default;
 
          template< typename U >
-         TAO_TUPLE_CUDA_ANNOTATE_COMMON tuple_value& operator=( U&& v ) noexcept( std::is_nothrow_assignable< T&, U >::value )
+         TAO_TUPLE_CUDA_ANNOTATE_COMMON tuple_value& operator=( U&& v ) noexcept( nanostl::is_nothrow_assignable< T&, U >::value )
          {
-            value = std::forward< U >( v );
+            value = nanostl::forward< U >( v );
             return *this;
          }
 
          TAO_TUPLE_CUDA_ANNOTATE_COMMON
          void swap( tuple_value& v ) noexcept( is_nothrow_swappable< T >::value )
          {
-            using std::swap;
+            using nanostl::swap;
             swap( value, v.value );
          }
 
@@ -226,13 +226,13 @@ namespace tao
          }
       };
 
-      template< std::size_t I, typename T >
+      template< nanostl::size_t I, typename T >
       struct tuple_value< I, T, true >
          : private T
       {
          TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
          constexpr TAO_TUPLE_CUDA_ANNOTATE_COMMON
-         tuple_value() noexcept( std::is_nothrow_default_constructible< T >::value )
+         tuple_value() noexcept( nanostl::is_nothrow_default_constructible< T >::value )
             : T()
          {}
 
@@ -247,7 +247,7 @@ namespace tao
          template< typename A >
          TAO_TUPLE_CUDA_ANNOTATE_COMMON
          tuple_value( uses_alloc_ctor< true, true >*, const A& a )
-            : T( std::allocator_arg_t(), a )
+            : T( nanostl::allocator_arg_t(), a )
          {}
 
          TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
@@ -259,31 +259,31 @@ namespace tao
 
          TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
          template< typename U,
-                   typename = impl::enable_if_t< !std::is_same< typename std::decay< U >::type, tuple_value >::value >,
-                   typename = impl::enable_if_t< std::is_constructible< T, U >::value > >
-         TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON explicit tuple_value( U&& v ) noexcept( std::is_nothrow_constructible< T, U >::value )
-            : T( std::forward< U >( v ) )
+                   typename = impl::enable_if_t< !nanostl::is_same< typename nanostl::decay< U >::type, tuple_value >::value >,
+                   typename = impl::enable_if_t< nanostl::is_constructible< T, U >::value > >
+         TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON explicit tuple_value( U&& v ) noexcept( nanostl::is_nothrow_constructible< T, U >::value )
+            : T( nanostl::forward< U >( v ) )
          {}
 
          TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
          template< bool B, typename A, typename U >
          TAO_TUPLE_CUDA_ANNOTATE_COMMON
          tuple_value( uses_alloc_ctor< false, B >*, const A&, U&& v )
-            : T( std::forward< U >( v ) )
+            : T( nanostl::forward< U >( v ) )
          {}
 
          TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
          template< typename A, typename U >
          TAO_TUPLE_CUDA_ANNOTATE_COMMON
          tuple_value( uses_alloc_ctor< true, true >*, const A& a, U&& v )
-            : T( std::allocator_arg_t(), a, std::forward< U >( v ) )
+            : T( nanostl::allocator_arg_t(), a, nanostl::forward< U >( v ) )
          {}
 
          TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
          template< typename A, typename U >
          TAO_TUPLE_CUDA_ANNOTATE_COMMON
          tuple_value( uses_alloc_ctor< true, false >*, const A& a, U&& v )
-            : T( std::forward< U >( v ), a )
+            : T( nanostl::forward< U >( v ), a )
          {}
 
          tuple_value( const tuple_value& ) = default;
@@ -292,16 +292,16 @@ namespace tao
          tuple_value& operator=( tuple_value&& ) = default;
 
          template< typename U >
-         TAO_TUPLE_CUDA_ANNOTATE_COMMON tuple_value& operator=( U&& v ) noexcept( std::is_nothrow_assignable< T&, U >::value )
+         TAO_TUPLE_CUDA_ANNOTATE_COMMON tuple_value& operator=( U&& v ) noexcept( nanostl::is_nothrow_assignable< T&, U >::value )
          {
-            T::operator=( std::forward< U >( v ) );
+            T::operator=( nanostl::forward< U >( v ) );
             return *this;
          }
 
          TAO_TUPLE_CUDA_ANNOTATE_COMMON
          void swap( tuple_value& v ) noexcept( is_nothrow_swappable< T >::value )
          {
-            using std::swap;
+            using nanostl::swap;
             swap( *this, v );
          }
 
@@ -323,7 +323,7 @@ namespace tao
       template< typename, typename... >
       struct tuple_base;
 
-      template< std::size_t... Is, typename... Ts >
+      template< nanostl::size_t... Is, typename... Ts >
       struct tuple_base< seq::index_sequence< Is... >, Ts... >
          : tuple_value< Is, Ts >...
       {
@@ -331,12 +331,12 @@ namespace tao
 
          template< typename... Us >
          TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON explicit tuple_base( Us&&... us )
-            : tuple_value< Is, Ts >( std::forward< Us >( us ) )...
+            : tuple_value< Is, Ts >( nanostl::forward< Us >( us ) )...
          {}
 
          template< typename A, typename... Us >
-         TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON tuple_base( std::allocator_arg_t, const A& a, Us&&... us )
-            : tuple_value< Is, Ts >( uses_alloc_ctor_t< Ts, A, Us >(), a, std::forward< Us >( us ) )...
+         TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON tuple_base( nanostl::allocator_arg_t, const A& a, Us&&... us )
+            : tuple_value< Is, Ts >( uses_alloc_ctor_t< Ts, A, Us >(), a, nanostl::forward< Us >( us ) )...
          {}
 
          tuple_base( const tuple_base& ) = default;
@@ -345,7 +345,7 @@ namespace tao
          tuple_base& operator=( tuple_base&& v ) = default;
 
          template< typename... Us >
-         TAO_TUPLE_CUDA_ANNOTATE_COMMON tuple_base& operator=( const tuple< Us... >& v ) noexcept( seq::is_all< std::is_nothrow_assignable< Ts&, const Us& >::value... >::value )
+         TAO_TUPLE_CUDA_ANNOTATE_COMMON tuple_base& operator=( const tuple< Us... >& v ) noexcept( seq::is_all< nanostl::is_nothrow_assignable< Ts&, const Us& >::value... >::value )
          {
 #ifdef TAO_SEQ_FOLD_EXPRESSIONS
             ( tuple_value< Is, Ts >::operator=( get< Is >( v ) ), ... );
@@ -356,12 +356,12 @@ namespace tao
          }
 
          template< typename... Us >
-         TAO_TUPLE_CUDA_ANNOTATE_COMMON tuple_base& operator=( tuple< Us... >&& v ) noexcept( seq::is_all< std::is_nothrow_assignable< Ts&, Us&& >::value... >::value )
+         TAO_TUPLE_CUDA_ANNOTATE_COMMON tuple_base& operator=( tuple< Us... >&& v ) noexcept( seq::is_all< nanostl::is_nothrow_assignable< Ts&, Us&& >::value... >::value )
          {
 #ifdef TAO_SEQ_FOLD_EXPRESSIONS
-            ( tuple_value< Is, Ts >::operator=( get< Is >( std::move( v ) ) ), ... );
+            ( tuple_value< Is, Ts >::operator=( get< Is >( nanostl::move( v ) ) ), ... );
 #else
-            (void)swallow{ ( tuple_value< Is, Ts >::operator=( get< Is >( std::move( v ) ) ), true )..., true };
+            (void)swallow{ ( tuple_value< Is, Ts >::operator=( get< Is >( nanostl::move( v ) ) ), true )..., true };
 #endif
             return *this;
          }
@@ -389,16 +389,16 @@ namespace tao
       using base_t = impl::tuple_base< seq::index_sequence_for< Ts... >, Ts... >;
       base_t base;
 
-      template< std::size_t I, typename... Us >
+      template< nanostl::size_t I, typename... Us >
       friend TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON seq::at_index_t< I, Us... >& get( tuple< Us... >& ) noexcept;
 
-      template< std::size_t I, typename... Us >
+      template< nanostl::size_t I, typename... Us >
       friend TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON seq::at_index_t< I, Us... >&& get( tuple< Us... >&& ) noexcept;
 
-      template< std::size_t I, typename... Us >
+      template< nanostl::size_t I, typename... Us >
       friend TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON const seq::at_index_t< I, Us... >& get( const tuple< Us... >& ) noexcept;
 
-      template< std::size_t I, typename... Us >
+      template< nanostl::size_t I, typename... Us >
       friend TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON const seq::at_index_t< I, Us... >&& get( const tuple< Us... >&& ) noexcept;
 
    public:
@@ -407,24 +407,24 @@ namespace tao
       // TODO: Move this templated condition to base?
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename dummy = void,
-                typename = impl::enable_if_t< seq::is_all< impl::dependent_type< std::is_default_constructible< Ts >, dummy >::value... >::value > >
-      TAO_TUPLE_CUDA_ANNOTATE_COMMON constexpr tuple() noexcept( seq::is_all< std::is_nothrow_default_constructible< Ts >::value... >::value )
+                typename = impl::enable_if_t< seq::is_all< impl::dependent_type< nanostl::is_default_constructible< Ts >, dummy >::value... >::value > >
+      TAO_TUPLE_CUDA_ANNOTATE_COMMON constexpr tuple() noexcept( seq::is_all< nanostl::is_nothrow_default_constructible< Ts >::value... >::value )
          : base()
       {}
 
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename dummy = void,
-                typename = impl::enable_if_t< seq::is_all< impl::dependent_type< std::is_copy_constructible< Ts >, dummy >::value... >::value > >
-      TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON explicit tuple( const Ts&... ts ) noexcept( seq::is_all< std::is_nothrow_copy_constructible< Ts >::value... >::value )
+                typename = impl::enable_if_t< seq::is_all< impl::dependent_type< nanostl::is_copy_constructible< Ts >, dummy >::value... >::value > >
+      TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON explicit tuple( const Ts&... ts ) noexcept( seq::is_all< nanostl::is_nothrow_copy_constructible< Ts >::value... >::value )
          : base( ts... )
       {}
 
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename... Us,
                 typename = impl::enable_if_t< sizeof...( Us ) == sizeof...( Ts ) >,
-                typename = impl::enable_if_t< seq::is_all< std::is_constructible< Ts, Us&& >::value... >::value > >
-      TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON explicit tuple( Us&&... us ) noexcept( seq::is_all< std::is_nothrow_constructible< Ts, Us&& >::value... >::value )
-         : base( std::forward< Us >( us )... )
+                typename = impl::enable_if_t< seq::is_all< nanostl::is_constructible< Ts, Us&& >::value... >::value > >
+      TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON explicit tuple( Us&&... us ) noexcept( seq::is_all< nanostl::is_nothrow_constructible< Ts, Us&& >::value... >::value )
+         : base( nanostl::forward< Us >( us )... )
       {}
 
       tuple( const tuple& ) = default;
@@ -435,88 +435,88 @@ namespace tao
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename... Us,
                 typename = impl::enable_if_t< sizeof...( Us ) == sizeof...( Ts ) >,
-                typename = impl::enable_if_t< seq::is_all< std::is_constructible< Ts, const Us& >::value... >::value > >
-      TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON explicit tuple( const tuple< Us... >& v ) noexcept( seq::is_all< std::is_nothrow_constructible< Ts, const Us& >::value... >::value )
+                typename = impl::enable_if_t< seq::is_all< nanostl::is_constructible< Ts, const Us& >::value... >::value > >
+      TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON explicit tuple( const tuple< Us... >& v ) noexcept( seq::is_all< nanostl::is_nothrow_constructible< Ts, const Us& >::value... >::value )
          : base( v )
       {}
 
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename... Us,
                 typename = impl::enable_if_t< sizeof...( Us ) == sizeof...( Ts ) >,
-                typename = impl::enable_if_t< seq::is_all< std::is_constructible< Ts, Us&& >::value... >::value > >
-      TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON explicit tuple( tuple< Us... >&& v ) noexcept( seq::is_all< std::is_nothrow_constructible< Ts, Us&& >::value... >::value )
-         : base( std::move( v ) )
+                typename = impl::enable_if_t< seq::is_all< nanostl::is_constructible< Ts, Us&& >::value... >::value > >
+      TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON explicit tuple( tuple< Us... >&& v ) noexcept( seq::is_all< nanostl::is_nothrow_constructible< Ts, Us&& >::value... >::value )
+         : base( nanostl::move( v ) )
       {}
 
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename A,
                 typename dummy = void,
-                typename = impl::enable_if_t< seq::is_all< impl::dependent_type< std::is_default_constructible< Ts >, dummy >::value... >::value > >
+                typename = impl::enable_if_t< seq::is_all< impl::dependent_type< nanostl::is_default_constructible< Ts >, dummy >::value... >::value > >
       TAO_TUPLE_CUDA_ANNOTATE_COMMON
-      tuple( std::allocator_arg_t, const A& a )
-         : base( std::allocator_arg_t(), a )
+      tuple( nanostl::allocator_arg_t, const A& a )
+         : base( nanostl::allocator_arg_t(), a )
       {}
 
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename A,
                 typename dummy = void,
-                typename = impl::enable_if_t< seq::is_all< impl::dependent_type< std::is_copy_constructible< Ts >, dummy >::value... >::value > >
+                typename = impl::enable_if_t< seq::is_all< impl::dependent_type< nanostl::is_copy_constructible< Ts >, dummy >::value... >::value > >
       TAO_TUPLE_CUDA_ANNOTATE_COMMON
-      tuple( std::allocator_arg_t, const A& a, const Ts&... ts )
-         : base( std::allocator_arg_t(), a, ts... )
+      tuple( nanostl::allocator_arg_t, const A& a, const Ts&... ts )
+         : base( nanostl::allocator_arg_t(), a, ts... )
       {}
 
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename A,
                 typename... Us,
                 typename = impl::enable_if_t< sizeof...( Us ) == sizeof...( Ts ) >,
-                typename = impl::enable_if_t< seq::is_all< std::is_constructible< Ts, Us&& >::value... >::value > >
+                typename = impl::enable_if_t< seq::is_all< nanostl::is_constructible< Ts, Us&& >::value... >::value > >
       TAO_TUPLE_CUDA_ANNOTATE_COMMON
-      tuple( std::allocator_arg_t, const A& a, Us&&... us )
-         : base( std::allocator_arg_t(), a, std::forward< Us >( us )... )
+      tuple( nanostl::allocator_arg_t, const A& a, Us&&... us )
+         : base( nanostl::allocator_arg_t(), a, nanostl::forward< Us >( us )... )
       {}
 
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename A >
       TAO_TUPLE_CUDA_ANNOTATE_COMMON
-      tuple( std::allocator_arg_t, const A& a, const tuple& v )
-         : base( std::allocator_arg_t(), a, v )
+      tuple( nanostl::allocator_arg_t, const A& a, const tuple& v )
+         : base( nanostl::allocator_arg_t(), a, v )
       {}
 
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename A >
       TAO_TUPLE_CUDA_ANNOTATE_COMMON
-      tuple( std::allocator_arg_t, const A& a, tuple&& v )
-         : base( std::allocator_arg_t(), a, std::move( v ) )
+      tuple( nanostl::allocator_arg_t, const A& a, tuple&& v )
+         : base( nanostl::allocator_arg_t(), a, nanostl::move( v ) )
       {}
 
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename A,
                 typename... Us,
                 typename = impl::enable_if_t< sizeof...( Us ) == sizeof...( Ts ) >,
-                typename = impl::enable_if_t< seq::is_all< std::is_constructible< Ts, const Us& >::value... >::value > >
+                typename = impl::enable_if_t< seq::is_all< nanostl::is_constructible< Ts, const Us& >::value... >::value > >
       TAO_TUPLE_CUDA_ANNOTATE_COMMON
-      tuple( std::allocator_arg_t, const A& a, const tuple< Us... >& v )
-         : base( std::allocator_arg_t(), a, v )
+      tuple( nanostl::allocator_arg_t, const A& a, const tuple< Us... >& v )
+         : base( nanostl::allocator_arg_t(), a, v )
       {}
 
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename A,
                 typename... Us,
                 typename = impl::enable_if_t< sizeof...( Us ) == sizeof...( Ts ) >,
-                typename = impl::enable_if_t< seq::is_all< std::is_constructible< Ts, Us&& >::value... >::value > >
+                typename = impl::enable_if_t< seq::is_all< nanostl::is_constructible< Ts, Us&& >::value... >::value > >
       TAO_TUPLE_CUDA_ANNOTATE_COMMON
-      tuple( std::allocator_arg_t, const A& a, tuple< Us... >&& v )
-         : base( std::allocator_arg_t(), a, std::move( v ) )
+      tuple( nanostl::allocator_arg_t, const A& a, tuple< Us... >&& v )
+         : base( nanostl::allocator_arg_t(), a, nanostl::move( v ) )
       {}
 
       // 20.4.2.2 Assignment [tuple.assign]
 
       template< typename T,
-                typename = impl::enable_if_t< std::is_assignable< base_t&, T >::value > >
-      TAO_TUPLE_CUDA_ANNOTATE_COMMON tuple& operator=( T&& v ) noexcept( std::is_nothrow_assignable< base_t&, T >::value )
+                typename = impl::enable_if_t< nanostl::is_assignable< base_t&, T >::value > >
+      TAO_TUPLE_CUDA_ANNOTATE_COMMON tuple& operator=( T&& v ) noexcept( nanostl::is_nothrow_assignable< base_t&, T >::value )
       {
-         base = std::forward< T >( v );
+         base = nanostl::forward< T >( v );
          return *this;
       }
 
@@ -540,13 +540,13 @@ namespace tao
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename A >
       TAO_TUPLE_CUDA_ANNOTATE_COMMON
-      tuple( std::allocator_arg_t, const A& ) noexcept
+      tuple( nanostl::allocator_arg_t, const A& ) noexcept
       {}
 
       TAO_TUPLE_SUPPRESS_NVCC_HD_WARN
       template< typename A >
       TAO_TUPLE_CUDA_ANNOTATE_COMMON
-      tuple( std::allocator_arg_t, const A&, const tuple& ) noexcept
+      tuple( nanostl::allocator_arg_t, const A&, const tuple& ) noexcept
       {}
 
       TAO_TUPLE_CUDA_ANNOTATE_COMMON
@@ -583,7 +583,7 @@ namespace tao
       };
 
       template< typename T >
-      struct make_tuple_return< std::reference_wrapper< T > >
+      struct make_tuple_return< nanostl::reference_wrapper< T > >
       {
          using type = T&;
       };
@@ -594,17 +594,17 @@ namespace tao
    }  // namespace impl
 
    // make_tuple
-   template< typename... Ts, typename R = tuple< impl::make_tuple_return_t< typename std::decay< Ts >::type >... > >
+   template< typename... Ts, typename R = tuple< impl::make_tuple_return_t< typename nanostl::decay< Ts >::type >... > >
    TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON R make_tuple( Ts&&... ts )
    {
-      return R( std::forward< Ts >( ts )... );
+      return R( nanostl::forward< Ts >( ts )... );
    }
 
    // forward_as_tuple
    template< typename... Ts >
    TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON tuple< Ts&&... > forward_as_tuple( Ts&&... ts ) noexcept
    {
-      return tuple< Ts&&... >( std::forward< Ts >( ts )... );
+      return tuple< Ts&&... >( nanostl::forward< Ts >( ts )... );
    }
 
    // tie
@@ -639,61 +639,61 @@ namespace tao
 
    template< typename... Ts >
    struct tuple_size< tuple< Ts... > >
-      : std::integral_constant< std::size_t, sizeof...( Ts ) >
+      : nanostl::integral_constant< nanostl::size_t, sizeof...( Ts ) >
    {};
 
    // tuple_element
-   template< std::size_t I, typename T >
+   template< nanostl::size_t I, typename T >
    struct tuple_element;
 
-   template< std::size_t I, typename T >
+   template< nanostl::size_t I, typename T >
    struct tuple_element< I, const T >
       : tuple_element< I, T >
    {};
 
-   template< std::size_t I, typename T >
+   template< nanostl::size_t I, typename T >
    struct tuple_element< I, volatile T >
       : tuple_element< I, T >
    {};
 
-   template< std::size_t I, typename T >
+   template< nanostl::size_t I, typename T >
    struct tuple_element< I, const volatile T >
       : tuple_element< I, T >
    {};
 
-   template< std::size_t I, typename... Ts >
+   template< nanostl::size_t I, typename... Ts >
    struct tuple_element< I, tuple< Ts... > >
       : seq::at_index< I, Ts... >
    {};
 
 #if __cplusplus >= 201402L
-   template< std::size_t I, typename T >
+   template< nanostl::size_t I, typename T >
    using tuple_element_t = typename tuple_element< I, T >::type;
 #endif
 
    // 20.4.2.6 Element access [tuple.elem]
 
    // get<I>
-   template< std::size_t I, typename... Ts >
+   template< nanostl::size_t I, typename... Ts >
    TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON seq::at_index_t< I, Ts... >& get( tuple< Ts... >& v ) noexcept
    {
       return static_cast< impl::tuple_value< I, seq::at_index_t< I, Ts... > >& >( v.base ).get();
    }
 
-   template< std::size_t I, typename... Ts >
+   template< nanostl::size_t I, typename... Ts >
    TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON seq::at_index_t< I, Ts... >&& get( tuple< Ts... >&& v ) noexcept
    {
       using type = seq::at_index_t< I, Ts... >;
       return static_cast< type&& >( static_cast< impl::tuple_value< I, type >& >( v.base ).get() );
    }
 
-   template< std::size_t I, typename... Ts >
+   template< nanostl::size_t I, typename... Ts >
    TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON const seq::at_index_t< I, Ts... >& get( const tuple< Ts... >& v ) noexcept
    {
       return static_cast< const impl::tuple_value< I, seq::at_index_t< I, Ts... > >& >( v.base ).get();
    }
 
-   template< std::size_t I, typename... Ts >
+   template< nanostl::size_t I, typename... Ts >
    TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON const seq::at_index_t< I, Ts... >&& get( const tuple< Ts... >&& v ) noexcept
    {
       using type = seq::at_index_t< I, Ts... >;
@@ -704,14 +704,14 @@ namespace tao
    namespace impl
    {
       template< typename T, typename... Ts >
-      using count_of = seq::sum< std::size_t, ( std::is_same< T, Ts >::value ? 1 : 0 )... >;
+      using count_of = seq::sum< nanostl::size_t, ( nanostl::is_same< T, Ts >::value ? 1 : 0 )... >;
 
       template< typename, typename, typename... >
       struct index_of_impl;
 
-      template< std::size_t... Is, typename T, typename... Ts >
+      template< nanostl::size_t... Is, typename T, typename... Ts >
       struct index_of_impl< seq::index_sequence< Is... >, T, Ts... >
-         : seq::sum< std::size_t, ( std::is_same< T, Ts >::value ? Is : 0 )... >
+         : seq::sum< nanostl::size_t, ( nanostl::is_same< T, Ts >::value ? Is : 0 )... >
       {
          static_assert( count_of< T, Ts... >::value > 0, "T not found within Ts..." );
          static_assert( count_of< T, Ts... >::value < 2, "T must be unique within Ts..." );
@@ -732,7 +732,7 @@ namespace tao
    template< typename T, typename... Ts >
    TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON T&& get( tuple< Ts... >&& v ) noexcept
    {
-      return get< impl::index_of< T, Ts... >::value >( std::move( v ) );
+      return get< impl::index_of< T, Ts... >::value >( nanostl::move( v ) );
    }
 
    template< typename T, typename... Ts >
@@ -744,7 +744,7 @@ namespace tao
    template< typename T, typename... Ts >
    TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON const T&& get( const tuple< Ts... >&& v ) noexcept
    {
-      return get< impl::index_of< T, Ts... >::value >( std::move( v ) );
+      return get< impl::index_of< T, Ts... >::value >( nanostl::move( v ) );
    }
 
    // 20.4.2.7 Relational operators [tuple.rel]
@@ -757,7 +757,7 @@ namespace tao
       template< typename >
       struct tuple_equal;
 
-      template< std::size_t... Is >
+      template< nanostl::size_t... Is >
       struct tuple_equal< seq::index_sequence< Is... > >
       {
          template< typename T, typename U >
@@ -770,10 +770,10 @@ namespace tao
 #else
 
       // here, recursion seems to be the better choice, especially wrt constexpr
-      template< std::size_t I, std::size_t S >
+      template< nanostl::size_t I, nanostl::size_t S >
       struct tuple_equal;
 
-      template< std::size_t I >
+      template< nanostl::size_t I >
       struct tuple_equal< I, I >
       {
          template< typename T, typename U >
@@ -783,7 +783,7 @@ namespace tao
          }
       };
 
-      template< std::size_t I, std::size_t S >
+      template< nanostl::size_t I, nanostl::size_t S >
       struct tuple_equal
       {
          template< typename T, typename U >
@@ -796,10 +796,10 @@ namespace tao
 #endif
 
       // here, recursion seems to be the better choice, especially wrt constexpr
-      template< std::size_t I, std::size_t S >
+      template< nanostl::size_t I, nanostl::size_t S >
       struct tuple_less;
 
-      template< std::size_t I >
+      template< nanostl::size_t I >
       struct tuple_less< I, I >
       {
          template< typename T, typename U >
@@ -809,7 +809,7 @@ namespace tao
          }
       };
 
-      template< std::size_t I, std::size_t S >
+      template< nanostl::size_t I, nanostl::size_t S >
       struct tuple_less
       {
          template< typename T, typename U >
@@ -885,18 +885,18 @@ namespace tao
    // tuple_cat helper
    namespace impl
    {
-      template< std::size_t M, std::size_t... Ns >
+      template< nanostl::size_t M, nanostl::size_t... Ns >
       struct count_less_or_equal
-         : seq::sum< std::size_t, ( ( Ns <= M ) ? 1 : 0 )... >
+         : seq::sum< nanostl::size_t, ( ( Ns <= M ) ? 1 : 0 )... >
       {};
 
       template< typename, typename >
       struct expand;
 
-      template< std::size_t... Is, std::size_t... Ns >
+      template< nanostl::size_t... Is, nanostl::size_t... Ns >
       struct expand< seq::index_sequence< Is... >, seq::index_sequence< Ns... > >
       {
-         template< std::size_t I >
+         template< nanostl::size_t I >
          using cleq = count_less_or_equal< I, Ns... >;
 
          using type = seq::index_sequence< cleq< Is >::value... >;
@@ -908,7 +908,7 @@ namespace tao
       template< typename... >
       struct tuple_cat_result;
 
-      template< std::size_t... Os, std::size_t... Is, typename... Ts >
+      template< nanostl::size_t... Os, nanostl::size_t... Is, typename... Ts >
       struct tuple_cat_result< seq::index_sequence< Os... >, seq::index_sequence< Is... >, Ts... >
       {
          using type = tuple< typename tuple_element< Is, seq::at_index_t< Os, Ts... > >::type... >;
@@ -929,7 +929,7 @@ namespace tao
          using result_type = tuple_cat_result_t< outer_index_sequence, inner_index_sequence, Ts... >;
       };
 
-      template< typename R, std::size_t... Os, std::size_t... Is, typename T >
+      template< typename R, nanostl::size_t... Os, nanostl::size_t... Is, typename T >
       TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON R tuple_cat( seq::index_sequence< Os... >, seq::index_sequence< Is... >, T v )
       {
          return R( get< Is >( get< Os >( v ) )... );
@@ -938,10 +938,10 @@ namespace tao
    }  // namespace impl
 
    // tuple_cat
-   template< typename... Ts, typename H = impl::tuple_cat_helper< typename std::remove_reference< Ts >::type... >, typename R = typename H::result_type >
+   template< typename... Ts, typename H = impl::tuple_cat_helper< typename nanostl::remove_reference< Ts >::type... >, typename R = typename H::result_type >
    TAO_TUPLE_CONSTEXPR TAO_TUPLE_CUDA_ANNOTATE_COMMON R tuple_cat( Ts&&... ts )
    {
-      return impl::tuple_cat< R >( typename H::outer_index_sequence(), typename H::inner_index_sequence(), tao::forward_as_tuple( std::forward< Ts >( ts )... ) );
+      return impl::tuple_cat< R >( typename H::outer_index_sequence(), typename H::inner_index_sequence(), tao::forward_as_tuple( nanostl::forward< Ts >( ts )... ) );
    }
 
 }  // namespace tao

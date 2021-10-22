@@ -8,7 +8,7 @@
 
 #include "zip.hpp"
 
-namespace std = nanostl;
+//namespace std = nanostl;
 
 namespace tao
 {
@@ -19,7 +19,7 @@ namespace tao
          struct plus
          {
             template< typename T, T A, T B >
-            using apply = std::integral_constant< T, A + B >;
+            using apply = nanostl::integral_constant< T, A + B >;
          };
 
       }  // namespace impl

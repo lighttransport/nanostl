@@ -9,7 +9,7 @@
 #include "nanocstddef.h"
 #include "make_integer_sequence.hpp"
 
-namespace std = nanostl;
+//namespace std = nanostl;
 
 namespace tao
 {
@@ -19,7 +19,7 @@ namespace tao
 
       namespace impl
       {
-         template< std::size_t, typename T >
+         template< nanostl::size_t, typename T >
          struct indexed
          {
             using type = T;
@@ -28,22 +28,22 @@ namespace tao
          template< typename, typename... Ts >
          struct indexer;
 
-         template< std::size_t... Is, typename... Ts >
+         template< nanostl::size_t... Is, typename... Ts >
          struct indexer< index_sequence< Is... >, Ts... >
             : indexed< Is, Ts >...
          {
          };
 
-         template< std::size_t I, typename T >
+         template< nanostl::size_t I, typename T >
          indexed< I, T > select( const indexed< I, T >& );
 
       }  // namespace impl
 
-      template< std::size_t I, typename... Ts >
+      template< nanostl::size_t I, typename... Ts >
       using at_index = decltype( impl::select< I >( impl::indexer< index_sequence_for< Ts... >, Ts... >() ) );
 
 #ifndef _MSC_VER
-      template< std::size_t I, typename... Ts >
+      template< nanostl::size_t I, typename... Ts >
       using at_index_t = typename at_index< I, Ts... >::type;
 #else
       namespace impl
@@ -56,7 +56,7 @@ namespace tao
 
       }  // namespace impl
 
-      template< std::size_t I, typename... Ts >
+      template< nanostl::size_t I, typename... Ts >
       using at_index_t = typename impl::get_type< at_index< I, Ts... > >::type;
 #endif
 

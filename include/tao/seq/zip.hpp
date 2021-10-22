@@ -5,7 +5,7 @@
 #define TAO_SEQ_ZIP_HPP
 
 #include "nanotype_traits.h"
-namespace std = nanostl;
+//namespace std = nanostl;
 
 #include "integer_sequence.hpp"
 
@@ -19,7 +19,7 @@ namespace tao
       template< typename OP, typename TA, TA... As, typename TB, TB... Bs >
       struct zip< OP, integer_sequence< TA, As... >, integer_sequence< TB, Bs... > >
       {
-         using CT = typename std::common_type< TA, TB >::type;
+         using CT = typename nanostl::common_type< TA, TB >::type;
          using type = integer_sequence< CT, OP::template apply< CT, As, Bs >::value... >;
       };
 
