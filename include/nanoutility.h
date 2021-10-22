@@ -101,6 +101,15 @@ forward(typename remove_reference<_Tp>::type&& __t) __NANOSTL_NOEXCEPT {
   return static_cast<_Tp&&>(__t);
 }
 
+template <class _Tp>
+inline /*_LIBCPP_INLINE_VISIBILITY*/ typename decay<_Tp>::type __decay_copy(_Tp&& __t)
+//#if _LIBCPP_STD_VER > 17
+//    noexcept(is_nothrow_convertible_v<_Tp, remove_reference_t<_Tp> >)
+//#endif
+{
+  return nanostl::forward<_Tp>(__t);
+}
+
 
 }  // namespace nanostl
 

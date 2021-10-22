@@ -121,6 +121,15 @@ constexpr const _Tp integral_constant<_Tp, __v>::value;
 template <class _Tp, class _Up> struct _NANOSTL_TEMPLATE_VIS is_same           : public false_type {};
 template <class _Tp>            struct _NANOSTL_TEMPLATE_VIS is_same<_Tp, _Tp> : public true_type {};
 
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_void
+    : public is_same<typename remove_cv<_Tp>::type, void> {};
+
+//#if _LIBCPP_STD_VER > 14
+//template <class _Tp>
+//inline constexpr bool is_void_v = is_void<_Tp>::value;
+//#endif
+
+
 // is_array
 
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_array
@@ -663,7 +672,44 @@ struct is_destructible<void>
     : public false_type {};
 
 
+template <class T, class... Args> struct is_constructible;
 template <class T>                struct is_default_constructible;
+
+// is_default_constructible
+
+template <class _Tp>
+struct _NANOSTL_TEMPLATE_VIS is_default_constructible
+    : public is_constructible<_Tp>
+    {};
+
+//#if _LIBCPP_STD_VER > 14
+//template <class _Tp>
+//inline constexpr bool is_default_constructible_v = is_default_constructible<_Tp>::value;
+//#endif
+
+#ifndef _LIBCPP_CXX03_LANG
+// First of all, we can't implement this check in C++03 mode because the {}
+// default initialization syntax isn't valid.
+// Second, we implement the trait in a funny manner with two defaulted template
+// arguments to workaround Clang's PR43454.
+template <class _Tp>
+void __test_implicit_default_constructible(_Tp);
+
+template <class _Tp, class = void, class = typename is_default_constructible<_Tp>::type>
+struct __is_implicitly_default_constructible
+    : false_type
+{ };
+
+template <class _Tp>
+struct __is_implicitly_default_constructible<_Tp, decltype(__test_implicit_default_constructible<_Tp const&>({})), true_type>
+    : true_type
+{ };
+
+template <class _Tp>
+struct __is_implicitly_default_constructible<_Tp, decltype(__test_implicit_default_constructible<_Tp const&>({})), false_type>
+    : false_type
+{ };
+#endif // !C++03
 
 // is_constructible
 //
@@ -708,46 +754,11 @@ template <class T>                struct is_default_constructible;
    template <> struct is_constructible<void const volatile> : public false_type{};
    template <> struct is_constructible<void volatile> : public false_type{};
 
-   template <class T> struct is_constructible<T> : public is_default_constructible<T>{};
+   //template <class T> struct is_constructible<T> : public is_default_constructible<T>{};
 
 // ----------------------------------------------------------------------------------------------------------
 
 
-// is_default_constructible
-
-template <class _Tp>
-struct _NANOSTL_TEMPLATE_VIS is_default_constructible
-    : public is_constructible<_Tp>
-    {};
-
-//#if _LIBCPP_STD_VER > 14
-//template <class _Tp>
-//inline constexpr bool is_default_constructible_v = is_default_constructible<_Tp>::value;
-//#endif
-
-#ifndef _LIBCPP_CXX03_LANG
-// First of all, we can't implement this check in C++03 mode because the {}
-// default initialization syntax isn't valid.
-// Second, we implement the trait in a funny manner with two defaulted template
-// arguments to workaround Clang's PR43454.
-template <class _Tp>
-void __test_implicit_default_constructible(_Tp);
-
-template <class _Tp, class = void, class = typename is_default_constructible<_Tp>::type>
-struct __is_implicitly_default_constructible
-    : false_type
-{ };
-
-template <class _Tp>
-struct __is_implicitly_default_constructible<_Tp, decltype(__test_implicit_default_constructible<_Tp const&>({})), true_type>
-    : true_type
-{ };
-
-template <class _Tp>
-struct __is_implicitly_default_constructible<_Tp, decltype(__test_implicit_default_constructible<_Tp const&>({})), false_type>
-    : false_type
-{ };
-#endif // !C++03
 
 // is_union
 

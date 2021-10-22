@@ -628,6 +628,11 @@ static void test_stod(void) {
   TEST_CHECK(double_equals_by_ulps(nanostl::stod("1.0"), 1.0, 0));
 }
 
+static void test_unique_ptr(void) {
+  nanostl::unique_ptr<double> ptr(new double);
+
+}
+
 extern "C" void test_valarray(void);
 
 TEST_LIST = {{"test-vector", test_vector},
@@ -652,6 +657,7 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-digits10", test_digits10},
              {"test-to_string", test_to_string},
              {"test-stof", test_stof},
+             {"test-unique_ptr", test_unique_ptr},
              {nullptr, nullptr}};
 
 // TEST_MAIN();

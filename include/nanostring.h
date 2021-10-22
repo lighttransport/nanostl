@@ -265,7 +265,13 @@ string to_string(int value) {
 
   auto myreverse = [](char *buf, int i, int j) {
     while (i < j) {
-      swap(buf[i++], buf[j--]);
+      char tmp = buf[j];
+      buf[j] = buf[i];
+      buf[i] = tmp;
+      i++;
+      j--;
+
+      //swap(buf[i++], buf[j--]);
     }
   };
 
@@ -308,7 +314,12 @@ string to_string(int64_t value) {
 
   auto myreverse = [](char *buf, int i, int j) {
     while (i < j) {
-      swap(buf[i++], buf[j--]);
+      char tmp = buf[j];
+      buf[j] = buf[i];
+      buf[i] = tmp;
+      i++;
+      j--;
+      //swap(buf[i++], buf[j--]);
     }
   };
 

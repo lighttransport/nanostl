@@ -457,8 +457,12 @@ public:
   _LIBCPP_INLINE_VISIBILITY
   _LIBCPP_CONSTEXPR unique_ptr(nullptr_t) __NANOSTL_NOEXCEPT : __ptr_(pointer(), __default_init_tag()) {}
 
-  template <bool _Dummy = true,
-            class = _EnableIfDeleterDefaultConstructible<_Dummy> >
+  // FIXME:
+  //template <bool _Dummy = true,
+  //          class = _EnableIfDeleterDefaultConstructible<_Dummy> >
+  //_LIBCPP_INLINE_VISIBILITY
+  //explicit unique_ptr(pointer __p) __NANOSTL_NOEXCEPT : __ptr_(__p, __default_init_tag()) {}
+
   _LIBCPP_INLINE_VISIBILITY
   explicit unique_ptr(pointer __p) __NANOSTL_NOEXCEPT : __ptr_(__p, __default_init_tag()) {}
 

@@ -62,11 +62,11 @@ class /*_LIBCPP_TYPE_VIS*/ __thread_struct
 {
     __thread_struct_imp* __p_;
 
-    __thread_struct(const __thread_struct&);
-    __thread_struct& operator=(const __thread_struct&);
 public:
     __thread_struct();
     ~__thread_struct();
+    __thread_struct(const __thread_struct&) = default;
+    __thread_struct& operator=(const __thread_struct&) = default;
 
     // TODO
     //void notify_all_at_thread_exit(condition_variable*, mutex*);
@@ -152,8 +152,10 @@ void* __thread_proxy(void* __vp)
     // _Fp = tuple< unique_ptr<__thread_struct>, Functor, Args...>
     unique_ptr<_Fp> __p(static_cast<_Fp*>(__vp));
     __thread_local_data().set_pointer(tao::get<0>(*__p.get()).release());
-    typedef typename __make_tuple_indices<tao::tuple_size<_Fp>::value, 2>::type _Index;
-    _VSTD::__thread_execute(*__p.get(), _Index());
+    //typedef typename __make_tuple_indices<tao::tuple_size<_Fp>::value, 2>::type _Index;
+    //typedef typename tao::seq::make_integer_sequence<typename tao::tuple_size<_Fp>::value, 2>::type _Index;
+    //_VSTD::__thread_execute(*__p.get(), _Index());
+    //_VSTD::__thread_execute(*__p.get(), tao::seq::make_integer_sequence<tao::tuple_size<_Fp>::value, 2>());
     return nullptr;
 }
 
@@ -188,9 +190,15 @@ class thread {
   thread() __NANOSTL_NOEXCEPT;
 
   template <class _Fp, class ..._Args>
-  explicit thread(_Fp&& f, _Args&&... args) {
+  explicit thread(_Fp&& __f, _Args&&... __args) {
     typedef unique_ptr<__thread_struct> _TSPtr;
+    _TSPtr __tsp(new __thread_struct);
     typedef tuple<_TSPtr, typename decay<_Fp>::type, typename decay<_Args>::type...> _Gp;
+
+    unique_ptr<_Gp> __p(
+            new _Gp(nanostl::move(__tsp),
+                    _VSTD::__decay_copy(nanostl::forward<_Fp>(__f)),
+                    _VSTD::__decay_copy(nanostl::forward<_Args>(__args))...));
 
   }
 
