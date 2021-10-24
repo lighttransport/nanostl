@@ -6,6 +6,7 @@ project(${NANOSTL_TARGET} CXX)
 
 set(NANOSTL_SOURCES
   src/nanothread.cc
+  src/nanoexception.cc
   src/hash.cc
   )
 

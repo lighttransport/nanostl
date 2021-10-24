@@ -160,13 +160,13 @@ inline in_place_t in_place_index( detail::in_place_index_tag<K> = detail::in_pla
 
 // mimic templated typedef:
 
-#define nonstd_lite_in_place_t(      T)  nonnanostl::in_place_t(&)( nonnanostl::detail::in_place_type_tag<T>  )
-#define nonstd_lite_in_place_type_t( T)  nonnanostl::in_place_t(&)( nonnanostl::detail::in_place_type_tag<T>  )
-#define nonstd_lite_in_place_index_t(K)  nonnanostl::in_place_t(&)( nonnanostl::detail::in_place_index_tag<K> )
+#define nonstd_lite_in_place_t(      T)  nonstd::in_place_t(&)( nonstd::detail::in_place_type_tag<T>  )
+#define nonstd_lite_in_place_type_t( T)  nonstd::in_place_t(&)( nonstd::detail::in_place_type_tag<T>  )
+#define nonstd_lite_in_place_index_t(K)  nonstd::in_place_t(&)( nonstd::detail::in_place_index_tag<K> )
 
-#define nonstd_lite_in_place(      T)    nonnanostl::in_place_type<T>
-#define nonstd_lite_in_place_type( T)    nonnanostl::in_place_type<T>
-#define nonstd_lite_in_place_index(K)    nonnanostl::in_place_index<K>
+#define nonstd_lite_in_place(      T)    nonstd::in_place_type<T>
+#define nonstd_lite_in_place_type( T)    nonstd::in_place_type<T>
+#define nonstd_lite_in_place_index(K)    nonstd::in_place_index<K>
 
 } // namespace nonstd
 
@@ -183,11 +183,11 @@ inline in_place_t in_place_index( detail::in_place_index_tag<K> = detail::in_pla
 #include <variant>
 
 #if ! variant_CONFIG_OMIT_VARIANT_SIZE_V_MACRO
-# define variant_size_V(T)  nonnanostl::variant_size<T>::value
+# define variant_size_V(T)  nonstd::variant_size<T>::value
 #endif
 
 #if ! variant_CONFIG_OMIT_VARIANT_ALTERNATIVE_T_MACRO
-# define variant_alternative_T(K,T)  typename nonnanostl::variant_alternative<K,T >::type
+# define variant_alternative_T(K,T)  typename nonstd::variant_alternative<K,T >::type
 #endif
 
 namespace nonstd {
@@ -224,6 +224,7 @@ namespace nonstd {
 //#include <utility>
 #include <nanolimits.h>
 #include <nanoutility.h>
+#include <nanoexception.h>
 
 #if variant_CONFIG_NO_EXCEPTIONS
 # include <nanocassert.h>
@@ -1137,7 +1138,7 @@ constexpr nanostl::size_t variant_size_v = variant_size<T>::value;
 #endif
 
 #if ! variant_CONFIG_OMIT_VARIANT_SIZE_V_MACRO
-# define variant_size_V(T)  nonnanostl::variant_size<T>::value
+# define variant_size_V(T)  nonstd::variant_size<T>::value
 #endif
 
 // obtain the type of the alternative specified by its index, at compile time:
@@ -1157,11 +1158,11 @@ using variant_alternative_t = typename variant_alternative<K, T>::type;
 #endif
 
 #if ! variant_CONFIG_OMIT_VARIANT_ALTERNATIVE_T_MACRO
-# define variant_alternative_T(K,T)  typename nonnanostl::variant_alternative<K,T >::type
+# define variant_alternative_T(K,T)  typename nonstd::variant_alternative<K,T >::type
 #endif
 
 // NTS:implement specializes the nanostl::uses_allocator type trait
-// nanostl::uses_allocator<nonnanostl::variant>
+// nanostl::uses_allocator<nonstd::variant>
 
 // index of the variant in the invalid state (constant)
 
@@ -2352,20 +2353,20 @@ using namespace variants;
 namespace std {
 
 template<>
-struct hash< nonnanostl::monostate >
+struct hash< nonstd::monostate >
 {
-    nanostl::size_t operator()( nonnanostl::monostate ) const variant_noexcept
+    nanostl::size_t operator()( nonstd::monostate ) const variant_noexcept
     {
         return 42;
     }
 };
 
 template< class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15 >
-struct hash< nonnanostl::variant<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> >
+struct hash< nonstd::variant<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> >
 {
-    nanostl::size_t operator()( nonnanostl::variant<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> const & v ) const variant_noexcept
+    nanostl::size_t operator()( nonstd::variant<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> const & v ) const variant_noexcept
     {
-        namespace nvd = nonnanostl::variants::detail;
+        namespace nvd = nonstd::variants::detail;
 
         switch( v.index() )
         {

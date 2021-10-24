@@ -26,7 +26,8 @@
 #define NANOSTL_EXCEPTION_H_
 
 #include "nanocommon.h"
-#if defined(NANOSTL_ENABLE_EXCEPTION)
+
+namespace nanostl {
 
 class exception
 {
@@ -39,8 +40,7 @@ public:
 };
 
 
-#endif
-
+/*noreturn*/ void terminate() __NANOSTL_NOEXCEPT;
 
 }  // namespace nanostl
 

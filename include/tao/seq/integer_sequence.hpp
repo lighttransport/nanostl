@@ -27,14 +27,14 @@ namespace tao
       {
          using value_type = T;
 
-         static constexpr size_t size() noexcept
+         static constexpr nanostl::size_t size() noexcept
          {
             return sizeof...( Ns );
          }
       };
 
-      template< size_t... Ns >
-      using index_sequence = integer_sequence< size_t, Ns... >;
+      template< nanostl::size_t... Ns >
+      using index_sequence = integer_sequence< nanostl::size_t, Ns... >;
 
 #endif
 
