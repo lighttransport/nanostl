@@ -14,6 +14,13 @@
 #include "nanoutility.h"
 #include "nanovector.h"
 #include "nanovalarray.h"
+#include "nanomemory.h"
+
+#include "nanooptional.h"
+#include "nanoany.h"
+#include "nanovariant.h"
+#include "nanoexpected.h"
+
 #include "__nanostrutil.h"
 
 #include <cstdio>
@@ -627,6 +634,34 @@ static void test_stod(void) {
   TEST_CHECK(double_equals_by_ulps(nanostl::stod("1.0"), 1.0, 0));
 }
 
+static void test_unique_ptr(void) {
+  nanostl::unique_ptr<double> ptr(new double);
+
+}
+
+static void test_optional(void) {
+  nanostl::optional<double> a;
+
+}
+
+static void test_any(void) {
+  nanostl::any a;
+
+  a = 1.0;
+}
+
+static void test_variant(void) {
+  nanostl::variant<int, double> a;
+
+  a = 1.0;
+}
+
+
+static void test_expected(void) {
+  nanostl::expected<double, std::string> a;
+
+}
+
 extern "C" void test_valarray(void);
 
 TEST_LIST = {{"test-vector", test_vector},
@@ -651,6 +686,11 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-digits10", test_digits10},
              {"test-to_string", test_to_string},
              {"test-stof", test_stof},
+             {"test-unique_ptr", test_unique_ptr},
+             {"test-optional", test_optional},
+             {"test-variant", test_variant},
+             {"test-any", test_any},
+             {"test-expected", test_expected},
              {nullptr, nullptr}};
 
 // TEST_MAIN();

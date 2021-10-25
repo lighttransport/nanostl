@@ -22,37 +22,19 @@
  * THE SOFTWARE.
  */
 
-#ifndef NANOSTL_CHRONO_H_
-#define NANOSTL_CHRONO_H_
+#ifndef NANOSTL_MUTEX_H_
+#define NANOSTL_MUTEX_H_
 
-#include "nanocstdint.h"
-#include "nanoratio.h"
+#if !defined(NANOSTL_NO_THREAD)
 
 namespace nanostl {
 
-namespace chrono {
-
-
-template <class Rep>
-struct duration_values
-{
-  static constexpr Rep zero();
-  static constexpr Rep max();
-  static constexpr Rep min();
-};
-
-template <class Rep, class Period = ratio<1>>
-class duration {
-
+class mutex {
 
 };
-
-typedef duration<long long, nano> nanoseconds;
-typedef duration<long long, micro> microseconds;
-typedef duration<long long, milli> milliseconds;
-
-} // namespace chrono
 
 } // namespace nanostl
 
-#endif // NANOSTL_CHRONO_H_
+#endif // NANOSTL_NO_THREAD
+
+#endif // NANOSTL_MUTEX_H_

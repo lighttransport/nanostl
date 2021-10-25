@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(NANOSTL_SOURCES
   src/nanothread.cc
+  src/nanoexception.cc
+  src/hash.cc
   )
 
 if (WIN32)
@@ -20,7 +22,17 @@ add_library(${NANOSTL_TARGET} STATIC ${NANOSTL_SOURCES})
 
 target_include_directories(${NANOSTL_TARGET} PRIVATE ${PROJECT_SOURCE_DIR}/include)
 
+# Disable standard stl
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_options(${NANOSTL_TARGET} PRIVATE "-nostdinc++")
+endif ()
+
+if (MSVC)
+  target_compile_options(${NANOSTL_TARGET} PRIVATE "/NODEFAULTLIB")
+endif ()
+
 if (WIN32)
+  target_compile_definitions(${NANOSTL_TARGET} PRIVATE "NOMINMAX")
   target_link_libraries(${NANOSTL_TARGET} PUBLIC Threads::Threads)
 endif ()
 

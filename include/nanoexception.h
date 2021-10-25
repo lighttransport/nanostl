@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2021 Light Transport Entertainment, Inc.
+ * Copyright (c) 2021-present Light Transport Entertainment, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,37 +22,26 @@
  * THE SOFTWARE.
  */
 
-#ifndef NANOSTL_CHRONO_H_
-#define NANOSTL_CHRONO_H_
+#ifndef NANOSTL_EXCEPTION_H_
+#define NANOSTL_EXCEPTION_H_
 
-#include "nanocstdint.h"
-#include "nanoratio.h"
+#include "nanocommon.h"
 
 namespace nanostl {
 
-namespace chrono {
-
-
-template <class Rep>
-struct duration_values
+class exception
 {
-  static constexpr Rep zero();
-  static constexpr Rep max();
-  static constexpr Rep min();
+public:
+    exception() __NANOSTL_NOEXCEPT;
+    exception(const exception&) __NANOSTL_NOEXCEPT;
+    exception& operator=(const exception&) __NANOSTL_NOEXCEPT;
+    virtual ~exception() __NANOSTL_NOEXCEPT;
+    virtual const char* what() const __NANOSTL_NOEXCEPT;
 };
 
-template <class Rep, class Period = ratio<1>>
-class duration {
 
+/*noreturn*/ void terminate() __NANOSTL_NOEXCEPT;
 
-};
+}  // namespace nanostl
 
-typedef duration<long long, nano> nanoseconds;
-typedef duration<long long, micro> microseconds;
-typedef duration<long long, milli> milliseconds;
-
-} // namespace chrono
-
-} // namespace nanostl
-
-#endif // NANOSTL_CHRONO_H_
+#endif  // NANOSTL_EXCEPTION_H_

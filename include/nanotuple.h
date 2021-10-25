@@ -22,37 +22,16 @@
  * THE SOFTWARE.
  */
 
-#ifndef NANOSTL_CHRONO_H_
-#define NANOSTL_CHRONO_H_
+#ifndef NANOSTL_TUPLE_H_
+#define NANOSTL_TUPLE_H_
 
-#include "nanocstdint.h"
-#include "nanoratio.h"
+// Use tao::tuple
+#include "tao/tuple/tuple.hpp"
 
 namespace nanostl {
 
-namespace chrono {
+using tao::tuple;
 
+}
 
-template <class Rep>
-struct duration_values
-{
-  static constexpr Rep zero();
-  static constexpr Rep max();
-  static constexpr Rep min();
-};
-
-template <class Rep, class Period = ratio<1>>
-class duration {
-
-
-};
-
-typedef duration<long long, nano> nanoseconds;
-typedef duration<long long, micro> microseconds;
-typedef duration<long long, milli> milliseconds;
-
-} // namespace chrono
-
-} // namespace nanostl
-
-#endif // NANOSTL_CHRONO_H_
+#endif // NANOSTL_TUPLE_H_
