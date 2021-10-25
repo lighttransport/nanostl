@@ -1217,6 +1217,53 @@ struct __is_nothrow_swappable
 {
 };
 
+// is_trivially_constructible
+
+template <class _Tp, class... _Args>
+struct _NANOSTL_TEMPLATE_VIS is_trivially_constructible
+    : integral_constant<bool, __is_trivially_constructible(_Tp, _Args...)>
+{
+};
+
+// is_trivially_default_constructible
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_trivially_default_constructible
+    : public is_trivially_constructible<_Tp>
+    {};
+
+// is_trivially_copy_constructible
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_trivially_copy_constructible
+    : public is_trivially_constructible<_Tp, typename add_lvalue_reference<const _Tp>::type>
+    {};
+
+// is_trivially_move_constructible
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_trivially_move_constructible
+    : public is_trivially_constructible<_Tp, typename add_rvalue_reference<_Tp>::type>
+    {};
+
+
+// is_scalar
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_scalar
+    : public integral_constant<bool, is_arithmetic<_Tp>::value     ||
+                                     is_member_pointer<_Tp>::value ||
+                                     is_pointer<_Tp>::value        ||
+                                     __is_nullptr_t<_Tp>::value    ||
+                                     __is_block<_Tp>::value        ||
+                                     is_enum<_Tp>::value           > {};
+
+template <> struct _NANOSTL_TEMPLATE_VIS is_scalar<nullptr_t> : public true_type {};
+
+
+// is_object
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_object
+    : public integral_constant<bool, is_scalar<_Tp>::value ||
+                                     is_array<_Tp>::value  ||
+                                     is_union<_Tp>::value  ||
+                                     is_class<_Tp>::value  > {};
 
 
 

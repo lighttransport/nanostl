@@ -108,26 +108,26 @@
 
 namespace nonstd {
 
-using std::in_place;
-using std::in_place_type;
-using std::in_place_index;
-using std::in_place_t;
-using std::in_place_type_t;
-using std::in_place_index_t;
+using nanostl::in_place;
+using nanostl::in_place_type;
+using nanostl::in_place_index;
+using nanostl::in_place_t;
+using nanostl::in_place_type_t;
+using nanostl::in_place_index_t;
 
-#define nonstd_lite_in_place_t(      T)  std::in_place_t
-#define nonstd_lite_in_place_type_t( T)  std::in_place_type_t<T>
-#define nonstd_lite_in_place_index_t(K)  std::in_place_index_t<K>
+#define nonstd_lite_in_place_t(      T)  nanostl::in_place_t
+#define nonstd_lite_in_place_type_t( T)  nanostl::in_place_type_t<T>
+#define nonstd_lite_in_place_index_t(K)  nanostl::in_place_index_t<K>
 
-#define nonstd_lite_in_place(      T)    std::in_place_t{}
-#define nonstd_lite_in_place_type( T)    std::in_place_type_t<T>{}
-#define nonstd_lite_in_place_index(K)    std::in_place_index_t<K>{}
+#define nonstd_lite_in_place(      T)    nanostl::in_place_t{}
+#define nonstd_lite_in_place_type( T)    nanostl::in_place_type_t<T>{}
+#define nonstd_lite_in_place_index(K)    nanostl::in_place_index_t<K>{}
 
 } // namespace nonstd
 
 #else // optional_CPP17_OR_GREATER
 
-#include <cstddef>
+#include <nanocstddef.h>
 
 namespace nonstd {
 namespace detail {
@@ -135,7 +135,7 @@ namespace detail {
 template< class T >
 struct in_place_type_tag {};
 
-template< std::size_t K >
+template< nanostl::size_t K >
 struct in_place_index_tag {};
 
 } // namespace detail
@@ -148,7 +148,7 @@ inline in_place_t in_place( detail::in_place_type_tag<T> /*unused*/ = detail::in
     return in_place_t();
 }
 
-template< std::size_t K >
+template< nanostl::size_t K >
 inline in_place_t in_place( detail::in_place_index_tag<K> /*unused*/ = detail::in_place_index_tag<K>() )
 {
     return in_place_t();
@@ -160,7 +160,7 @@ inline in_place_t in_place_type( detail::in_place_type_tag<T> /*unused*/ = detai
     return in_place_t();
 }
 
-template< std::size_t K >
+template< nanostl::size_t K >
 inline in_place_t in_place_index( detail::in_place_index_tag<K> /*unused*/ = detail::in_place_index_tag<K>() )
 {
     return in_place_t();
@@ -191,27 +191,27 @@ inline in_place_t in_place_index( detail::in_place_index_tag<K> /*unused*/ = det
 
 namespace nonstd {
 
-    using std::optional;
-    using std::bad_optional_access;
-    using std::hash;
+    using nanostl::optional;
+    using nanostl::bad_optional_access;
+    using nanostl::hash;
 
-    using std::nullopt;
-    using std::nullopt_t;
+    using nanostl::nullopt;
+    using nanostl::nullopt_t;
 
-    using std::operator==;
-    using std::operator!=;
-    using std::operator<;
-    using std::operator<=;
-    using std::operator>;
-    using std::operator>=;
-    using std::make_optional;
-    using std::swap;
+    using nanostl::operator==;
+    using nanostl::operator!=;
+    using nanostl::operator<;
+    using nanostl::operator<=;
+    using nanostl::operator>;
+    using nanostl::operator>=;
+    using nanostl::make_optional;
+    using nanostl::swap;
 }
 
 #else // optional_USES_STD_OPTIONAL
 
-#include <cassert>
-#include <utility>
+#include <nanocassert.h>
+#include <nanoutility.h>
 
 // optional-lite alignment configuration:
 
@@ -417,21 +417,22 @@ namespace nonstd {
 #if optional_CONFIG_NO_EXCEPTIONS
 // already included: <cassert>
 #else
-# include <stdexcept>
+# include <nanostdexcept.h>
 #endif
 
 #if optional_CPP11_OR_GREATER
-# include <functional>
+# include <nanofunctional.h>
 #endif
 
 #if optional_HAVE( INITIALIZER_LIST )
-# include <initializer_list>
+# include <nanoinitializer_list.h>
 #endif
 
 #if optional_HAVE( TYPE_TRAITS )
-# include <type_traits>
+# include <nanotype_traits.h>
 #elif optional_HAVE( TR1_TYPE_TRAITS )
-# include <tr1/type_traits>
+//# include <tr1/type_traits>
+# include <nanotype_traits.h>
 #endif
 
 // Method enabling
@@ -439,16 +440,16 @@ namespace nonstd {
 #if optional_CPP11_OR_GREATER
 
 #define optional_REQUIRES_0(...) \
-    template< bool B = (__VA_ARGS__), typename std::enable_if<B, int>::type = 0 >
+    template< bool B = (__VA_ARGS__), typename nanostl::enable_if<B, int>::type = 0 >
 
 #define optional_REQUIRES_T(...) \
-    , typename std::enable_if< (__VA_ARGS__), int >::type = 0
+    , typename nanostl::enable_if< (__VA_ARGS__), int >::type = 0
 
 #define optional_REQUIRES_R(R, ...) \
-    typename std::enable_if< (__VA_ARGS__), R>::type
+    typename nanostl::enable_if< (__VA_ARGS__), R>::type
 
 #define optional_REQUIRES_A(...) \
-    , typename std::enable_if< (__VA_ARGS__), void*>::type = nullptr
+    , typename nanostl::enable_if< (__VA_ARGS__), void*>::type = nullptr
 
 #endif
 
@@ -467,50 +468,50 @@ typedef bool_constant< true  > true_type;
 typedef bool_constant< false > false_type;
 
 #if optional_CPP11_OR_GREATER
-    using std::move;
+    using nanostl::move;
 #else
     template< typename T > T & move( T & t ) { return t; }
 #endif
 
 #if optional_HAVE( CONDITIONAL )
-    using std::conditional;
+    using nanostl::conditional;
 #else
     template< bool B, typename T, typename F > struct conditional              { typedef T type; };
     template<         typename T, typename F > struct conditional<false, T, F> { typedef F type; };
 #endif // optional_HAVE_CONDITIONAL
 
 #if optional_HAVE( IS_ASSIGNABLE )
-    using std::is_assignable;
+    using nanostl::is_assignable;
 #else
     template< class T, class U > struct is_assignable : std11::true_type{};
 #endif
 
 #if optional_HAVE( IS_MOVE_CONSTRUCTIBLE )
-    using std::is_move_constructible;
+    using nanostl::is_move_constructible;
 #else
     template< class T > struct is_move_constructible : std11::true_type{};
 #endif
 
 #if optional_HAVE( IS_NOTHROW_MOVE_ASSIGNABLE )
-    using std::is_nothrow_move_assignable;
+    using nanostl::is_nothrow_move_assignable;
 #else
     template< class T > struct is_nothrow_move_assignable : std11::true_type{};
 #endif
 
 #if optional_HAVE( IS_NOTHROW_MOVE_CONSTRUCTIBLE )
-    using std::is_nothrow_move_constructible;
+    using nanostl::is_nothrow_move_constructible;
 #else
     template< class T > struct is_nothrow_move_constructible : std11::true_type{};
 #endif
 
 #if optional_HAVE( IS_TRIVIALLY_COPY_CONSTRUCTIBLE )
-    using std::is_trivially_copy_constructible;
+    using nanostl::is_trivially_copy_constructible;
 #else
     template< class T > struct is_trivially_copy_constructible : std11::true_type{};
 #endif
 
 #if optional_HAVE( IS_TRIVIALLY_MOVE_CONSTRUCTIBLE )
-    using std::is_trivially_move_constructible;
+    using nanostl::is_trivially_move_constructible;
 #else
     template< class T > struct is_trivially_move_constructible : std11::true_type{};
 #endif
@@ -525,18 +526,18 @@ namespace std17 {
 
 #if optional_CPP17_OR_GREATER
 
-using std::is_swappable;
-using std::is_nothrow_swappable;
+using nanostl::is_swappable;
+using nanostl::is_nothrow_swappable;
 
 #elif optional_CPP11_OR_GREATER
 
 namespace detail {
 
-using std::swap;
+using nanostl::swap;
 
 struct is_swappable
 {
-    template< typename T, typename = decltype( swap( std::declval<T&>(), std::declval<T&>() ) ) >
+    template< typename T, typename = decltype( swap( nanostl::declval<T&>(), nanostl::declval<T&>() ) ) >
     static std11::true_type test( int /*unused*/ );
 
     template< typename >
@@ -550,7 +551,7 @@ struct is_nothrow_swappable
     template< typename T >
     static constexpr bool satisfies()
     {
-        return noexcept( swap( std::declval<T&>(), std::declval<T&>() ) );
+        return noexcept( swap( nanostl::declval<T&>(), nanostl::declval<T&>() ) );
     }
 
     template< typename T >
@@ -581,7 +582,7 @@ namespace std20 {
 template< typename T >
 struct remove_cvref
 {
-    typedef typename std::remove_cv< typename std::remove_reference<T>::type >::type type;
+    typedef typename nanostl::remove_cv< typename nanostl::remove_reference<T>::type >::type type;
 };
 
 } // namespace std20
@@ -684,6 +685,8 @@ struct alignment_of_hack
     alignment_of_hack();
 };
 
+using nanostl::size_t;
+
 template< size_t A, size_t S >
 struct alignment_logic
 {
@@ -777,30 +780,30 @@ union storage_t
 
     explicit storage_t( value_type && v )
     {
-        construct_value( std::move( v ) );
+        construct_value( nanostl::move( v ) );
     }
 
     void construct_value( value_type && v )
     {
-        ::new( value_ptr() ) value_type( std::move( v ) );
+        ::new( value_ptr() ) value_type( nanostl::move( v ) );
     }
 
     template< class... Args >
     storage_t( nonstd_lite_in_place_t(T), Args&&... args )
     {
-        emplace( std::forward<Args>(args)... );
+        emplace( nanostl::forward<Args>(args)... );
     }
 
     template< class... Args >
     void emplace( Args&&... args )
     {
-        ::new( value_ptr() ) value_type( std::forward<Args>(args)... );
+        ::new( value_ptr() ) value_type( nanostl::forward<Args>(args)... );
     }
 
     template< class U, class... Args >
-    void emplace( std::initializer_list<U> il, Args&&... args )
+    void emplace( nanostl::initializer_list<U> il, Args&&... args )
     {
-        ::new( value_ptr() ) value_type( il, std::forward<Args>(args)... );
+        ::new( value_ptr() ) value_type( il, nanostl::forward<Args>(args)... );
     }
 
 #endif
@@ -834,19 +837,19 @@ union storage_t
 
     optional_nodiscard value_type const && value() const optional_refref_qual
     {
-        return std::move( value() );
+        return nanostl::move( value() );
     }
 
     value_type && value() optional_refref_qual
     {
-        return std::move( value() );
+        return nanostl::move( value() );
     }
 
 #endif
 
 #if optional_CPP11_OR_GREATER
 
-    using aligned_storage_t = typename std::aligned_storage< sizeof(value_type), alignof(value_type) >::type;
+    using aligned_storage_t = typename nanostl::aligned_storage< sizeof(value_type), alignof(value_type) >::type;
     aligned_storage_t data;
 
 #elif optional_CONFIG_MAX_ALIGN_HACK
@@ -910,7 +913,7 @@ const nullopt_t nullopt(( nullopt_t::init() ));
 
 #if ! optional_CONFIG_NO_EXCEPTIONS
 
-class bad_optional_access : public std::logic_error
+class bad_optional_access : public nanostl::logic_error
 {
 public:
   explicit bad_optional_access()
@@ -924,13 +927,13 @@ public:
 template< typename T>
 class optional
 {
-    optional_static_assert(( !std::is_same<typename std::remove_cv<T>::type, nullopt_t>::value  ),
+    optional_static_assert(( !nanostl::is_same<typename nanostl::remove_cv<T>::type, nullopt_t>::value  ),
         "T in optional<T> must not be of type 'nullopt_t'.")
 
-    optional_static_assert(( !std::is_same<typename std::remove_cv<T>::type, in_place_t>::value ),
+    optional_static_assert(( !nanostl::is_same<typename nanostl::remove_cv<T>::type, in_place_t>::value ),
         "T in optional<T> must not be of type 'in_place_t'.")
 
-    optional_static_assert(( std::is_object<T>::value && std::is_destructible<T>::value && !std::is_array<T>::value ),
+    optional_static_assert(( nanostl::is_object<T>::value && nanostl::is_destructible<T>::value && !nanostl::is_array<T>::value ),
         "T in optional<T> must meet the Cpp17Destructible requirements.")
 
 private:
@@ -960,7 +963,7 @@ public:
 #if optional_CPP11_OR_GREATER
     // template< typename U = T
     //     optional_REQUIRES_T(
-    //         std::is_copy_constructible<U>::value
+    //         nanostl::is_copy_constructible<U>::value
     //         || std11::is_trivially_copy_constructible<U>::value
     //     )
     // >
@@ -990,23 +993,23 @@ public:
     {
         if ( other.has_value() )
         {
-            contained.construct_value( std::move( other.contained.value() ) );
+            contained.construct_value( nanostl::move( other.contained.value() ) );
         }
     }
 
     // 4a (C++11) - explicit converting copy-construct from optional
     template< typename U
         optional_REQUIRES_T(
-            std::is_constructible<T, U const &>::value
-            && !std::is_constructible<T, optional<U> &          >::value
-            && !std::is_constructible<T, optional<U> &&         >::value
-            && !std::is_constructible<T, optional<U> const &    >::value
-            && !std::is_constructible<T, optional<U> const &&   >::value
-            && !std::is_convertible<     optional<U> &       , T>::value
-            && !std::is_convertible<     optional<U> &&      , T>::value
-            && !std::is_convertible<     optional<U> const & , T>::value
-            && !std::is_convertible<     optional<U> const &&, T>::value
-            && !std::is_convertible<               U const & , T>::value /*=> explicit */
+            nanostl::is_constructible<T, U const &>::value
+            && !nanostl::is_constructible<T, optional<U> &          >::value
+            && !nanostl::is_constructible<T, optional<U> &&         >::value
+            && !nanostl::is_constructible<T, optional<U> const &    >::value
+            && !nanostl::is_constructible<T, optional<U> const &&   >::value
+            && !nanostl::is_convertible<     optional<U> &       , T>::value
+            && !nanostl::is_convertible<     optional<U> &&      , T>::value
+            && !nanostl::is_convertible<     optional<U> const & , T>::value
+            && !nanostl::is_convertible<     optional<U> const &&, T>::value
+            && !nanostl::is_convertible<               U const & , T>::value /*=> explicit */
         )
     >
     explicit optional( optional<U> const & other )
@@ -1023,16 +1026,16 @@ public:
     template< typename U
 #if optional_CPP11_OR_GREATER
         optional_REQUIRES_T(
-            std::is_constructible<T, U const &>::value
-            && !std::is_constructible<T, optional<U> &          >::value
-            && !std::is_constructible<T, optional<U> &&         >::value
-            && !std::is_constructible<T, optional<U> const &    >::value
-            && !std::is_constructible<T, optional<U> const &&   >::value
-            && !std::is_convertible<     optional<U> &       , T>::value
-            && !std::is_convertible<     optional<U> &&      , T>::value
-            && !std::is_convertible<     optional<U> const & , T>::value
-            && !std::is_convertible<     optional<U> const &&, T>::value
-            &&  std::is_convertible<               U const & , T>::value /*=> non-explicit */
+            nanostl::is_constructible<T, U const &>::value
+            && !nanostl::is_constructible<T, optional<U> &          >::value
+            && !nanostl::is_constructible<T, optional<U> &&         >::value
+            && !nanostl::is_constructible<T, optional<U> const &    >::value
+            && !nanostl::is_constructible<T, optional<U> const &&   >::value
+            && !nanostl::is_convertible<     optional<U> &       , T>::value
+            && !nanostl::is_convertible<     optional<U> &&      , T>::value
+            && !nanostl::is_convertible<     optional<U> const & , T>::value
+            && !nanostl::is_convertible<     optional<U> const &&, T>::value
+            &&  nanostl::is_convertible<               U const & , T>::value /*=> non-explicit */
         )
 #endif // optional_CPP11_OR_GREATER
     >
@@ -1051,16 +1054,16 @@ public:
     // 5a (C++11) - explicit converting move-construct from optional
     template< typename U
         optional_REQUIRES_T(
-            std::is_constructible<T, U &&>::value
-            && !std::is_constructible<T, optional<U> &          >::value
-            && !std::is_constructible<T, optional<U> &&         >::value
-            && !std::is_constructible<T, optional<U> const &    >::value
-            && !std::is_constructible<T, optional<U> const &&   >::value
-            && !std::is_convertible<     optional<U> &       , T>::value
-            && !std::is_convertible<     optional<U> &&      , T>::value
-            && !std::is_convertible<     optional<U> const & , T>::value
-            && !std::is_convertible<     optional<U> const &&, T>::value
-            && !std::is_convertible<                     U &&, T>::value /*=> explicit */
+            nanostl::is_constructible<T, U &&>::value
+            && !nanostl::is_constructible<T, optional<U> &          >::value
+            && !nanostl::is_constructible<T, optional<U> &&         >::value
+            && !nanostl::is_constructible<T, optional<U> const &    >::value
+            && !nanostl::is_constructible<T, optional<U> const &&   >::value
+            && !nanostl::is_convertible<     optional<U> &       , T>::value
+            && !nanostl::is_convertible<     optional<U> &&      , T>::value
+            && !nanostl::is_convertible<     optional<U> const & , T>::value
+            && !nanostl::is_convertible<     optional<U> const &&, T>::value
+            && !nanostl::is_convertible<                     U &&, T>::value /*=> explicit */
         )
     >
     explicit optional( optional<U> && other
@@ -1069,23 +1072,23 @@ public:
     {
         if ( other.has_value() )
         {
-            contained.construct_value( T{ std::move( other.contained.value() ) } );
+            contained.construct_value( T{ nanostl::move( other.contained.value() ) } );
         }
     }
 
     // 5a (C++11) - non-explicit converting move-construct from optional
     template< typename U
         optional_REQUIRES_T(
-            std::is_constructible<T, U &&>::value
-            && !std::is_constructible<T, optional<U> &          >::value
-            && !std::is_constructible<T, optional<U> &&         >::value
-            && !std::is_constructible<T, optional<U> const &    >::value
-            && !std::is_constructible<T, optional<U> const &&   >::value
-            && !std::is_convertible<     optional<U> &       , T>::value
-            && !std::is_convertible<     optional<U> &&      , T>::value
-            && !std::is_convertible<     optional<U> const & , T>::value
-            && !std::is_convertible<     optional<U> const &&, T>::value
-            &&  std::is_convertible<                     U &&, T>::value /*=> non-explicit */
+            nanostl::is_constructible<T, U &&>::value
+            && !nanostl::is_constructible<T, optional<U> &          >::value
+            && !nanostl::is_constructible<T, optional<U> &&         >::value
+            && !nanostl::is_constructible<T, optional<U> const &    >::value
+            && !nanostl::is_constructible<T, optional<U> const &&   >::value
+            && !nanostl::is_convertible<     optional<U> &       , T>::value
+            && !nanostl::is_convertible<     optional<U> &&      , T>::value
+            && !nanostl::is_convertible<     optional<U> const & , T>::value
+            && !nanostl::is_convertible<     optional<U> const &&, T>::value
+            &&  nanostl::is_convertible<                     U &&, T>::value /*=> non-explicit */
         )
     >
     // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
@@ -1094,59 +1097,59 @@ public:
     {
         if ( other.has_value() )
         {
-            contained.construct_value( std::move( other.contained.value() ) );
+            contained.construct_value( nanostl::move( other.contained.value() ) );
         }
     }
 
     // 6 (C++11) - in-place construct
     template< typename... Args
         optional_REQUIRES_T(
-            std::is_constructible<T, Args&&...>::value
+            nanostl::is_constructible<T, Args&&...>::value
         )
     >
     optional_constexpr explicit optional( nonstd_lite_in_place_t(T), Args&&... args )
     : has_value_( true )
-    , contained( in_place, std::forward<Args>(args)... )
+    , contained( in_place, nanostl::forward<Args>(args)... )
     {}
 
     // 7 (C++11) - in-place construct,  initializer-list
     template< typename U, typename... Args
         optional_REQUIRES_T(
-            std::is_constructible<T, std::initializer_list<U>&, Args&&...>::value
+            nanostl::is_constructible<T, nanostl::initializer_list<U>&, Args&&...>::value
         )
     >
-    optional_constexpr explicit optional( nonstd_lite_in_place_t(T), std::initializer_list<U> il, Args&&... args )
+    optional_constexpr explicit optional( nonstd_lite_in_place_t(T), nanostl::initializer_list<U> il, Args&&... args )
     : has_value_( true )
-    , contained( T( il, std::forward<Args>(args)...) )
+    , contained( T( il, nanostl::forward<Args>(args)...) )
     {}
 
     // 8a (C++11) - explicit move construct from value
     template< typename U = T
         optional_REQUIRES_T(
-            std::is_constructible<T, U&&>::value
-            && !std::is_same<typename std20::remove_cvref<U>::type, nonstd_lite_in_place_t(U)>::value
-            && !std::is_same<typename std20::remove_cvref<U>::type, optional<T>>::value
-            && !std::is_convertible<U&&, T>::value /*=> explicit */
+            nanostl::is_constructible<T, U&&>::value
+            && !nanostl::is_same<typename std20::remove_cvref<U>::type, nonstd_lite_in_place_t(U)>::value
+            && !nanostl::is_same<typename std20::remove_cvref<U>::type, optional<T>>::value
+            && !nanostl::is_convertible<U&&, T>::value /*=> explicit */
         )
     >
     optional_constexpr explicit optional( U && value )
     : has_value_( true )
-    , contained( nonstd_lite_in_place(T), std::forward<U>( value ) )
+    , contained( nonstd_lite_in_place(T), nanostl::forward<U>( value ) )
     {}
 
     // 8b (C++11) - non-explicit move construct from value
     template< typename U = T
         optional_REQUIRES_T(
-            std::is_constructible<T, U&&>::value
-            && !std::is_same<typename std20::remove_cvref<U>::type, nonstd_lite_in_place_t(U)>::value
-            && !std::is_same<typename std20::remove_cvref<U>::type, optional<T>>::value
-            && std::is_convertible<U&&, T>::value /*=> non-explicit */
+            nanostl::is_constructible<T, U&&>::value
+            && !nanostl::is_same<typename std20::remove_cvref<U>::type, nonstd_lite_in_place_t(U)>::value
+            && !nanostl::is_same<typename std20::remove_cvref<U>::type, optional<T>>::value
+            && nanostl::is_convertible<U&&, T>::value /*=> non-explicit */
         )
     >
     // NOLINTNEXTLINE( google-explicit-constructor, hicpp-explicit-conversions )
     optional_constexpr /*non-explicit*/ optional( U && value )
     : has_value_( true )
-    , contained( nonstd_lite_in_place(T), std::forward<U>( value ) )
+    , contained( nonstd_lite_in_place(T), nanostl::forward<U>( value ) )
     {}
 
 #else // optional_CPP11_OR_GREATER
@@ -1184,8 +1187,8 @@ public:
     optional_REQUIRES_R(
         optional &,
         true
-//      std::is_copy_constructible<T>::value
-//      && std::is_copy_assignable<T>::value
+//      nanostl::is_copy_constructible<T>::value
+//      && nanostl::is_copy_assignable<T>::value
     )
     operator=( optional const & other )
         noexcept(
@@ -1210,13 +1213,13 @@ public:
         optional &,
         true
 //      std11::is_move_constructible<T>::value
-//      && std::is_move_assignable<T>::value
+//      && nanostl::is_move_assignable<T>::value
     )
     operator=( optional && other ) noexcept
     {
         if      ( (has_value() == true ) && (other.has_value() == false) ) { reset(); }
-        else if ( (has_value() == false) && (other.has_value() == true ) ) { initialize( std::move( *other ) ); }
-        else if ( (has_value() == true ) && (other.has_value() == true ) ) { contained.value() = std::move( *other ); }
+        else if ( (has_value() == false) && (other.has_value() == true ) ) { initialize( nanostl::move( *other ) ); }
+        else if ( (has_value() == true ) && (other.has_value() == true ) ) { contained.value() = nanostl::move( *other ); }
         return *this;
     }
 
@@ -1225,21 +1228,21 @@ public:
         // NOLINTNEXTLINE( cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator )
         optional_REQUIRES_R(
             optional &,
-            std::is_constructible<T , U>::value
+            nanostl::is_constructible<T , U>::value
             && std11::is_assignable<T&, U>::value
-            && !std::is_same<typename std20::remove_cvref<U>::type, nonstd_lite_in_place_t(U)>::value
-            && !std::is_same<typename std20::remove_cvref<U>::type, optional<T>>::value
-            && !(std::is_scalar<T>::value && std::is_same<T, typename std::decay<U>::type>::value)
+            && !nanostl::is_same<typename std20::remove_cvref<U>::type, nonstd_lite_in_place_t(U)>::value
+            && !nanostl::is_same<typename std20::remove_cvref<U>::type, optional<T>>::value
+            && !(nanostl::is_scalar<T>::value && nanostl::is_same<T, typename nanostl::decay<U>::type>::value)
         )
     operator=( U && value )
     {
         if ( has_value() )
         {
-            contained.value() = std::forward<U>( value );
+            contained.value() = nanostl::forward<U>( value );
         }
         else
         {
-            initialize( T( std::forward<U>( value ) ) );
+            initialize( T( nanostl::forward<U>( value ) ) );
         }
         return *this;
     }
@@ -1263,16 +1266,16 @@ public:
         // NOLINTNEXTLINE( cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator )
         optional_REQUIRES_R(
             optional&,
-            std::is_constructible<  T , U const &>::value
+            nanostl::is_constructible<  T , U const &>::value
             &&  std11::is_assignable< T&, U const &>::value
-            && !std::is_constructible<T, optional<U> &          >::value
-            && !std::is_constructible<T, optional<U> &&         >::value
-            && !std::is_constructible<T, optional<U> const &    >::value
-            && !std::is_constructible<T, optional<U> const &&   >::value
-            && !std::is_convertible<     optional<U> &       , T>::value
-            && !std::is_convertible<     optional<U> &&      , T>::value
-            && !std::is_convertible<     optional<U> const & , T>::value
-            && !std::is_convertible<     optional<U> const &&, T>::value
+            && !nanostl::is_constructible<T, optional<U> &          >::value
+            && !nanostl::is_constructible<T, optional<U> &&         >::value
+            && !nanostl::is_constructible<T, optional<U> const &    >::value
+            && !nanostl::is_constructible<T, optional<U> const &&   >::value
+            && !nanostl::is_convertible<     optional<U> &       , T>::value
+            && !nanostl::is_convertible<     optional<U> &&      , T>::value
+            && !nanostl::is_convertible<     optional<U> const & , T>::value
+            && !nanostl::is_convertible<     optional<U> const &&, T>::value
             && !std11::is_assignable<  T&, optional<U> &          >::value
             && !std11::is_assignable<  T&, optional<U> &&         >::value
             && !std11::is_assignable<  T&, optional<U> const &    >::value
@@ -1293,16 +1296,16 @@ public:
         // NOLINTNEXTLINE( cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator )
         optional_REQUIRES_R(
             optional&,
-            std::is_constructible<  T , U>::value
+            nanostl::is_constructible<  T , U>::value
             &&  std11::is_assignable< T&, U>::value
-            && !std::is_constructible<T, optional<U> &          >::value
-            && !std::is_constructible<T, optional<U> &&         >::value
-            && !std::is_constructible<T, optional<U> const &    >::value
-            && !std::is_constructible<T, optional<U> const &&   >::value
-            && !std::is_convertible<     optional<U> &       , T>::value
-            && !std::is_convertible<     optional<U> &&      , T>::value
-            && !std::is_convertible<     optional<U> const & , T>::value
-            && !std::is_convertible<     optional<U> const &&, T>::value
+            && !nanostl::is_constructible<T, optional<U> &          >::value
+            && !nanostl::is_constructible<T, optional<U> &&         >::value
+            && !nanostl::is_constructible<T, optional<U> const &    >::value
+            && !nanostl::is_constructible<T, optional<U> const &&   >::value
+            && !nanostl::is_convertible<     optional<U> &       , T>::value
+            && !nanostl::is_convertible<     optional<U> &&      , T>::value
+            && !nanostl::is_convertible<     optional<U> const & , T>::value
+            && !nanostl::is_convertible<     optional<U> const &&, T>::value
             && !std11::is_assignable<  T&, optional<U> &          >::value
             && !std11::is_assignable<  T&, optional<U> &&         >::value
             && !std11::is_assignable<  T&, optional<U> const &    >::value
@@ -1310,19 +1313,19 @@ public:
         )
     operator=( optional<U> && other )
     {
-        return *this = optional( std::move( other ) );
+        return *this = optional( nanostl::move( other ) );
     }
 
     // 7 (C++11) - emplace
     template< typename... Args
         optional_REQUIRES_T(
-            std::is_constructible<T, Args&&...>::value
+            nanostl::is_constructible<T, Args&&...>::value
         )
     >
     T& emplace( Args&&... args )
     {
         *this = nullopt;
-        contained.emplace( std::forward<Args>(args)...  );
+        contained.emplace( nanostl::forward<Args>(args)...  );
         has_value_ = true;
         return contained.value();
     }
@@ -1330,13 +1333,13 @@ public:
     // 8 (C++11) - emplace, initializer-list
     template< typename U, typename... Args
         optional_REQUIRES_T(
-            std::is_constructible<T, std::initializer_list<U>&, Args&&...>::value
+            nanostl::is_constructible<T, nanostl::initializer_list<U>&, Args&&...>::value
         )
     >
-    T& emplace( std::initializer_list<U> il, Args&&... args )
+    T& emplace( nanostl::initializer_list<U> il, Args&&... args )
     {
         *this = nullopt;
-        contained.emplace( il, std::forward<Args>(args)...  );
+        contained.emplace( il, nanostl::forward<Args>(args)...  );
         has_value_ = true;
         return contained.value();
     }
@@ -1353,7 +1356,7 @@ public:
         )
 #endif
     {
-        using std::swap;
+        using nanostl::swap;
         if      ( (has_value() == true ) && (other.has_value() == true ) ) { swap( **this, *other ); }
         else if ( (has_value() == false) && (other.has_value() == true ) ) { initialize( std11::move(*other) ); other.reset(); }
         else if ( (has_value() == true ) && (other.has_value() == false) ) { other.initialize( std11::move(**this) ); reset(); }
@@ -1389,12 +1392,12 @@ public:
 
     optional_constexpr value_type const && operator *() const optional_refref_qual
     {
-        return std::move( **this );
+        return nanostl::move( **this );
     }
 
     optional_constexpr14 value_type && operator *() optional_refref_qual
     {
-        return std::move( **this );
+        return nanostl::move( **this );
     }
 
 #endif
@@ -1449,12 +1452,12 @@ public:
     // NOLINTNEXTLINE( modernize-use-nodiscard )
     /*optional_nodiscard*/ optional_constexpr value_type const && value() const optional_refref_qual
     {
-        return std::move( value() );
+        return nanostl::move( value() );
     }
 
     optional_constexpr14 value_type && value() optional_refref_qual
     {
-        return std::move( value() );
+        return nanostl::move( value() );
     }
 
 #endif
@@ -1464,16 +1467,16 @@ public:
     template< typename U >
     optional_constexpr value_type value_or( U && v ) const optional_ref_qual
     {
-        return has_value() ? contained.value() : static_cast<T>(std::forward<U>( v ) );
+        return has_value() ? contained.value() : static_cast<T>(nanostl::forward<U>( v ) );
     }
 
     template< typename U >
     optional_constexpr14 value_type value_or( U && v ) optional_refref_qual
     {
 #if optional_COMPILER_CLANG_VERSION
-        return has_value() ? /*std::move*/( contained.value() ) : static_cast<T>(std::forward<U>( v ) );
+        return has_value() ? /*nanostl::move*/( contained.value() ) : static_cast<T>(nanostl::forward<U>( v ) );
 #else
-        return has_value() ? std::move( contained.value() ) : static_cast<T>(std::forward<U>( v ) );
+        return has_value() ? nanostl::move( contained.value() ) : static_cast<T>(nanostl::forward<U>( v ) );
 #endif
     }
 
@@ -1515,7 +1518,7 @@ private:
     void initialize( V && value )
     {
         assert( ! has_value()  );
-        contained.construct_value( std::move( value ) );
+        contained.construct_value( nanostl::move( value ) );
         has_value_ = true;
     }
 
@@ -1733,21 +1736,21 @@ void swap( optional<T> & x, optional<T> & y )
 #if optional_CPP11_OR_GREATER
 
 template< typename T >
-optional_constexpr optional< typename std::decay<T>::type > make_optional( T && value )
+optional_constexpr optional< typename nanostl::decay<T>::type > make_optional( T && value )
 {
-    return optional< typename std::decay<T>::type >( std::forward<T>( value ) );
+    return optional< typename nanostl::decay<T>::type >( nanostl::forward<T>( value ) );
 }
 
 template< typename T, typename...Args >
 optional_constexpr optional<T> make_optional( Args&&... args )
 {
-    return optional<T>( nonstd_lite_in_place(T), std::forward<Args>(args)...);
+    return optional<T>( nonstd_lite_in_place(T), nanostl::forward<Args>(args)...);
 }
 
 template< typename T, typename U, typename... Args >
-optional_constexpr optional<T> make_optional( std::initializer_list<U> il, Args&&... args )
+optional_constexpr optional<T> make_optional( nanostd::initializer_list<U> il, Args&&... args )
 {
-    return optional<T>( nonstd_lite_in_place(T), il, std::forward<Args>(args)...);
+    return optional<T>( nonstd_lite_in_place(T), il, nanostd::forward<Args>(args)...);
 }
 
 #else
@@ -1784,7 +1787,7 @@ template< class T >
 struct hash< nonstd::optional<T> >
 {
 public:
-    std::size_t operator()( nonstd::optional<T> const & v ) const optional_noexcept
+    nanostl::size_t operator()( nonstd::optional<T> const & v ) const optional_noexcept
     {
         return bool( v ) ? std::hash<T>{}( *v ) : 0;
     }
