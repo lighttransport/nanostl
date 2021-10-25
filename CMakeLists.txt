@@ -4,6 +4,8 @@ set(NANOSTL_TARGET nanostl)
 
 project(${NANOSTL_TARGET} CXX)
 
+set(CMAKE_CXX_STANDARD 11)
+
 set(NANOSTL_SOURCES
   src/nanothread.cc
   )
