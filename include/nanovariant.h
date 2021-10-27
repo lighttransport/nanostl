@@ -6,6 +6,8 @@
 namespace nanostl {
 
 using nonstd::variant;
+using nonstd::get;
+using nonstd::get_if;
 
 } // nanostl
 

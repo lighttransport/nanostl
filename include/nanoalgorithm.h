@@ -56,6 +56,7 @@ void fill(ForwardIterator first, ForwardIterator last, const T& value) {
   while (first != last) *first++ = value;
 }
 
+
 #if defined(NANOSTL_PSTL)
 template <class ExecutionPolicy, class ForwardIterator, class T>
 void fill(ExecutionPolicy&& exec, ForwardIterator first, ForwardIterator last,

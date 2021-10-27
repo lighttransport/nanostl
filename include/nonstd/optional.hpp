@@ -46,6 +46,9 @@
 
 // Control presence of exception handling (try and auto discover):
 
+#if !defined(NANOSTL_ENABLE_EXCEPTION)
+#  define optional_CONFIG_NO_EXCEPTIONS  1
+#else
 #ifndef optional_CONFIG_NO_EXCEPTIONS
 # if defined(_MSC_VER)
 # include <cstddef>     // for _HAS_EXCEPTIONS
@@ -55,6 +58,7 @@
 # else
 #  define optional_CONFIG_NO_EXCEPTIONS  1
 # endif
+#endif
 #endif
 
 // C++ language version detection (C++20 is speculative):
@@ -1748,9 +1752,9 @@ optional_constexpr optional<T> make_optional( Args&&... args )
 }
 
 template< typename T, typename U, typename... Args >
-optional_constexpr optional<T> make_optional( nanostd::initializer_list<U> il, Args&&... args )
+optional_constexpr optional<T> make_optional( nanostl::initializer_list<U> il, Args&&... args )
 {
-    return optional<T>( nonstd_lite_in_place(T), il, nanostd::forward<Args>(args)...);
+    return optional<T>( nonstd_lite_in_place(T), il, nanostl::forward<Args>(args)...);
 }
 
 #else
@@ -1779,21 +1783,21 @@ using optional_lite::make_optional;
 
 #if optional_CPP11_OR_GREATER
 
-// specialize the std::hash algorithm:
+// specialize the nanostl::hash algorithm:
 
-namespace std {
+namespace nanostl {
 
 template< class T >
-struct hash< nonstd::optional<T> >
+struct nanostl::hash< nonstd::optional<T> >
 {
 public:
     nanostl::size_t operator()( nonstd::optional<T> const & v ) const optional_noexcept
     {
-        return bool( v ) ? std::hash<T>{}( *v ) : 0;
+        return bool( v ) ? nanostl::hash<T>{}( *v ) : 0;
     }
 };
 
-} //namespace std
+} //namespace nanostl
 
 #endif // optional_CPP11_OR_GREATER
 

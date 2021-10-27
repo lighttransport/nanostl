@@ -654,6 +654,9 @@ static void test_variant(void) {
   nanostl::variant<int, double> a;
 
   a = 1.0;
+
+  TEST_CHECK(nanostl::get_if<double>(&a) != nullptr);
+  TEST_CHECK(nanostl::get_if<int>(&a) == nullptr);
 }
 
 

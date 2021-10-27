@@ -639,7 +639,7 @@ template< class Head, class Tail >
 struct typelist_max< typelist<Head, Tail> >
 {
 private:
-    enum TV { tail_value = size_t( typelist_max<Tail>::value ) };
+    enum TV { tail_value = nanostl::size_t( typelist_max<Tail>::value ) };
 
     typedef typename typelist_max<Tail>::type tail_type;
 
@@ -666,7 +666,7 @@ template< class Head, class Tail >
 struct typelist_max_alignof< typelist<Head, Tail> >
 {
 private:
-    enum TV { tail_value = size_t( typelist_max_alignof<Tail>::value ) };
+    enum TV { tail_value = nanostl::size_t( typelist_max_alignof<Tail>::value ) };
 
 public:
     enum V { value = (alignof( Head ) > tail_value) ? alignof( Head ) : nanostl::size_t( tail_value ) };
@@ -1319,7 +1319,7 @@ public:
         type_index = helper_type::template construct_i<K>( ptr(), nanostl::forward<Args>(args)... );
     }
 
-    template< size_t K, class U, class... Args
+    template< nanostl::size_t K, class U, class... Args
         variant_REQUIRES_T( nanostl::is_constructible< type_at_t<K>, nanostl::initializer_list<U>&, Args...>::value )
     >
     explicit variant( nonstd_lite_in_place_index_t(K), nanostl::initializer_list<U> il, Args&&... args )
@@ -1440,7 +1440,7 @@ public:
         return *as<T>();
     }
 
-    template< size_t K, class... Args
+    template< nanostl::size_t K, class... Args
         variant_REQUIRES_T( nanostl::is_constructible< type_at_t<K>, Args...>::value )
     >
     variant_alternative_t<K, variant> & emplace( Args&&... args )
@@ -1448,7 +1448,7 @@ public:
         return this->template emplace< type_at_t<K> >( nanostl::forward<Args>(args)... );
     }
 
-    template< size_t K, class U, class... Args
+    template< nanostl::size_t K, class U, class... Args
         variant_REQUIRES_T( nanostl::is_constructible< type_at_t<K>, nanostl::initializer_list<U>&, Args...>::value )
     >
     variant_alternative_t<K, variant> & emplace( nanostl::initializer_list<U> il, Args&&... args )
@@ -1936,9 +1936,9 @@ template< typename R, typename Visitor, typename V1 >
 struct VisitorUnwrapper;
 
 #if variant_CPP11_OR_GREATER
-template< size_t NumVars, typename R, typename Visitor, typename ... T >
+template< nanostl::size_t NumVars, typename R, typename Visitor, typename ... T >
 #else
-template< size_t NumVars, typename R, typename Visitor, typename T1, typename T2 = S0, typename T3 = S0, typename T4 = S0, typename T5 = S0 >
+template< nanostl::size_t NumVars, typename R, typename Visitor, typename T1, typename T2 = S0, typename T3 = S0, typename T4 = S0, typename T5 = S0 >
 #endif
 struct TypedVisitorUnwrapper;
 
@@ -2117,7 +2117,7 @@ struct VisitorApplicator
         }
     }
 
-    template<size_t Idx, typename Visitor, typename V1>
+    template<nanostl::size_t Idx, typename Visitor, typename V1>
     static R apply_visitor(const Visitor& v, const V1& arg)
     {
 
@@ -2175,7 +2175,7 @@ struct VisitorApplicator
 };
 
 #if variant_CPP11_OR_GREATER
-template< size_t NumVars, typename Visitor, typename ... V >
+template< nanostl::size_t NumVars, typename Visitor, typename ... V >
 struct VisitorImpl
 {
     typedef decltype(nanostl::declval<Visitor>()(get<0>(static_cast<const V&>(nanostl::declval<V>()))...)) result_type;
@@ -2350,7 +2350,7 @@ using namespace variants;
 
 // 19.7.12 Hash support
 
-namespace std {
+namespace nanostl {
 
 template<>
 struct hash< nonstd::monostate >
@@ -2370,29 +2370,29 @@ struct hash< nonstd::variant<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T
 
         switch( v.index() )
         {
-            case 0: return nvd::hash( 0 ) ^ nvd::hash( get<0>( v ) );
-            case 1: return nvd::hash( 1 ) ^ nvd::hash( get<1>( v ) );
-            case 2: return nvd::hash( 2 ) ^ nvd::hash( get<2>( v ) );
-            case 3: return nvd::hash( 3 ) ^ nvd::hash( get<3>( v ) );
-            case 4: return nvd::hash( 4 ) ^ nvd::hash( get<4>( v ) );
-            case 5: return nvd::hash( 5 ) ^ nvd::hash( get<5>( v ) );
-            case 6: return nvd::hash( 6 ) ^ nvd::hash( get<6>( v ) );
-            case 7: return nvd::hash( 7 ) ^ nvd::hash( get<7>( v ) );
-            case 8: return nvd::hash( 8 ) ^ nvd::hash( get<8>( v ) );
-            case 9: return nvd::hash( 9 ) ^ nvd::hash( get<9>( v ) );
-            case 10: return nvd::hash( 10 ) ^ nvd::hash( get<10>( v ) );
-            case 11: return nvd::hash( 11 ) ^ nvd::hash( get<11>( v ) );
-            case 12: return nvd::hash( 12 ) ^ nvd::hash( get<12>( v ) );
-            case 13: return nvd::hash( 13 ) ^ nvd::hash( get<13>( v ) );
-            case 14: return nvd::hash( 14 ) ^ nvd::hash( get<14>( v ) );
-            case 15: return nvd::hash( 15 ) ^ nvd::hash( get<15>( v ) );
+            case 0: return nvd::hash( 0 ) ^ nvd::hash( this->get<0>( v ) );
+            case 1: return nvd::hash( 1 ) ^ nvd::hash( this->get<1>( v ) );
+            case 2: return nvd::hash( 2 ) ^ nvd::hash( this->get<2>( v ) );
+            case 3: return nvd::hash( 3 ) ^ nvd::hash( this->get<3>( v ) );
+            case 4: return nvd::hash( 4 ) ^ nvd::hash( this->get<4>( v ) );
+            case 5: return nvd::hash( 5 ) ^ nvd::hash( this->get<5>( v ) );
+            case 6: return nvd::hash( 6 ) ^ nvd::hash( this->get<6>( v ) );
+            case 7: return nvd::hash( 7 ) ^ nvd::hash( this->get<7>( v ) );
+            case 8: return nvd::hash( 8 ) ^ nvd::hash( this->get<8>( v ) );
+            case 9: return nvd::hash( 9 ) ^ nvd::hash( this->get<9>( v ) );
+            case 10: return nvd::hash( 10 ) ^ nvd::hash( this->get<10>( v ) );
+            case 11: return nvd::hash( 11 ) ^ nvd::hash( this->get<11>( v ) );
+            case 12: return nvd::hash( 12 ) ^ nvd::hash( this->get<12>( v ) );
+            case 13: return nvd::hash( 13 ) ^ nvd::hash( this->get<13>( v ) );
+            case 14: return nvd::hash( 14 ) ^ nvd::hash( this->get<14>( v ) );
+            case 15: return nvd::hash( 15 ) ^ nvd::hash( this->get<15>( v ) );
 
             default: return 0;
         }
     }
 };
 
-} //namespace std
+} //namespace nanostl
 
 #endif // variant_CPP11_OR_GREATER
 

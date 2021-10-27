@@ -29,7 +29,8 @@
 #define NANOSTL_TYPE_TRAITS_H_
 
 #include "nanocommon.h"
-
+#include "nanocstddef.h"
+#include "__nullptr"
 
 namespace nanostl {
 
@@ -55,16 +56,16 @@ template <class _If, class _Then>
     struct _NANOSTL_TEMPLATE_VIS conditional<false, _If, _Then> {typedef _Then type;};
 
 // Primary classification traits:
-template <class T>
-struct is_void;
+//template <class T>
+//struct is_void;
 // template <class T> struct is_null_pointer;  // C++14
-template <class T>
-struct is_integral;
-template <class T>
-struct is_floating_point;
+//template <class T>
+//struct is_integral;
+//template <class T>
+//struct is_floating_point;
 
-template <class T>
-struct is_pointer;
+//template <class T>
+//struct is_pointer;
 // template <class T> struct is_lvalue_reference;
 // template <class T> struct is_rvalue_reference;
 // template <class T> struct is_member_object_pointer;
@@ -150,6 +151,16 @@ template <class _Tp, size_t _Np> struct _NANOSTL_TEMPLATE_VIS remove_extent<_Tp[
     {typedef _Tp type;};
 
 
+template <bool _Val>
+using _BoolConstant = integral_constant<bool, _Val>;
+
+// is_integral
+
+// __libcpp_is_integral defined in nanocstddef.h
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_integral
+    : public _BoolConstant<__libcpp_is_integral<typename remove_cv<_Tp>::type>::value> {};
+
+
 
 template <class _Tp> struct __libcpp_is_floating_point              : public false_type {};
 template <>          struct __libcpp_is_floating_point<float>       : public true_type {};
@@ -198,6 +209,7 @@ struct __libcpp_is_unsigned : public __libcpp_is_unsigned_impl<_Tp> {};
 template <class _Tp> struct __libcpp_is_unsigned<_Tp, false> : public false_type {};
 
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_unsigned : public __libcpp_is_unsigned<_Tp> {};
+
 
 // since libcxx uses compiler's intrinsic function __is_abstract, use boost's one instead.
 //
@@ -349,8 +361,6 @@ using __uncvref_t = typename __uncvref<_Tp>::type;
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_const            : public false_type {};
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_const<_Tp const> : public true_type {};
 
-template <bool _Val>
-using _BoolConstant = integral_constant<bool, _Val>;
 
 template <class _Tp, class _Up>
 using _IsSame = _BoolConstant<
@@ -1243,8 +1253,92 @@ template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_trivially_move_constructibl
     : public is_trivially_constructible<_Tp, typename add_rvalue_reference<_Tp>::type>
     {};
 
+// __is_nullptr_t
+
+template <class _Tp> struct __is_nullptr_t_impl       : public false_type {};
+template <>          struct __is_nullptr_t_impl<nullptr_t> : public true_type {};
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS __is_nullptr_t
+    : public __is_nullptr_t_impl<typename remove_cv<_Tp>::type> {};
+
+//#if _LIBCPP_STD_VER > 11
+//template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_null_pointer
+//    : public __is_nullptr_t_impl<typename remove_cv<_Tp>::type> {};
+
+//#if _LIBCPP_STD_VER > 14
+//template <class _Tp>
+//inline constexpr bool is_null_pointer_v = is_null_pointer<_Tp>::value;
+//#endif
+
+//#endif // _LIBCPP_STD_VER > 11
+
+
+// is_member_function_pointer
+
+template <class _Tp> struct __libcpp_is_member_pointer {
+  enum {
+    __is_member = false,
+    __is_func = false,
+    __is_obj = false
+  };
+};
+template <class _Tp, class _Up> struct __libcpp_is_member_pointer<_Tp _Up::*> {
+  enum {
+    __is_member = true,
+    __is_func = is_function<_Tp>::value,
+    __is_obj = !__is_func,
+  };
+};
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_member_function_pointer
+    : public _BoolConstant< __libcpp_is_member_pointer<typename remove_cv<_Tp>::type>::__is_func > {};
+
+
+// is_member_pointer
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_member_pointer
+ : public _BoolConstant< __libcpp_is_member_pointer<typename remove_cv<_Tp>::type>::__is_member > {};
+
+// is_pointer
+
+template <class _Tp> struct __libcpp_is_pointer       : public false_type {};
+template <class _Tp> struct __libcpp_is_pointer<_Tp*> : public true_type {};
+
+template <class _Tp> struct __libcpp_remove_objc_qualifiers { typedef _Tp type; };
+//#if defined(_LIBCPP_HAS_OBJC_ARC)
+//template <class _Tp> struct __libcpp_remove_objc_qualifiers<_Tp __strong> { typedef _Tp type; };
+//template <class _Tp> struct __libcpp_remove_objc_qualifiers<_Tp __weak> { typedef _Tp type; };
+//template <class _Tp> struct __libcpp_remove_objc_qualifiers<_Tp __autoreleasing> { typedef _Tp type; };
+//template <class _Tp> struct __libcpp_remove_objc_qualifiers<_Tp __unsafe_unretained> { typedef _Tp type; };
+//#endif
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_pointer
+    : public __libcpp_is_pointer<typename __libcpp_remove_objc_qualifiers<typename remove_cv<_Tp>::type>::type> {};
+
+
+
+// is_enum
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_enum
+    : public integral_constant<bool, !is_void<_Tp>::value             &&
+                                     !is_integral<_Tp>::value         &&
+                                     !is_floating_point<_Tp>::value   &&
+                                     !is_array<_Tp>::value            &&
+                                     !is_pointer<_Tp>::value          &&
+                                     !is_reference<_Tp>::value        &&
+                                     !is_member_pointer<_Tp>::value   &&
+                                     !is_union<_Tp>::value            &&
+                                     !is_class<_Tp>::value            &&
+                                     !is_function<_Tp>::value         > {};
+
 
 // is_scalar
+
+template <class _Tp> struct __is_block : false_type {};
+#if defined(_LIBCPP_HAS_EXTENSION_BLOCKS)
+template <class _Rp, class ..._Args> struct __is_block<_Rp (^)(_Args...)> : true_type {};
+#endif
+
 
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_scalar
     : public integral_constant<bool, is_arithmetic<_Tp>::value     ||

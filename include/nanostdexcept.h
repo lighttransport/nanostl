@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2019-2020 Light Transport Entertainment, Inc.
+ * Copyright (c) 2021-present Light Transport Entertainment, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,17 +22,21 @@
  * THE SOFTWARE.
  */
 
-#ifndef NANOSTL_CASSERT_H_
-#define NANOSTL_CASSERT_H_
+#ifndef NANOSTL_STDEXCEPT_H_
+#define NANOSTL_STDEXCEPT_H_
 
-//#ifdef __CUDACC__
-#include <assert.h>
-//#else
-// TODO(LTE): Provide our own `assert` implementation when libc is not available.
-//#ifndef assert
-//#define assert(x)
-//#endif
-//#endif
+#include "nanocommon.h"
+#include "nanostring.h"
+
+namespace nanostl {
+
+class logic_error
+{
+    explicit logic_error(const string&);
+    explicit logic_error(const char*);
+};
 
 
-#endif  // NANOSTL_CASSERT_H_
+}  // namespace nanostl
+
+#endif  // NANOSTL_STDEXCEPT_H_
