@@ -52,7 +52,8 @@ inline pair<T1, T2> make_pair(const T1& x, const T2& y) {
   return pair<T1, T2>(x, y);
 }
 
-// limited implementation of swap
+// swap is defined in nanotype_traits
+#if 0
 template <class T>
 inline void swap(T &a, T &b) __NANOSTL_NOEXCEPT
 {
@@ -61,6 +62,9 @@ inline void swap(T &a, T &b) __NANOSTL_NOEXCEPT
   a = b;
   b = tmp;
 }
+#endif
+
+
 
 template <class _Tp>
 /*_LIBCPP_NODISCARD_EXT*/ inline /*_LIBCPP_INLINE_VISIBILITY*/ constexpr typename remove_reference<_Tp>::type&&

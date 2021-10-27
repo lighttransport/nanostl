@@ -27,8 +27,8 @@
 #define _LIBCPP_CONSTEXPR_AFTER_CXX14
 #endif
 
-#ifndef _VSTD
-#define _VSTD nanostl
+#ifndef _VNANOSTL
+#define _VNANOSTL nanostl
 #endif
 
 #ifndef _LIBCPP_NODEBUG
@@ -282,7 +282,7 @@ struct __compressed_pair_elem<_Tp, _Idx, true> : private _Tp {
 //  _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
 //  __compressed_pair_elem(piecewise_construct_t, tuple<_Args...> __args,
 //                         __tuple_indices<_Indexes...>)
-//      : __value_type(_VSTD::forward<_Args>(_VSTD::get<_Indexes>(__args))...) {}
+//      : __value_type(_VNANOSTL::forward<_Args>(_VNANOSTL::get<_Indexes>(__args))...) {}
 //#endif
 
   _LIBCPP_INLINE_VISIBILITY reference __get() __NANOSTL_NOEXCEPT { return *this; }
@@ -319,16 +319,16 @@ public:
   template <class _U1, class _U2>
   _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR
   __compressed_pair(_U1&& __t1, _U2&& __t2)
-      : _Base1(_VSTD::forward<_U1>(__t1)), _Base2(_VSTD::forward<_U2>(__t2)) {}
+      : _Base1(_VNANOSTL::forward<_U1>(__t1)), _Base2(_VNANOSTL::forward<_U2>(__t2)) {}
 
 //#ifndef _LIBCPP_CXX03_LANG
 //  template <class... _Args1, class... _Args2>
 //  _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR_AFTER_CXX14
 //  __compressed_pair(piecewise_construct_t __pc, tuple<_Args1...> __first_args,
 //                    tuple<_Args2...> __second_args)
-//      : _Base1(__pc, _VSTD::move(__first_args),
+//      : _Base1(__pc, _VNANOSTL::move(__first_args),
 //               typename __make_tuple_indices<sizeof...(_Args1)>::type()),
-//        _Base2(__pc, _VSTD::move(__second_args),
+//        _Base2(__pc, _VNANOSTL::move(__second_args),
 //               typename __make_tuple_indices<sizeof...(_Args2)>::type()) {}
 //#endif
 
@@ -367,7 +367,7 @@ public:
     __NANOSTL_NOEXCEPT_(__is_nothrow_swappable<_T1>::value &&
                __is_nothrow_swappable<_T2>::value)
   {
-    using _VSTD::swap;
+    using _VNANOSTL::swap;
     swap(first(), __x.first());
     swap(second(), __x.second());
   }
@@ -476,7 +476,7 @@ public:
             class = _EnableIfDeleterConstructible<_GoodRValRefType<_Dummy> > >
   _LIBCPP_INLINE_VISIBILITY
   unique_ptr(pointer __p, _GoodRValRefType<_Dummy> __d) __NANOSTL_NOEXCEPT
-      : __ptr_(__p, _VSTD::move(__d)) {
+      : __ptr_(__p, _VNANOSTL::move(__d)) {
     static_assert(!is_reference<deleter_type>::value,
                   "rvalue deleter bound to reference");
   }
@@ -488,7 +488,7 @@ public:
 
   _LIBCPP_INLINE_VISIBILITY
   unique_ptr(unique_ptr&& __u) __NANOSTL_NOEXCEPT
-      : __ptr_(__u.release(), _VSTD::forward<deleter_type>(__u.get_deleter())) {
+      : __ptr_(__u.release(), _VNANOSTL::forward<deleter_type>(__u.get_deleter())) {
   }
 
   template <class _Up, class _Ep,
@@ -497,7 +497,7 @@ public:
   >
   _LIBCPP_INLINE_VISIBILITY
   unique_ptr(unique_ptr<_Up, _Ep>&& __u) __NANOSTL_NOEXCEPT
-      : __ptr_(__u.release(), _VSTD::forward<_Ep>(__u.get_deleter())) {}
+      : __ptr_(__u.release(), _VNANOSTL::forward<_Ep>(__u.get_deleter())) {}
 
 //#if _LIBCPP_STD_VER <= 14 || defined(_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR)
 //  template <class _Up>
@@ -513,7 +513,7 @@ public:
   _LIBCPP_INLINE_VISIBILITY
   unique_ptr& operator=(unique_ptr&& __u) __NANOSTL_NOEXCEPT {
     reset(__u.release());
-    __ptr_.second() = _VSTD::forward<deleter_type>(__u.get_deleter());
+    __ptr_.second() = _VNANOSTL::forward<deleter_type>(__u.get_deleter());
     return *this;
   }
 
@@ -524,7 +524,7 @@ public:
   _LIBCPP_INLINE_VISIBILITY
   unique_ptr& operator=(unique_ptr<_Up, _Ep>&& __u) __NANOSTL_NOEXCEPT {
     reset(__u.release());
-    __ptr_.second() = _VSTD::forward<_Ep>(__u.get_deleter());
+    __ptr_.second() = _VNANOSTL::forward<_Ep>(__u.get_deleter());
     return *this;
   }
 
@@ -709,7 +709,7 @@ public:
             class = _EnableIfPointerConvertible<_Pp> >
   _LIBCPP_INLINE_VISIBILITY
   unique_ptr(_Pp __p, _GoodRValRefType<_Dummy> __d) __NANOSTL_NOEXCEPT
-      : __ptr_(__p, _VSTD::move(__d)) {
+      : __ptr_(__p, _VNANOSTL::move(__d)) {
     static_assert(!is_reference<deleter_type>::value,
                   "rvalue deleter bound to reference");
   }
@@ -718,7 +718,7 @@ public:
             class = _EnableIfDeleterConstructible<_GoodRValRefType<_Dummy> > >
   _LIBCPP_INLINE_VISIBILITY
   unique_ptr(nullptr_t, _GoodRValRefType<_Dummy> __d) __NANOSTL_NOEXCEPT
-      : __ptr_(nullptr, _VSTD::move(__d)) {
+      : __ptr_(nullptr, _VNANOSTL::move(__d)) {
     static_assert(!is_reference<deleter_type>::value,
                   "rvalue deleter bound to reference");
   }
@@ -732,13 +732,13 @@ public:
 
   _LIBCPP_INLINE_VISIBILITY
   unique_ptr(unique_ptr&& __u) __NANOSTL_NOEXCEPT
-      : __ptr_(__u.release(), _VSTD::forward<deleter_type>(__u.get_deleter())) {
+      : __ptr_(__u.release(), _VNANOSTL::forward<deleter_type>(__u.get_deleter())) {
   }
 
   _LIBCPP_INLINE_VISIBILITY
   unique_ptr& operator=(unique_ptr&& __u) __NANOSTL_NOEXCEPT {
     reset(__u.release());
-    __ptr_.second() = _VSTD::forward<deleter_type>(__u.get_deleter());
+    __ptr_.second() = _VNANOSTL::forward<deleter_type>(__u.get_deleter());
     return *this;
   }
 
@@ -748,7 +748,7 @@ public:
   >
   _LIBCPP_INLINE_VISIBILITY
   unique_ptr(unique_ptr<_Up, _Ep>&& __u) __NANOSTL_NOEXCEPT
-      : __ptr_(__u.release(), _VSTD::forward<_Ep>(__u.get_deleter())) {
+      : __ptr_(__u.release(), _VNANOSTL::forward<_Ep>(__u.get_deleter())) {
   }
 
   template <class _Up, class _Ep,
@@ -759,7 +759,7 @@ public:
   unique_ptr&
   operator=(unique_ptr<_Up, _Ep>&& __u) __NANOSTL_NOEXCEPT {
     reset(__u.release());
-    __ptr_.second() = _VSTD::forward<_Ep>(__u.get_deleter());
+    __ptr_.second() = _VNANOSTL::forward<_Ep>(__u.get_deleter());
     return *this;
   }
 

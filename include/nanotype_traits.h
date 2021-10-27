@@ -30,6 +30,7 @@
 
 #include "nanocommon.h"
 #include "nanocstddef.h"
+#include "nanoutility.h" // swap
 #include "__nullptr"
 
 namespace nanostl {

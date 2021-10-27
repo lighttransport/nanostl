@@ -46,6 +46,9 @@
 
 // Control presence of exception handling (try and auto discover):
 
+#if !defined(NANOSTL_ENABLE_EXCEPTION)
+#  define any_CONFIG_NO_EXCEPTIONS  1
+#else
 #ifndef any_CONFIG_NO_EXCEPTIONS
 # if defined(_MSC_VER)
 #  include <cstddef>    // for _HAS_EXCEPTIONS
@@ -55,6 +58,7 @@
 # else
 #  define any_CONFIG_NO_EXCEPTIONS  1
 # endif
+#endif
 #endif
 
 // C++ language version detection (C++20 is speculative):
@@ -103,26 +107,26 @@
 
 namespace nonstd {
 
-using std::in_place;
-using std::in_place_type;
-using std::in_place_index;
-using std::in_place_t;
-using std::in_place_type_t;
-using std::in_place_index_t;
+using nanostl::in_place;
+using nanostl::in_place_type;
+using nanostl::in_place_index;
+using nanostl::in_place_t;
+using nanostl::in_place_type_t;
+using nanostl::in_place_index_t;
 
-#define nonstd_lite_in_place_t(      T)  std::in_place_t
-#define nonstd_lite_in_place_type_t( T)  std::in_place_type_t<T>
-#define nonstd_lite_in_place_index_t(K)  std::in_place_index_t<K>
+#define nonstd_lite_in_place_t(      T)  nanostl::in_place_t
+#define nonstd_lite_in_place_type_t( T)  nanostl::in_place_type_t<T>
+#define nonstd_lite_in_place_index_t(K)  nanostl::in_place_index_t<K>
 
-#define nonstd_lite_in_place(      T)    std::in_place_t{}
-#define nonstd_lite_in_place_type( T)    std::in_place_type_t<T>{}
-#define nonstd_lite_in_place_index(K)    std::in_place_index_t<K>{}
+#define nonstd_lite_in_place(      T)    nanostl::in_place_t{}
+#define nonstd_lite_in_place_type( T)    nanostl::in_place_type_t<T>{}
+#define nonstd_lite_in_place_index(K)    nanostl::in_place_index_t<K>{}
 
 } // namespace nonstd
 
 #else // any_CPP17_OR_GREATER
 
-#include <cstddef>
+#include "nanocstddef.h"
 
 namespace nonstd {
 namespace detail {
@@ -130,7 +134,7 @@ namespace detail {
 template< class T >
 struct in_place_type_tag {};
 
-template< std::size_t K >
+template< nanostl::size_t K >
 struct in_place_index_tag {};
 
 } // namespace detail
@@ -143,7 +147,7 @@ inline in_place_t in_place( detail::in_place_type_tag<T> = detail::in_place_type
     return in_place_t();
 }
 
-template< std::size_t K >
+template< nanostl::size_t K >
 inline in_place_t in_place( detail::in_place_index_tag<K> = detail::in_place_index_tag<K>() )
 {
     return in_place_t();
@@ -155,7 +159,7 @@ inline in_place_t in_place_type( detail::in_place_type_tag<T> = detail::in_place
     return in_place_t();
 }
 
-template< std::size_t K >
+template< nanostl::size_t K >
 inline in_place_t in_place_index( detail::in_place_index_tag<K> = detail::in_place_index_tag<K>() )
 {
     return in_place_t();
@@ -187,16 +191,16 @@ inline in_place_t in_place_index( detail::in_place_index_tag<K> = detail::in_pla
 
 namespace nonstd {
 
-    using std::any;
-    using std::any_cast;
-    using std::make_any;
-    using std::swap;
-    using std::bad_any_cast;
+    using nanostl::any;
+    using nanostl::any_cast;
+    using nanostl::make_any;
+    using nanostl::swap;
+    using nanostl::bad_any_cast;
 }
 
 #else // any_USES_STD_ANY
 
-#include <utility>
+#include "nanoutility.h"
 
 // Compiler versions:
 //
@@ -322,23 +326,25 @@ namespace nonstd {
 // additional includes:
 
 #if any_CONFIG_NO_EXCEPTIONS
-# include <cassert>
+# include "nanocassert.h"
+# include <typeinfo> // include NanoSTL's typeinfo as a system header
 #else
-# include <typeinfo>
+# include "nanotypeinfo.h"
 #endif
 
 #if ! any_HAVE_NULLPTR
-# include <cstddef>
+# include "nanocstddef.h"
 #endif
 
 #if any_HAVE_INITIALIZER_LIST
-# include <initializer_list>
+# include "nanoinitializer_list.h"
 #endif
 
 #if any_HAVE_TYPE_TRAITS
-# include <type_traits>
+# include "nanotype_traits.h"
 #elif any_HAVE_TR1_TYPE_TRAITS
-# include <tr1/type_traits>
+#error "This code path is not avaiable in NanoSTL"
+//# include <tr1/type_traits>
 #endif
 
 // Method enabling
@@ -346,16 +352,16 @@ namespace nonstd {
 #if any_CPP11_OR_GREATER
 
 #define any_REQUIRES_0(...) \
-    template< bool B = (__VA_ARGS__), typename std::enable_if<B, int>::type = 0 >
+    template< bool B = (__VA_ARGS__), typename nanostl::enable_if<B, int>::type = 0 >
 
 #define any_REQUIRES_T(...) \
-    , typename std::enable_if< (__VA_ARGS__), int >::type = 0
+    , typename nanostl::enable_if< (__VA_ARGS__), int >::type = 0
 
 #define any_REQUIRES_R(R, ...) \
-    typename std::enable_if<__VA_ARGS__, R>::type
+    typename nanostl::enable_if<__VA_ARGS__, R>::type
 
 #define any_REQUIRES_A(...) \
-    , typename std::enable_if<__VA_ARGS__, void*>::type = nullptr
+    , typename nanostl::enable_if<__VA_ARGS__, void*>::type = nullptr
 
 #endif
 
@@ -371,11 +377,11 @@ namespace std11 {
 
 #if any_HAVE_ADD_CONST
 
-using std::add_const;
+using nanostl::add_const;
 
 #elif any_HAVE_TR1_ADD_CONST
 
-using std::tr1::add_const;
+using nanostl::tr1::add_const;
 
 #else
 
@@ -385,11 +391,11 @@ template< class T > struct add_const { typedef const T type; };
 
 #if any_HAVE_REMOVE_REFERENCE
 
-using std::remove_reference;
+using nanostl::remove_reference;
 
 #elif any_HAVE_TR1_REMOVE_REFERENCE
 
-using std::tr1::remove_reference;
+using nanostl::tr1::remove_reference;
 
 #else
 
@@ -410,7 +416,7 @@ namespace detail {
 
 #if ! any_CONFIG_NO_EXCEPTIONS
 
-class bad_any_cast : public std::bad_cast
+class bad_any_cast : public nanostl::bad_cast
 {
 public:
 #if any_CPP11_OR_GREATER
@@ -439,33 +445,33 @@ public:
 #if any_CPP11_OR_GREATER
 
     any( any && other ) any_noexcept
-    : content( std::move( other.content ) )
+    : content( nanostl::move( other.content ) )
     {
         other.content = any_nullptr;
     }
 
     template<
-        class ValueType, class T = typename std::decay<ValueType>::type
-        any_REQUIRES_T( ! std::is_same<T, any>::value )
+        class ValueType, class T = typename nanostl::decay<ValueType>::type
+        any_REQUIRES_T( ! nanostl::is_same<T, any>::value )
     >
     any( ValueType && value ) any_noexcept
-    : content( new holder<T>( std::forward<ValueType>( value ) ) )
+    : content( new holder<T>( nanostl::forward<ValueType>( value ) ) )
     {}
 
     template<
         class T, class... Args
-        any_REQUIRES_T( std::is_constructible<T, Args&&...>::value )
+        any_REQUIRES_T( nanostl::is_constructible<T, Args&&...>::value )
     >
     explicit any( nonstd_lite_in_place_type_t(T), Args&&... args )
-    : content( new holder<T>( T( std::forward<Args>(args)... ) ) )
+    : content( new holder<T>( T( nanostl::forward<Args>(args)... ) ) )
     {}
 
     template<
         class T, class U, class... Args
-        any_REQUIRES_T( std::is_constructible<T, std::initializer_list<U>&, Args&&...>::value )
+        any_REQUIRES_T( nanostl::is_constructible<T, nanostl::initializer_list<U>&, Args&&...>::value )
     >
-    explicit any( nonstd_lite_in_place_type_t(T), std::initializer_list<U> il, Args&&... args )
-    : content( new holder<T>( T( il, std::forward<Args>(args)... ) ) )
+    explicit any( nonstd_lite_in_place_type_t(T), nanostl::initializer_list<U> il, Args&&... args )
+    : content( new holder<T>( T( il, nanostl::forward<Args>(args)... ) ) )
     {}
 
 #else
@@ -492,33 +498,33 @@ public:
 
     any & operator=( any && other ) any_noexcept
     {
-        any( std::move( other ) ).swap( *this );
+        any( nanostl::move( other ) ).swap( *this );
         return *this;
     }
 
     template<
-        class ValueType, class T = typename std::decay<ValueType>::type
-        any_REQUIRES_T( ! std::is_same<T, any>::value )
+        class ValueType, class T = typename nanostl::decay<ValueType>::type
+        any_REQUIRES_T( ! nanostl::is_same<T, any>::value )
     >
     any & operator=( T && value )
     {
-        any( std::move( value ) ).swap( *this );
+        any( nanostl::move( value ) ).swap( *this );
         return *this;
     }
 
     template< class T, class... Args >
     void emplace( Args && ... args )
     {
-        any( T( std::forward<Args>(args)... ) ).swap( *this );
+        any( T( nanostl::forward<Args>(args)... ) ).swap( *this );
     }
 
     template<
         class T, class U, class... Args
-        any_REQUIRES_T( std::is_constructible<T, std::initializer_list<U>&, Args&&...>::value )
+        any_REQUIRES_T( nanostl::is_constructible<T, nanostl::initializer_list<U>&, Args&&...>::value )
     >
-    void emplace( std::initializer_list<U> il, Args&&... args )
+    void emplace( nanostl::initializer_list<U> il, Args&&... args )
     {
-        any( T( il, std::forward<Args>(args)... ) ).swap( *this );
+        any( T( il, nanostl::forward<Args>(args)... ) ).swap( *this );
     }
 
 #else
@@ -539,7 +545,7 @@ public:
 
     void swap( any & other ) any_noexcept
     {
-        std::swap( content, other.content );
+        nanostl::swap( content, other.content );
     }
 
     bool has_value() const any_noexcept
@@ -547,7 +553,7 @@ public:
         return content != any_nullptr;
     }
 
-    const std::type_info & type() const any_noexcept
+    const nanostl::type_info & type() const any_noexcept
     {
         return has_value() ? content->type() : typeid( void );
     }
@@ -576,7 +582,7 @@ private:
         {
         }
 
-        virtual std::type_info const & type() const = 0;
+        virtual nanostl::type_info const & type() const = 0;
 
         virtual placeholder * clone() const = 0;
     };
@@ -591,11 +597,11 @@ private:
 
 #if any_CPP11_OR_GREATER
         holder( ValueType && value )
-        : held( std::move( value ) )
+        : held( nanostl::move( value ) )
         {}
 #endif
 
-        virtual std::type_info const & type() const any_override
+        virtual nanostl::type_info const & type() const any_override
         {
             return typeid( ValueType );
         }
@@ -621,13 +627,13 @@ inline void swap( any & x, any & y ) any_noexcept
 template< class T, class ...Args >
 inline any make_any( Args&& ...args )
 {
-    return any( nonstd_lite_in_place_type(T), std::forward<Args>(args)...);
+    return any( nonstd_lite_in_place_type(T), nanostl::forward<Args>(args)...);
 }
 
 template< class T, class U, class ...Args >
-inline any make_any( std::initializer_list<U> il, Args&& ...args )
+inline any make_any( nanostl::initializer_list<U> il, Args&& ...args )
 {
-    return any( nonstd_lite_in_place_type(T), il, std::forward<Args>(args)...);
+    return any( nonstd_lite_in_place_type(T), il, nanostl::forward<Args>(args)...);
 }
 
 #endif // any_CPP11_OR_GREATER
@@ -636,7 +642,7 @@ template<
     class ValueType
 #if any_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
 //  any_REQUIRES_T(...) Allow for VC120 (VS2013):
-    , typename = typename std::enable_if< (std::is_reference<ValueType>::value || std::is_copy_constructible<ValueType>::value), nonstd::any_lite::detail::enabler >::type
+    , typename = typename nanostl::enable_if< (nanostl::is_reference<ValueType>::value || nanostl::is_copy_constructible<ValueType>::value), any_lite::detail::enabler >::type
 #endif
 >
 any_nodiscard inline ValueType any_cast( any const & operand )
@@ -659,7 +665,7 @@ template<
     class ValueType
 #if any_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
 //  any_REQUIRES_T(...) Allow for VC120 (VS2013):
-    , typename = typename std::enable_if< (std::is_reference<ValueType>::value || std::is_copy_constructible<ValueType>::value), nonstd::any_lite::detail::enabler >::type
+    , typename = typename nanostl::enable_if< (nanostl::is_reference<ValueType>::value || nanostl::is_copy_constructible<ValueType>::value), any_lite::detail::enabler >::type
 #endif
 >
 any_nodiscard inline ValueType any_cast( any & operand )
@@ -683,7 +689,7 @@ any_nodiscard inline ValueType any_cast( any & operand )
 template<
     class ValueType
 #if any_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
-    any_REQUIRES_T( std::is_reference<ValueType>::value || std::is_copy_constructible<ValueType>::value )
+    any_REQUIRES_T( nanostl::is_reference<ValueType>::value || nanostl::is_copy_constructible<ValueType>::value )
 #endif
 >
 any_nodiscard inline ValueType any_cast( any && operand )

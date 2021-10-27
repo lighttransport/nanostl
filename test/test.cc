@@ -17,9 +17,9 @@
 #include "nanomemory.h"
 
 #include "nanooptional.h"
-#include "nanoany.h"
+//#include "nanoany.h"
 #include "nanovariant.h"
-#include "nanoexpected.h"
+//#include "nanoexpected.h"
 
 #include "__nanostrutil.h"
 
@@ -644,11 +644,13 @@ static void test_optional(void) {
 
 }
 
+#if 0
 static void test_any(void) {
   nanostl::any a;
 
   a = 1.0;
 }
+#endif
 
 static void test_variant(void) {
   nanostl::variant<int, double> a;
@@ -660,10 +662,12 @@ static void test_variant(void) {
 }
 
 
+#if 0
 static void test_expected(void) {
   nanostl::expected<double, std::string> a;
 
 }
+#endif
 
 extern "C" void test_valarray(void);
 
@@ -692,8 +696,8 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-unique_ptr", test_unique_ptr},
              {"test-optional", test_optional},
              {"test-variant", test_variant},
-             {"test-any", test_any},
-             {"test-expected", test_expected},
+             //{"test-any", test_any},
+             //{"test-expected", test_expected},
              {nullptr, nullptr}};
 
 // TEST_MAIN();
