@@ -2,9 +2,10 @@
 #define NANOSTL_TYPEINFO_H
 
 #include "nanocommon.h"
+#include "nanocstdint.h"
 
 #ifndef _LIBCPP_INLINE_VISIBILITY
-#define _LIBCPP_INLINE_VISIBILITY 
+#define _LIBCPP_INLINE_VISIBILITY
 #endif
 
 #ifndef _LIBCPP_ALWAYS_INLINE
@@ -20,8 +21,8 @@
 #endif
 
 // TODO(LTE): Implement
-#ifndef _LIBCPP_EXCEPTION_ABI 
-#define _LIBCPP_EXCEPTION_ABI 
+#ifndef _LIBCPP_EXCEPTION_ABI
+#define _LIBCPP_EXCEPTION_ABI
 #endif
 
 // TODO(LTE): Implement

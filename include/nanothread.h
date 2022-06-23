@@ -198,8 +198,8 @@ class thread {
 
     unique_ptr<_Gp> __p(
             new _Gp(nanostl::move(__tsp),
-                    _VSTD::__decay_copy(nanostl::forward<_Fp>(__f)),
-                    _VSTD::__decay_copy(nanostl::forward<_Args>(__args))...));
+                    nanostl::__decay_copy(nanostl::forward<_Fp>(__f)),
+                    nanostl::__decay_copy(nanostl::forward<_Args>(__args))...));
 
   }
 

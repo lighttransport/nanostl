@@ -103,7 +103,7 @@
 
 #if any_CPP17_OR_GREATER
 
-#include <utility>
+#include "nanoutility.h"
 
 namespace nonstd {
 
@@ -327,7 +327,13 @@ namespace nonstd {
 
 #if any_CONFIG_NO_EXCEPTIONS
 # include "nanocassert.h"
-# include <typeinfo> // include NanoSTL's typeinfo as a system header
+#if defined(__GNUC__)
+# include <typeinfo> // include gcc's typeinfo as a system header
+#elif defined(__clang__)
+# include <__typeinfo> // include NanoSTL's typeinfo as a system header
+#else
+#error "TODO"
+#endif
 #else
 # include "nanotypeinfo.h"
 #endif
