@@ -256,3 +256,4 @@ Some functions in nanomath is licenced under modified BSD license.
 * libc++: Apache License v2.0 with LLVM Exceptions
 * `mattiasgustavsson/libs`: MIT license. https://github.com/mattiasgustavsson/libs
 * taocpp/tuple : MIT license. https://github.com/taocpp/tuple
+* fast_float : NanoSTL Choose MIT license(fast_float is MIT/Apache2.0 dual license). https://github.com/fast_float/fast_float
