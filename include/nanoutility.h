@@ -25,6 +25,7 @@
 #ifndef NANOSTL_UTILITY_H_
 #define NANOSTL_UTILITY_H_
 
+#include "nanocommon.h"
 #include "nanotype_traits.h"
 
 namespace nanostl {
@@ -64,6 +65,21 @@ inline void swap(T &a, T &b) __NANOSTL_NOEXCEPT
 }
 #endif
 
+#if 0 // moved to nanotype_traits
+//#if __has_keyword(__remove_reference)
+//
+//template<class _Tp>
+//struct _LIBCPP_TEMPLATE_VIS remove_reference { typedef __remove_reference(_Tp) type; };
+//
+//#else // __has_keyword(__remove_reference)
+
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS remove_reference        {typedef /*_LIBCPP_NODEBUG*/ _Tp type;}  ;
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS remove_reference<_Tp&>  {typedef /*_LIBCPP_NODEBUG*/ _Tp type;}  ;
+template <class _Tp> struct _NANOSTL_TEMPLATE_VIS remove_reference<_Tp&&> {typedef /*_LIBCPP_NODEBUG*/ _Tp type;}  ;
+
+//#if _LIBCPP_STD_VER > 11
+template <class _Tp> using remove_reference_t = typename remove_reference<_Tp>::type;
+//#endif
 
 
 template <class _Tp>
@@ -72,6 +88,7 @@ move(_Tp&& __t) __NANOSTL_NOEXCEPT {
   typedef /*_LIBCPP_NODEBUG*/ typename remove_reference<_Tp>::type _Up;
   return static_cast<_Up&&>(__t);
 }
+#endif
 
 #ifndef _LIBCPP_CXX03_LANG
 template <class _Tp>
