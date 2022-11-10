@@ -184,7 +184,7 @@ class thread {
     //std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& out, thread::id id);
 
     template <class T> struct hash;
-    template <> struct hash<thread::id>;
+    //template <> struct hash<thread::id>; // TODO
 
   };
 

@@ -258,6 +258,8 @@ float stod(const nanostl::string &str, nanostl::size_t *idx = nullptr);
 
 #if defined(NANOSTL_STRING_IMPLEMENTATION)
 
+#include "fast_float/fast_float.h"
+
 NANOSTL_HOST_AND_DEVICE_QUAL
 string to_string(int value) {
   // naiive implementation of base-10 int to ascii
@@ -372,6 +374,7 @@ string to_string(double value) {
   return string(buf);
 }
 
+#if 0
 NANOSTL_HOST_AND_DEVICE_QUAL
 float stof(const nanostl::string &str, nanostl::size_t *idx) {
   (void)idx;  // TODO(LTE):
@@ -385,6 +388,8 @@ float stof(const nanostl::string &str, nanostl::size_t *idx) {
 
   return value;
 }
+#else
+#endif
 
 NANOSTL_HOST_AND_DEVICE_QUAL
 float stod(const nanostl::string &str, nanostl::size_t *idx) {
