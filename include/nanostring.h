@@ -29,6 +29,7 @@
 #include "nanolimits.h"
 #include "nanovector.h"
 #include "nanoutility.h"
+#include "nanoiosfwd.h"
 
 #ifdef NANOSTL_DEBUG
 #if !defined(__CUDACC__)
@@ -224,7 +225,16 @@ basic_string<charT> &basic_string<charT>::operator+=(
   return (*this);
 }
 
+
 typedef basic_string<char> string;
+
+// stream
+ostream &operator<<(ostream &os, const string &s)
+{
+  os << s;
+
+  return os;
+}
 
 NANOSTL_HOST_AND_DEVICE_QUAL
 string to_string(int value);
