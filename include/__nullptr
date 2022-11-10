@@ -40,7 +40,7 @@ struct nullptr_t
 inline constexpr nullptr_t __get_nullptr_t() {return nullptr_t(0);}
 
 //#define nullptr _VSTD::__get_nullptr_t()
-#define nullptr nanostl::__get_nullptr_t()
+#define nullptr __get_nullptr_t()
 
 }
 

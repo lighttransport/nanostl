@@ -2,7 +2,7 @@
 #define FASTFLOAT_ASCII_NUMBER_H
 
 //#include <cctype>
-#include "nanostdint.h"
+#include "nanocstdint.h"
 #include "nanocstring.h"
 #include <iterator>
 
