@@ -41,6 +41,15 @@ typedef short int16_t;
 typedef int int32_t;
 typedef long long int64_t;
 
+// Assume 64bit
+typedef long long intmax_t;
+typedef unsigned long long uintmax_t;
+
+typedef unsigned long int uintptr_t;
+typedef long int intptr_t;
+
 }  // namespace nanostl
+
+
 
 #endif  // NANOSTL_CSTDINT_H_

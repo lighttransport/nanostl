@@ -69,6 +69,23 @@ NANOSTL_HOST_AND_DEVICE_QUAL ForwardIt min_element(ForwardIt first,
   return smallest;
 }
 
+template <class ForwardIterator, class T>
+void fill(ForwardIterator first, ForwardIterator last, const T& value) {
+  while (first != last) *first++ = value;
+}
+
+
+#if defined(NANOSTL_PSTL)
+template <class ExecutionPolicy, class ForwardIterator, class T>
+void fill(ExecutionPolicy&& exec, ForwardIterator first, ForwardIterator last,
+          const T& value) {
+  // TODO: Implement
+  (void)exec;
+
+  fill(first, last, value);
+  }
+#endif
+
 }  // namespace nanostl
 
 #endif  // NANOSTL_ALGORITHM_H_

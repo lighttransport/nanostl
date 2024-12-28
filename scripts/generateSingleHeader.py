@@ -124,4 +124,4 @@ def generate(v):
 
 if __name__ == '__main__':
     #from releaseCommon import Version
-    generate("0.1.0")
+    generate("0.2.0")

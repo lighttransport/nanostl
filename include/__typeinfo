@@ -1,0 +1,9 @@
+#pragma once
+
+#include "nanotypeinfo.h"
+
+namespace std {
+
+using nanostl::type_info;
+
+} // namespace std

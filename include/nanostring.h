@@ -25,9 +25,11 @@
 #ifndef NANOSTL_STRING_H_
 #define NANOSTL_STRING_H_
 
-#include "nanovector.h"
-#include "nanolimits.h"
 #include "__nanostrutil.h"
+#include "nanolimits.h"
+#include "nanovector.h"
+#include "nanoutility.h"
+#include "nanoiosfwd.h"
 
 #ifdef NANOSTL_DEBUG
 #if !defined(__CUDACC__)
@@ -57,13 +59,17 @@ class basic_string {
   typedef const_pointer const_iterator;
 
   NANOSTL_HOST_AND_DEVICE_QUAL
-  basic_string() {}
+  basic_string() {
+    data_.resize(1);
+    data_[0] = '\0';
+  }
 
   NANOSTL_HOST_AND_DEVICE_QUAL
   basic_string(const basic_string &s) { data_ = s.data_; }
 
   NANOSTL_HOST_AND_DEVICE_QUAL
   basic_string(const charT *s) {
+    data_.clear();
     while (s && (*s) != '\0') {
       data_.push_back(*s);
       s++;
@@ -102,9 +108,11 @@ class basic_string {
     return data_.size() - 1;
   }
 
-
   NANOSTL_HOST_AND_DEVICE_QUAL
-  void clear() { data_.clear(); }
+  void clear() { data_.clear();
+    data_.resize(1);
+    data_[0] = '\0';
+  }
 
   NANOSTL_HOST_AND_DEVICE_QUAL
   const charT *c_str() const { return &data_.at(0); }
@@ -139,7 +147,10 @@ class basic_string {
   basic_string &operator+=(const basic_string &s);
 
   NANOSTL_HOST_AND_DEVICE_QUAL
-  basic_string &operator=(const basic_string &s);
+  basic_string &operator=(const basic_string &s) {
+    this->data_ = s.data_;
+    return (*this);
+  }
 
   NANOSTL_HOST_AND_DEVICE_QUAL
   bool operator==(const basic_string &str) const { return compare(str) == 0; }
@@ -190,18 +201,177 @@ basic_string<charT> basic_string<charT>::operator+(
 template <class charT>
 basic_string<charT> &basic_string<charT>::operator+=(
     const basic_string<charT> &s) {
+  // remove '\0'
+  if (data_.size() < 1) {
+    // this should not be happen
+  } else {
+    data_.pop_back();
+  }
+
   const_iterator first = s.data_.begin();
-  const_iterator last = s.data_.end();
+  const_iterator last = s.data_.end(); // this contains `\0`
 
   for (; first != last; ++first) {
+#ifdef NANOSTL_DEBUG
+    printf("first = %c\n", *first);
+#endif
     data_.push_back(*first);
   }
+
+#ifdef NANOSTL_DEBUG
+  printf("data_ = %s\n", &data_.at(0));
+#endif
 
   return (*this);
 }
 
+
 typedef basic_string<char> string;
 
+// stream
+ostream &operator<<(ostream &os, const string &s)
+{
+  os << s;
+
+  return os;
+}
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(int value);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(unsigned int value);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(int64_t value);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(uint64_t value);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(float value);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(double value);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+float stof(const string &str, size_t *idx = nullptr);
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+float stod(const string &str, size_t *idx = nullptr);
+
+}  // namespace nanostl
+
+#if defined(NANOSTL_IMPLEMENTATION)
+#ifndef NANOSTL_STRING_IMPLEMENTATION
+#define NANOSTL_STRING_IMPLEMENTATION
+#endif
+#endif
+
+#if defined(NANOSTL_STRING_IMPLEMENTATION)
+
+#include "fast_float/fast_float.h"
+
+namespace nanostl {
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(int value) {
+  // naiive implementation of base-10 int to ascii
+  // based on https://www.techiedelight.com/implement-itoa-function-in-c/
+
+  auto myreverse = [](char *buf, int i, int j) {
+    while (i < j) {
+      char tmp = buf[j];
+      buf[j] = buf[i];
+      buf[i] = tmp;
+      i++;
+      j--;
+
+      //swap(buf[i++], buf[j--]);
+    }
+  };
+
+  char buffer[numeric_limits<int>::digits10 + 2];  // +2 for sign and null
+
+  int n = (value < 0) ? -value : value;  // abs
+  int i = 0;
+  int base = 10;
+  while (n) {
+    int r = n % base;
+
+    if (r >= 10) {
+      buffer[i++] = 'A' + (r - 10);  //
+    } else {
+      buffer[i++] = '0' + r;
+    }
+
+    n = n / base;
+  }
+
+  if (i == 0) {
+    buffer[i++] = '0';
+  }
+
+  if ((value < 0) && (base == 10)) {
+    buffer[i++] = '-';
+  }
+
+  buffer[i] = '\0';
+
+  myreverse(buffer, 0, i - 1);
+
+  return string(buffer);
+}
+
+NANOSTL_HOST_AND_DEVICE_QUAL
+string to_string(int64_t value) {
+  // naiive implementation of base-10 int to ascii
+  // based on https://www.techiedelight.com/implement-itoa-function-in-c/
+
+  auto myreverse = [](char *buf, int i, int j) {
+    while (i < j) {
+      char tmp = buf[j];
+      buf[j] = buf[i];
+      buf[i] = tmp;
+      i++;
+      j--;
+      //swap(buf[i++], buf[j--]);
+    }
+  };
+
+  char buffer[numeric_limits<int64_t>::digits10 + 2];  // +2 for sign and null
+
+  int n = (value < 0) ? -value : value;  // abs
+  int i = 0;
+  int base = 10;
+  while (n) {
+    int r = n % base;
+
+    if (r >= 10) {
+      buffer[i++] = 'A' + (r - 10);  //
+    } else {
+      buffer[i++] = '0' + r;
+    }
+
+    n = n / base;
+  }
+
+  if (i == 0) {
+    buffer[i++] = '0';
+  }
+
+  if ((value < 0) && (base == 10)) {
+    buffer[i++] = '-';
+  }
+
+  buffer[i] = '\0';
+
+  myreverse(buffer, 0, i - 1);
+
+  return string(buffer);
+}
+
+// TODO: Move implementation to .cc and remove `static`
 NANOSTL_HOST_AND_DEVICE_QUAL
 string to_string(float value) {
   char buf[16];
@@ -219,9 +389,8 @@ string to_string(double value) {
 }
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-float stof(const nanostl::string &str, nanostl::size_t *idx = nullptr)
-{
-  (void)idx; // TODO(LTE):
+float stof(const string &str, size_t *idx) {
+  (void)idx;  // TODO(LTE):
   float value;
   ryu::RyuStatus ret = ryu::s2f_n(str.c_str(), str.size(), &value);
 
@@ -234,9 +403,8 @@ float stof(const nanostl::string &str, nanostl::size_t *idx = nullptr)
 }
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-float stod(const nanostl::string &str, nanostl::size_t *idx = nullptr)
-{
-  (void)idx; // TODO(LTE):
+float stod(const string &str, size_t *idx) {
+  (void)idx;  // TODO(LTE):
   double value;
   ryu::RyuStatus ret = ryu::s2d_n(str.c_str(), str.size(), &value);
 
@@ -249,5 +417,8 @@ float stod(const nanostl::string &str, nanostl::size_t *idx = nullptr)
 }
 
 }  // namespace nanostl
+
+#endif // NANOSTL_STRING_IMPLEMENTATION
+
 
 #endif  // NANOSTL_STRING_H_

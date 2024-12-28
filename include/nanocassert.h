@@ -25,12 +25,14 @@
 #ifndef NANOSTL_CASSERT_H_
 #define NANOSTL_CASSERT_H_
 
-#ifdef __CUDACC__
+//#ifdef __CUDACC__
 #include <assert.h>
-#else
-// TODO(LTE): Delegate `assert` implementation when the backend c library or equivalent library supports it.
-#define assert(x)
-#endif
+//#else
+// TODO(LTE): Provide our own `assert` implementation when libc is not available.
+//#ifndef assert
+//#define assert(x)
+//#endif
+//#endif
 
 
 #endif  // NANOSTL_CASSERT_H_

@@ -18,6 +18,18 @@ Eearly testing stage. Not ready for the production use.
 * Experimental CUDA support. You can use NanoSTL on device functions.
   * See `sandbox/cuda/`
 
+## Example
+
+NanoSTL is header-only library. No need to compile/link with `.cc`
+Some function(e.g. `std::to_string`) requires the implementation, thus must define `NANOSTL_IMPLEMENTATION` in **single** `*.cc` file.
+
+```
+#define NANOSTL_IMPLEMENTATION
+#include <nanosring.h>
+
+...
+```
+
 ## Supported features
 
 * vector
@@ -28,6 +40,18 @@ Eearly testing stage. Not ready for the production use.
   * [x] `stod`(string to double. using ryu_parse)
 * algorithm
 * limits
+  * [x] `numeric_limits<T>::min`
+  * [x] `numeric_limits<T>::max`
+  * [x] `numeric_limits<T>::epsilon()`
+  * [x] `numeric_limits<T>::digits10`
+  * [x] `numeric_limits<float>::denorm_min()`
+  * [x] `numeric_limits<double>::denorm_min()`
+  * [x] `numeric_limits<float>::inifinity()`
+  * [x] `numeric_limits<float>::quiet_NaN()`
+  * [x] `numeric_limits<float>::signaling_NaN()`
+  * [x] `numeric_limits<double>::inifinity()`
+  * [x] `numeric_limits<double>::quiet_NaN()`
+  * [x] `numeric_limits<double>::signaling_NaN()`
 * map
 
 Be careful! Not all C++ STL functions are supported for each module.
@@ -61,6 +85,14 @@ Be careful! Not all C++ STL functions are supported for each module.
   * [ ] strlen
   * [ ] NULL
   * [x] `size_t`
+* [ ] iostream
+* [x] hash: Basic type
+* [ ] hash: string
+* [ ] thread
+* [ ] atomic
+* [ ] mutex
+* [ ] ratio
+* [ ] chrono
 
 #### math functions
 
@@ -93,7 +125,7 @@ Be careful! Not all C++ STL functions are supported for each module.
 
 ## Supported architectures
 
-* 64bit and 32bit machine.
+* 64bit arctecture only.
 * Big endian and little endian
   * Some math functions may not run on big endian machine.
 * CUDA device.
@@ -106,6 +138,13 @@ Even though NanoSTL should be compilable with older and various C++ compilers, a
   * NanoSTL itself can be compilable with gcc 4.2.4(fails to compile Catch unit test code)
 * clang 3.4+
 
+## Supported threading library
+
+For `thread` and parallel STL feature, threading library is required.
+
+* pthread(non-Windows)
+* Win32 thread(Windows)
+
 ## Types
 
 NanoSTL assumes following type definitions.
@@ -117,23 +156,44 @@ NanoSTL assumes following type definitions.
 * float : 32bit IEEE754 floating point.
 * double : 64bit IEEE754 floating point.
 
+`long` and `int long` is not recommended to use.  Please use `cstdint` typedefs.
+
 ## Compiler macros
 
 * `NANOSTL_BIG_ENDIAN` Set endianness to big endian. Considering to support various compilers, user must explicitly specify endianness to the compiler. Default is little endian.
+* `NANOSTL_NO_IO` Disable all I/O operation(e.g. iostream). Useful for embedded devices.
+* `NANOSTL_USE_EXCEPTION` Enable exception feature(may not be available for all STL functions)
+* `NANOSTL_NO_THREAD` Disable `thread`, `atomic` and `mutex` feature.
+* `NANOSTL_PSTL` Enable parallel STL feature. Requires C++17 compiler. This also undefine `NANOSTL_NO_THREAD`
+
+### header-only mode
+
+You can define `NANOSTL_IMPLEMENTATION` to define the implementation of some STL functions.
+This is useful if you want to use NanoSTL as a header-only library
+(No need to compile/add `.cc`)
+
+```
+#define NANOSTL_IMPLEMENTATION
+#include <nanostl.h>
+```
+
 
 ## Differences compared to (full featured) C++ STL
 
 * **No thread safety** Currently NanoSTL is not thread safe
   * Application must care about the thread safety
   * For example, need to use mutex or lock for `nanostl::vector::push_back()` operation if you are accesing `nanostl::vector` object from multiple threads.
-* RTTI and exception is not supported.
+* RTTI and exception is basically not supported.
+  * some API may support it through `NANOSTL_USE_EXCEPTION`
 * Returns `NULL` when memory allocation failed(no `bad_alloc`)
 * stof, stod
   * Return (signaling) NaN for invalid input
 
 ## TODO
 
-* [ ] iostream, fstream(stdout/stdin, file IO)
+* [ ] iostream(stdout)
+* [ ] iostream: Custom output/input sink.
+* [ ] fstream(file IO)
 * [ ] Math complex type
 * [x] CUDA support(experimental)
 * [x] isnan/isinf/isfinite support
@@ -144,6 +204,7 @@ NanoSTL assumes following type definitions.
 * [ ] Backport of some C++11 features(e.g. `unordered_map`)
 * [ ] Replace oiio math functions so that we can have clean MIT licensed code.
 * [ ] FLOAT16 and BFLOAT16 support.
+* [ ] C++17 parallel STL
 
 ## Developer note
 
@@ -152,6 +213,19 @@ NanoSTL assumes following type definitions.
 ```
 $ python scripts/generateSingleHeader.py
 ```
+
+Each `.h` must have wrapped with like this:
+
+```
+#ifndef NANOSTL_*_H_`
+#define NANOSTL_*_H_`
+
+// comment after `#endif` is required!
+#endif // NANOSTL_*_H_
+```
+
+to extract codes for single header generation.
+(no `#pragma once`)
 
 ### Unit tests
 
@@ -174,6 +248,12 @@ Some functions in nanomath is licenced under modified BSD license.
 
 ### Third party licenses
 
+* SipHash: cc0 license. https://www.131002.net/siphash/
+* expected-lite, any-lite, optional-lie, variant-lite:  Copyright by Martin Moene. Boost Software License 1.0. https://github.com/martinmoene/variant-lite
 * acutest : MIT license.
 * faster math functions: Some math functions implemented in nanomath is grabbed from OpenImageIO fmath.h, which is licensed under modified BSD license. https://github.com/OpenImageIO/oiio/
 * ryu(floating point <-> string converter). NanoSTL choose Boost 1.0 license. https://github.com/ulfjack/ryu
+* libc++: Apache License v2.0 with LLVM Exceptions
+* `mattiasgustavsson/libs`: MIT license. https://github.com/mattiasgustavsson/libs
+* taocpp/tuple : MIT license. https://github.com/taocpp/tuple
+* fast_float : NanoSTL Choose MIT license(fast_float is MIT/Apache2.0 dual license). https://github.com/fast_float/fast_float

@@ -151,6 +151,14 @@ class vector {
     return elements_ + size_;
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL inline void pop_back() {
+    if (size_ < 1) {
+      // this should be undefined behavior
+    }
+    size_--;
+  }
+
+
   NANOSTL_HOST_AND_DEVICE_QUAL iterator erase(iterator pos) {
     while ((pos + 1) != end()) {
       (*pos) = *(pos + 1);
