@@ -23,14 +23,14 @@
 
 #include "__nanostrutil.h"
 
-#include <cstdio>
-#include <cstdlib>
+//#include <cstdio>
+//#include <cstdlib>
 //#include <cstdint>
-#include <cassert>
-#include <cmath>
-#include <iostream>
-#include <vector>
-#include <valarray>
+//#include <cassert>
+//#include <cmath>
+//#include <iostream>
+//#include <vector>
+//#include <valarray>
 
 #include "nanoiterator.h"
 
@@ -668,6 +668,7 @@ static void test_expected(void) {
 
 }
 #endif
+
 
 extern "C" void test_valarray(void);
 

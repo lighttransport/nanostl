@@ -4,11 +4,14 @@
 #include "ascii_number.h"
 #include "decimal_to_binary.h"
 #include "digit_comparison.h"
+//
+#include "nanolimits.h"
+#include "nanosystem_error.h"
 
-#include <cmath>
-#include <cstring>
-#include <limits>
-#include <system_error>
+//#include <cmath>
+//#include <cstring>
+//#include <limits>
+//#include <system_error>
 
 namespace fast_float {
 
@@ -23,7 +26,7 @@ template <typename T>
 from_chars_result parse_infnan(const char *first, const char *last, T &value)  noexcept  {
   from_chars_result answer;
   answer.ptr = first;
-  answer.ec = std::errc(); // be optimistic
+  answer.ec = nanostl::errc(); // be optimistic
   bool minusSign = false;
   if (*first == '-') { // assume first < last, so dereference without checks; C++17 20.19.3.(7.1) explicitly forbids '+' here
       minusSign = true;
@@ -32,7 +35,7 @@ from_chars_result parse_infnan(const char *first, const char *last, T &value)  n
   if (last - first >= 3) {
     if (fastfloat_strncasecmp(first, "nan", 3)) {
       answer.ptr = (first += 3);
-      value = minusSign ? -std::numeric_limits<T>::quiet_NaN() : std::numeric_limits<T>::quiet_NaN();
+      value = minusSign ? -::nanostl::numeric_limits<T>::quiet_NaN() : ::nanostl::numeric_limits<T>::quiet_NaN();
       // Check for possible nan(n-char-seq-opt), C++17 20.19.3.7, C11 7.20.1.3.3. At least MSVC produces nan(ind) and nan(snan).
       if(first != last && *first == '(') {
         for(const char* ptr = first + 1; ptr != last; ++ptr) {
@@ -52,11 +55,11 @@ from_chars_result parse_infnan(const char *first, const char *last, T &value)  n
       } else {
         answer.ptr = first + 3;
       }
-      value = minusSign ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::infinity();
+      value = minusSign ? -::nanostl::numeric_limits<T>::infinity() : ::nanostl::numeric_limits<T>::infinity();
       return answer;
     }
   }
-  answer.ec = std::errc::invalid_argument;
+  answer.ec = nanostl::errc::invalid_argument;
   return answer;
 }
 
@@ -72,12 +75,12 @@ template<typename T>
 from_chars_result from_chars_advanced(const char *first, const char *last,
                                       T &value, parse_options options)  noexcept  {
 
-  static_assert (std::is_same<T, double>::value || std::is_same<T, float>::value, "only float and double are supported");
+  static_assert (::nanostl::is_same<T, double>::value || ::nanostl::is_same<T, float>::value, "only float and double are supported");
 
 
   from_chars_result answer;
   if (first == last) {
-    answer.ec = std::errc::invalid_argument;
+    answer.ec = nanostl::errc::invalid_argument;
     answer.ptr = first;
     return answer;
   }
@@ -85,7 +88,7 @@ from_chars_result from_chars_advanced(const char *first, const char *last,
   if (!pns.valid) {
     return detail::parse_infnan(first, last, value);
   }
-  answer.ec = std::errc(); // be optimistic
+  answer.ec = nanostl::errc(); // be optimistic
   answer.ptr = pns.lastmatch;
   // Next is Clinger's fast path.
   if (binary_format<T>::min_exponent_fast_path() <= pns.exponent && pns.exponent <= binary_format<T>::max_exponent_fast_path() && pns.mantissa <=binary_format<T>::max_mantissa_fast_path() && !pns.too_many_digits) {

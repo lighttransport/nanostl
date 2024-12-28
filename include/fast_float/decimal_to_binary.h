@@ -3,12 +3,12 @@
 
 #include "float_common.h"
 #include "fast_table.h"
-#include <cfloat>
-#include <cinttypes>
-#include <cmath>
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
+//#include <cfloat>
+//#include <cinttypes>
+//#include <cmath>
+//#include <cstdint>
+//#include <cstdlib>
+//#include <cstring>
 
 namespace fast_float {
 
@@ -18,16 +18,16 @@ namespace fast_float {
 //
 template <int bit_precision>
 fastfloat_really_inline
-value128 compute_product_approximation(int64_t q, uint64_t w) {
+value128 compute_product_approximation(nanostl::int64_t q, nanostl::uint64_t w) {
   const int index = 2 * int(q - powers::smallest_power_of_five);
   // For small values of q, e.g., q in [0,27], the answer is always exact because
   // The line value128 firstproduct = full_multiplication(w, power_of_five_128[index]);
   // gives the exact answer.
   value128 firstproduct = full_multiplication(w, powers::power_of_five_128[index]);
   static_assert((bit_precision >= 0) && (bit_precision <= 64), " precision should  be in (0,64]");
-  constexpr uint64_t precision_mask = (bit_precision < 64) ?
-               (uint64_t(0xFFFFFFFFFFFFFFFF) >> bit_precision)
-               : uint64_t(0xFFFFFFFFFFFFFFFF);
+  constexpr nanostl::uint64_t precision_mask = (bit_precision < 64) ?
+               (nanostl::uint64_t(0xFFFFFFFFFFFFFFFF) >> bit_precision)
+               : nanostl::uint64_t(0xFFFFFFFFFFFFFFFF);
   if((firstproduct.high & precision_mask) == precision_mask) { // could further guard with  (lower + w < lower)
     // regarding the second product, we only need secondproduct.high, but our expectation is that the compiler will optimize this extra work away if needed.
     value128 secondproduct = full_multiplication(w, powers::power_of_five_128[index + 1]);
@@ -48,14 +48,14 @@ namespace detail {
  * where
  *   p = log(5**q)/log(2) = q * log(5)/log(2)
  *
- * For negative values of q in (-400,0), we have that 
+ * For negative values of q in (-400,0), we have that
  *  f = (((152170 + 65536) * q ) >> 16);
- * is equal to 
+ * is equal to
  *   -ceil(p) + q
  * where
  *   p = log(5**-q)/log(2) = -q * log(5)/log(2)
  */
-  constexpr fastfloat_really_inline int32_t power(int32_t q)  noexcept  {
+  constexpr fastfloat_really_inline nanostl::int32_t power(nanostl::int32_t q)  noexcept  {
     return (((152170 + 65536) * q) >> 16) + 63;
   }
 } // namespace detail
@@ -64,12 +64,12 @@ namespace detail {
 // for significant digits already multiplied by 10 ** q.
 template <typename binary>
 fastfloat_really_inline
-adjusted_mantissa compute_error_scaled(int64_t q, uint64_t w, int lz) noexcept  {
+adjusted_mantissa compute_error_scaled(nanostl::int64_t q, nanostl::uint64_t w, int lz) noexcept  {
   int hilz = int(w >> 63) ^ 1;
   adjusted_mantissa answer;
   answer.mantissa = w << hilz;
   int bias = binary::mantissa_explicit_bits() - binary::minimum_exponent();
-  answer.power2 = int32_t(detail::power(int32_t(q)) + bias - hilz - lz - 62 + invalid_am_bias);
+  answer.power2 = nanostl::int32_t(detail::power(nanostl::int32_t(q)) + bias - hilz - lz - 62 + invalid_am_bias);
   return answer;
 }
 
@@ -77,7 +77,7 @@ adjusted_mantissa compute_error_scaled(int64_t q, uint64_t w, int lz) noexcept  
 // the power2 in the exponent will be adjusted by invalid_am_bias.
 template <typename binary>
 fastfloat_really_inline
-adjusted_mantissa compute_error(int64_t q, uint64_t w)  noexcept  {
+adjusted_mantissa compute_error(nanostl::int64_t q, nanostl::uint64_t w)  noexcept  {
   int lz = leading_zeroes(w);
   w <<= lz;
   value128 product = compute_product_approximation<binary::mantissa_explicit_bits() + 3>(q, w);
@@ -91,7 +91,7 @@ adjusted_mantissa compute_error(int64_t q, uint64_t w)  noexcept  {
 // in such cases.
 template <typename binary>
 fastfloat_really_inline
-adjusted_mantissa compute_float(int64_t q, uint64_t w)  noexcept  {
+adjusted_mantissa compute_float(nanostl::int64_t q, nanostl::uint64_t w)  noexcept  {
   adjusted_mantissa answer;
   if ((w == 0) || (q < binary::smallest_power_of_ten())) {
     answer.power2 = 0;
@@ -121,7 +121,7 @@ adjusted_mantissa compute_float(int64_t q, uint64_t w)  noexcept  {
     // In some very rare cases, this could happen, in which case we might need a more accurate
     // computation that what we can provide cheaply. This is very, very unlikely.
     //
-    const bool inside_safe_exponent = (q >= -27) && (q <= 55); // always good because 5**q <2**128 when q>=0, 
+    const bool inside_safe_exponent = (q >= -27) && (q <= 55); // always good because 5**q <2**128 when q>=0,
     // and otherwise, for q<0, we have 5**-q<2**64 and the 128-bit reciprocal allows for exact computation.
     if(!inside_safe_exponent) {
       return compute_error_scaled<binary>(q, product.high, lz);
@@ -135,7 +135,7 @@ adjusted_mantissa compute_float(int64_t q, uint64_t w)  noexcept  {
 
   answer.mantissa = product.high >> (upperbit + 64 - binary::mantissa_explicit_bits() - 3);
 
-  answer.power2 = int32_t(detail::power(int32_t(q)) + upperbit - lz - binary::minimum_exponent());
+  answer.power2 = nanostl::int32_t(detail::power(nanostl::int32_t(q)) + upperbit - lz - binary::minimum_exponent());
   if (answer.power2 <= 0) { // we have a subnormal?
     // Here have that answer.power2 <= 0 so -answer.power2 >= 0
     if(-answer.power2 + 1 >= 64) { // if we have more than 64 bits below the minimum exponent, you have a zero for sure.
@@ -157,7 +157,7 @@ adjusted_mantissa compute_float(int64_t q, uint64_t w)  noexcept  {
     // up 0x3fffffffffffff x 2^-1023-53  and once we do, we are no longer
     // subnormal, but we can only know this after rounding.
     // So we only declare a subnormal if we are smaller than the threshold.
-    answer.power2 = (answer.mantissa < (uint64_t(1) << binary::mantissa_explicit_bits())) ? 0 : 1;
+    answer.power2 = (answer.mantissa < (nanostl::uint64_t(1) << binary::mantissa_explicit_bits())) ? 0 : 1;
     return answer;
   }
 
@@ -170,18 +170,18 @@ adjusted_mantissa compute_float(int64_t q, uint64_t w)  noexcept  {
     //   answer.mantissa = product.high >> (upperbit + 64 - binary::mantissa_explicit_bits() - 3);
     // ... we dropped out only zeroes. But if this happened, then we can go back!!!
     if((answer.mantissa  << (upperbit + 64 - binary::mantissa_explicit_bits() - 3)) ==  product.high) {
-      answer.mantissa &= ~uint64_t(1);          // flip it so that we do not round up
+      answer.mantissa &= ~nanostl::uint64_t(1);          // flip it so that we do not round up
     }
   }
 
   answer.mantissa += (answer.mantissa & 1); // round up
   answer.mantissa >>= 1;
-  if (answer.mantissa >= (uint64_t(2) << binary::mantissa_explicit_bits())) {
-    answer.mantissa = (uint64_t(1) << binary::mantissa_explicit_bits());
+  if (answer.mantissa >= (nanostl::uint64_t(2) << binary::mantissa_explicit_bits())) {
+    answer.mantissa = (nanostl::uint64_t(1) << binary::mantissa_explicit_bits());
     answer.power2++; // undo previous addition
   }
 
-  answer.mantissa &= ~(uint64_t(1) << binary::mantissa_explicit_bits());
+  answer.mantissa &= ~(nanostl::uint64_t(1) << binary::mantissa_explicit_bits());
   if (answer.power2 >= binary::infinite_power()) { // infinity
     answer.power2 = binary::infinite_power();
     answer.mantissa = 0;

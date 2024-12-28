@@ -1,10 +1,10 @@
 #ifndef FASTFLOAT_DIGIT_COMPARISON_H
 #define FASTFLOAT_DIGIT_COMPARISON_H
 
-#include <algorithm>
-#include <cstdint>
-#include <cstring>
-#include <iterator>
+//#include <algorithm>
+//#include <cstdint>
+//#include <cstring>
+//#include <iterator>
 
 #include "float_common.h"
 #include "bigint.h"
@@ -13,7 +13,7 @@
 namespace fast_float {
 
 // 1e0 to 1e19
-constexpr static uint64_t powers_of_ten_uint64[] = {
+constexpr static nanostl::uint64_t powers_of_ten_uint64[] = {
     1UL, 10UL, 100UL, 1000UL, 10000UL, 100000UL, 1000000UL, 10000000UL, 100000000UL,
     1000000000UL, 10000000000UL, 100000000000UL, 1000000000000UL, 10000000000000UL,
     100000000000000UL, 1000000000000000UL, 10000000000000000UL, 100000000000000000UL,
@@ -52,7 +52,7 @@ fastfloat_really_inline adjusted_mantissa to_extended(T value) noexcept {
   adjusted_mantissa am;
   int32_t bias = binary_format<T>::mantissa_explicit_bits() - binary_format<T>::minimum_exponent();
   equiv_uint bits;
-  ::memcpy(&bits, &value, sizeof(T));
+  ::nanostl::memcpy(&bits, &value, sizeof(T));
   if ((bits & exponent_mask) == 0) {
     // denormal
     am.power2 = 1 - bias;
@@ -86,7 +86,7 @@ fastfloat_really_inline void round(adjusted_mantissa& am, callback cb) noexcept 
   if (-am.power2 >= mantissa_shift) {
     // have a denormal float
     int32_t shift = -am.power2 + 1;
-    cb(am, std::min<int32_t>(shift, 64));
+    cb(am, ::nanostl::min<int32_t>(shift, 64));
     // check for round-up: if rounding-nearest carried us to the hidden bit.
     am.power2 = (am.mantissa < (uint64_t(1) << binary_format<T>::mantissa_explicit_bits())) ? 0 : 1;
     return;
@@ -115,7 +115,7 @@ void round_nearest_tie_even(adjusted_mantissa& am, int32_t shift, callback cb) n
   uint64_t mask;
   uint64_t halfway;
   if (shift == 64) {
-    mask = UINT64_MAX;
+    mask = 18446744073709551615ull; // UINT64_MAX;
   } else {
     mask = (uint64_t(1) << shift) - 1;
   }
@@ -151,8 +151,8 @@ fastfloat_really_inline void round_down(adjusted_mantissa& am, int32_t shift) no
 
 fastfloat_really_inline void skip_zeros(const char*& first, const char* last) noexcept {
   uint64_t val;
-  while (std::distance(first, last) >= 8) {
-    ::memcpy(&val, first, sizeof(uint64_t));
+  while (nanostl::distance(first, last) >= 8) {
+    ::nanostl::memcpy(&val, first, sizeof(uint64_t));
     if (val != 0x3030303030303030) {
       break;
     }
@@ -171,8 +171,8 @@ fastfloat_really_inline void skip_zeros(const char*& first, const char* last) no
 fastfloat_really_inline bool is_truncated(const char* first, const char* last) noexcept {
   // do 8-bit optimizations, can just compare to 8 literal 0s.
   uint64_t val;
-  while (std::distance(first, last) >= 8) {
-    ::memcpy(&val, first, sizeof(uint64_t));
+  while (nanostl::distance(first, last) >= 8) {
+    ::nanostl::memcpy(&val, first, sizeof(uint64_t));
     if (val != 0x3030303030303030) {
       return true;
     }
@@ -192,7 +192,7 @@ fastfloat_really_inline bool is_truncated(byte_span s) noexcept {
 }
 
 fastfloat_really_inline
-void parse_eight_digits(const char*& p, limb& value, size_t& counter, size_t& count) noexcept {
+void parse_eight_digits(const char*& p, limb& value, nanostl::size_t& counter, nanostl::size_t& count) noexcept {
   value = value * 100000000 + parse_eight_digits_unrolled(p);
   p += 8;
   counter += 8;
@@ -200,7 +200,7 @@ void parse_eight_digits(const char*& p, limb& value, size_t& counter, size_t& co
 }
 
 fastfloat_really_inline
-void parse_one_digit(const char*& p, limb& value, size_t& counter, size_t& count) noexcept {
+void parse_one_digit(const char*& p, limb& value, nanostl::size_t& counter, nanostl::size_t& count) noexcept {
   value = value * 10 + limb(*p - '0');
   p++;
   counter++;
@@ -213,7 +213,7 @@ void add_native(bigint& big, limb power, limb value) noexcept {
   big.add(value);
 }
 
-fastfloat_really_inline void round_up_bigint(bigint& big, size_t& count) noexcept {
+fastfloat_really_inline void round_up_bigint(bigint& big, nanostl::size_t& count) noexcept {
   // need to round-up the digits, but need to avoid rounding
   // ....9999 to ...10000, which could cause a false halfway point.
   add_native(big, 10, 1);
@@ -221,17 +221,17 @@ fastfloat_really_inline void round_up_bigint(bigint& big, size_t& count) noexcep
 }
 
 // parse the significant digits into a big integer
-inline void parse_mantissa(bigint& result, parsed_number_string& num, size_t max_digits, size_t& digits) noexcept {
+inline void parse_mantissa(bigint& result, parsed_number_string& num, nanostl::size_t max_digits, nanostl::size_t& digits) noexcept {
   // try to minimize the number of big integer and scalar multiplication.
   // therefore, try to parse 8 digits at a time, and multiply by the largest
   // scalar value (9 or 19 digits) for each step.
-  size_t counter = 0;
+  nanostl::size_t counter = 0;
   digits = 0;
   limb value = 0;
 #ifdef FASTFLOAT_64BIT_LIMB
-  size_t step = 19;
+  nanostl::size_t step = 19;
 #else
-  size_t step = 9;
+  nanostl::size_t step = 9;
 #endif
 
   // process all integer digits.
@@ -240,7 +240,7 @@ inline void parse_mantissa(bigint& result, parsed_number_string& num, size_t max
   skip_zeros(p, pend);
   // process all digits, in increments of step per loop
   while (p != pend) {
-    while ((std::distance(p, pend) >= 8) && (step - counter >= 8) && (max_digits - digits >= 8)) {
+    while ((nanostl::distance(p, pend) >= 8) && (step - counter >= 8) && (max_digits - digits >= 8)) {
       parse_eight_digits(p, value, counter, digits);
     }
     while (counter < step && p != pend && digits < max_digits) {
@@ -273,7 +273,7 @@ inline void parse_mantissa(bigint& result, parsed_number_string& num, size_t max
     }
     // process all digits, in increments of step per loop
     while (p != pend) {
-      while ((std::distance(p, pend) >= 8) && (step - counter >= 8) && (max_digits - digits >= 8)) {
+      while ((nanostl::distance(p, pend) >= 8) && (step - counter >= 8) && (max_digits - digits >= 8)) {
         parse_eight_digits(p, value, counter, digits);
       }
       while (counter < step && p != pend && digits < max_digits) {
@@ -389,8 +389,8 @@ inline adjusted_mantissa digit_comp(parsed_number_string& num, adjusted_mantissa
   am.power2 -= invalid_am_bias;
 
   int32_t sci_exp = scientific_exponent(num);
-  size_t max_digits = binary_format<T>::max_digits();
-  size_t digits = 0;
+  nanostl::size_t max_digits = binary_format<T>::max_digits();
+  nanostl::size_t digits = 0;
   bigint bigmant;
   parse_mantissa(bigmant, num, max_digits, digits);
   // can't underflow, since digits is at most max_digits.

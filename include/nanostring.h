@@ -255,10 +255,12 @@ NANOSTL_HOST_AND_DEVICE_QUAL
 string to_string(double value);
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-float stof(const nanostl::string &str, nanostl::size_t *idx = nullptr);
+float stof(const string &str, size_t *idx = nullptr);
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-float stod(const nanostl::string &str, nanostl::size_t *idx = nullptr);
+float stod(const string &str, size_t *idx = nullptr);
+
+}  // namespace nanostl
 
 #if defined(NANOSTL_IMPLEMENTATION)
 #ifndef NANOSTL_STRING_IMPLEMENTATION
@@ -269,6 +271,8 @@ float stod(const nanostl::string &str, nanostl::size_t *idx = nullptr);
 #if defined(NANOSTL_STRING_IMPLEMENTATION)
 
 #include "fast_float/fast_float.h"
+
+namespace nanostl {
 
 NANOSTL_HOST_AND_DEVICE_QUAL
 string to_string(int value) {
@@ -402,7 +406,7 @@ float stof(const nanostl::string &str, nanostl::size_t *idx) {
 #endif
 
 NANOSTL_HOST_AND_DEVICE_QUAL
-float stod(const nanostl::string &str, nanostl::size_t *idx) {
+float stod(const string &str, size_t *idx) {
   (void)idx;  // TODO(LTE):
   double value;
   ryu::RyuStatus ret = ryu::s2d_n(str.c_str(), str.size(), &value);
@@ -414,8 +418,10 @@ float stod(const nanostl::string &str, nanostl::size_t *idx) {
 
   return value;
 }
-#endif
 
 }  // namespace nanostl
+
+#endif // NANOSTL_STRING_IMPLEMENTATION
+
 
 #endif  // NANOSTL_STRING_H_

@@ -1788,7 +1788,7 @@ using optional_lite::make_optional;
 namespace nanostl {
 
 template< class T >
-struct nanostl::hash< nonstd::optional<T> >
+struct hash< nonstd::optional<T> >
 {
 public:
     nanostl::size_t operator()( nonstd::optional<T> const & v ) const optional_noexcept

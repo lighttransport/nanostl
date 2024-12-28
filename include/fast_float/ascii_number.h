@@ -4,7 +4,7 @@
 //#include <cctype>
 #include "nanocstdint.h"
 #include "nanocstring.h"
-#include <iterator>
+#include "nanoiterator.h"
 
 #include "float_common.h"
 
@@ -14,7 +14,7 @@ namespace fast_float {
 // able to optimize it well.
 fastfloat_really_inline bool is_integer(char c)  noexcept  { return c >= '0' && c <= '9'; }
 
-fastfloat_really_inline uint64_t byteswap(uint64_t val) {
+fastfloat_really_inline nanostl::uint64_t byteswap(nanostl::uint64_t val) {
   return (val & 0xFF00000000000000) >> 56
     | (val & 0x00FF000000000000) >> 40
     | (val & 0x0000FF0000000000) >> 24
@@ -25,9 +25,9 @@ fastfloat_really_inline uint64_t byteswap(uint64_t val) {
     | (val & 0x00000000000000FF) << 56;
 }
 
-fastfloat_really_inline uint64_t read_u64(const char *chars) {
-  uint64_t val;
-  ::memcpy(&val, chars, sizeof(uint64_t));
+fastfloat_really_inline nanostl::uint64_t read_u64(const char *chars) {
+  nanostl::uint64_t val;
+  nanostl::memcpy(&val, chars, sizeof(nanostl::uint64_t));
 #if FASTFLOAT_IS_BIG_ENDIAN == 1
   // Need to read as-if the number was in little-endian order.
   val = byteswap(val);
@@ -35,31 +35,31 @@ fastfloat_really_inline uint64_t read_u64(const char *chars) {
   return val;
 }
 
-fastfloat_really_inline void write_u64(uint8_t *chars, uint64_t val) {
+fastfloat_really_inline void write_u64(nanostl::uint8_t *chars, nanostl::uint64_t val) {
 #if FASTFLOAT_IS_BIG_ENDIAN == 1
   // Need to read as-if the number was in little-endian order.
   val = byteswap(val);
 #endif
-  ::memcpy(chars, &val, sizeof(uint64_t));
+  nanostl::memcpy(chars, &val, sizeof(nanostl::uint64_t));
 }
 
 // credit  @aqrit
-fastfloat_really_inline uint32_t  parse_eight_digits_unrolled(uint64_t val) {
-  const uint64_t mask = 0x000000FF000000FF;
-  const uint64_t mul1 = 0x000F424000000064; // 100 + (1000000ULL << 32)
-  const uint64_t mul2 = 0x0000271000000001; // 1 + (10000ULL << 32)
+fastfloat_really_inline nanostl::uint32_t  parse_eight_digits_unrolled(nanostl::uint64_t val) {
+  const nanostl::uint64_t mask = 0x000000FF000000FF;
+  const nanostl::uint64_t mul1 = 0x000F424000000064; // 100 + (1000000ULL << 32)
+  const nanostl::uint64_t mul2 = 0x0000271000000001; // 1 + (10000ULL << 32)
   val -= 0x3030303030303030;
   val = (val * 10) + (val >> 8); // val = (val * 2561) >> 8;
   val = (((val & mask) * mul1) + (((val >> 16) & mask) * mul2)) >> 32;
-  return uint32_t(val);
+  return nanostl::uint32_t(val);
 }
 
-fastfloat_really_inline uint32_t parse_eight_digits_unrolled(const char *chars)  noexcept  {
+fastfloat_really_inline nanostl::uint32_t parse_eight_digits_unrolled(const char *chars)  noexcept  {
   return parse_eight_digits_unrolled(read_u64(chars));
 }
 
 // credit @aqrit
-fastfloat_really_inline bool is_made_of_eight_digits_fast(uint64_t val)  noexcept  {
+fastfloat_really_inline bool is_made_of_eight_digits_fast(nanostl::uint64_t val)  noexcept  {
   return !((((val + 0x4646464646464646) | (val - 0x3030303030303030)) &
      0x8080808080808080));
 }
@@ -71,8 +71,8 @@ fastfloat_really_inline bool is_made_of_eight_digits_fast(const char *chars)  no
 typedef span<const char> byte_span;
 
 struct parsed_number_string {
-  int64_t exponent{0};
-  uint64_t mantissa{0};
+  nanostl::int64_t exponent{0};
+  nanostl::uint64_t mantissa{0};
   const char *lastmatch{nullptr};
   bool negative{false};
   bool valid{false};
@@ -104,9 +104,9 @@ parsed_number_string parse_number_string(const char *p, const char *pend, parse_
   }
   const char *const start_digits = p;
 
-  uint64_t i = 0; // an unsigned int avoids signed overflows (which are bad)
+  nanostl::uint64_t i = 0; // an unsigned int avoids signed overflows (which are bad)
 
-  while ((std::distance(p, pend) >= 8) && is_made_of_eight_digits_fast(p)) {
+  while ((nanostl::distance(p, pend) >= 8) && is_made_of_eight_digits_fast(p)) {
     i = i * 100000000 + parse_eight_digits_unrolled(p); // in rare cases, this will overflow, but that's ok
     p += 8;
   }
@@ -114,36 +114,36 @@ parsed_number_string parse_number_string(const char *p, const char *pend, parse_
     // a multiplication by 10 is cheaper than an arbitrary integer
     // multiplication
     i = 10 * i +
-        uint64_t(*p - '0'); // might overflow, we will handle the overflow later
+        nanostl::uint64_t(*p - '0'); // might overflow, we will handle the overflow later
     ++p;
   }
   const char *const end_of_integer_part = p;
-  int64_t digit_count = int64_t(end_of_integer_part - start_digits);
-  answer.integer = byte_span(start_digits, size_t(digit_count));
-  int64_t exponent = 0;
+  nanostl::int64_t digit_count = nanostl::int64_t(end_of_integer_part - start_digits);
+  answer.integer = byte_span(start_digits, nanostl::size_t(digit_count));
+  nanostl::int64_t exponent = 0;
   if ((p != pend) && (*p == decimal_point)) {
     ++p;
     const char* before = p;
     // can occur at most twice without overflowing, but let it occur more, since
     // for integers with many digits, digit parsing is the primary bottleneck.
-    while ((std::distance(p, pend) >= 8) && is_made_of_eight_digits_fast(p)) {
+    while ((nanostl::distance(p, pend) >= 8) && is_made_of_eight_digits_fast(p)) {
       i = i * 100000000 + parse_eight_digits_unrolled(p); // in rare cases, this will overflow, but that's ok
       p += 8;
     }
     while ((p != pend) && is_integer(*p)) {
-      uint8_t digit = uint8_t(*p - '0');
+      nanostl::uint8_t digit = nanostl::uint8_t(*p - '0');
       ++p;
       i = i * 10 + digit; // in rare cases, this will overflow, but that's ok
     }
     exponent = before - p;
-    answer.fraction = byte_span(before, size_t(p - before));
+    answer.fraction = byte_span(before, nanostl::size_t(p - before));
     digit_count -= exponent;
   }
   // we must have encountered at least one integer!
   if (digit_count == 0) {
     return answer;
   }
-  int64_t exp_number = 0;            // explicit exponential part
+  nanostl::int64_t exp_number = 0;            // explicit exponential part
   if ((fmt & chars_format::scientific) && (p != pend) && (('e' == *p) || ('E' == *p))) {
     const char * location_of_e = p;
     ++p;
@@ -163,7 +163,7 @@ parsed_number_string parse_number_string(const char *p, const char *pend, parse_
       p = location_of_e;
     } else {
       while ((p != pend) && is_integer(*p)) {
-        uint8_t digit = uint8_t(*p - '0');
+        nanostl::uint8_t digit = nanostl::uint8_t(*p - '0');
         if (exp_number < 0x10000000) {
           exp_number = 10 * exp_number + digit;
         }
@@ -202,9 +202,9 @@ parsed_number_string parse_number_string(const char *p, const char *pend, parse_
       i = 0;
       p = answer.integer.ptr;
       const char* int_end = p + answer.integer.len();
-      const uint64_t minimal_nineteen_digit_integer{1000000000000000000};
+      const nanostl::uint64_t minimal_nineteen_digit_integer{1000000000000000000};
       while((i < minimal_nineteen_digit_integer) && (p != int_end)) {
-        i = i * 10 + uint64_t(*p - '0');
+        i = i * 10 + nanostl::uint64_t(*p - '0');
         ++p;
       }
       if (i >= minimal_nineteen_digit_integer) { // We have a big integers
@@ -213,7 +213,7 @@ parsed_number_string parse_number_string(const char *p, const char *pend, parse_
           p = answer.fraction.ptr;
           const char* frac_end = p + answer.fraction.len();
           while((i < minimal_nineteen_digit_integer) && (p != frac_end)) {
-            i = i * 10 + uint64_t(*p - '0');
+            i = i * 10 + nanostl::uint64_t(*p - '0');
             ++p;
           }
           exponent = answer.fraction.ptr - p + exp_number;

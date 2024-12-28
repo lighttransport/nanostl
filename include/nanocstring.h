@@ -43,6 +43,28 @@ inline void *memcpy(void *dest, const void *src, unsigned long long num)
   return dest;
 }
 
+// Naiive implementation of memmove
+NANOSTL_HOST_AND_DEVICE_QUAL
+inline void *memmove(void *dest, const void *src, unsigned long long num)
+{
+  unsigned char *d_ptr = reinterpret_cast<unsigned char *>(dest);
+  const unsigned char *s_ptr = reinterpret_cast<const unsigned char *>(src);
+
+  unsigned char *tmp_ptr = new unsigned char[num];
+
+  for (unsigned long long i = 0; i < num; i++) {
+    tmp_ptr[i] = s_ptr[i];
+  }
+
+  for (unsigned long long i = 0; i < num; i++) {
+    d_ptr[i] = tmp_ptr[i];
+  }
+
+  delete [] tmp_ptr;
+
+  return dest;
+}
+
 }  // namespace nanostl
 
 #endif  // NANOSTL_CSTRING_H_
