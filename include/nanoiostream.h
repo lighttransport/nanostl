@@ -216,14 +216,24 @@ namespace nanostl {
 
 #ifndef NANOSTL_NO_IO
 
+#if __clang__
 #if __has_feature(cxx_alignas)
 #define _ALIGNAS_TYPE(x) alignas(x)
 #define _ALIGNAS(x) alignas(x)
 #else
-#error TODO
-#define _ALIGNAS_TYPE(x) __attribute__((__aligned__(_LIBCPP_ALIGNOF(x))))
+//#error TODO
+//#define _ALIGNAS_TYPE(x) __attribute__((__aligned__(_LIBCPP_ALIGNOF(x))))
 #define _ALIGNAS(x) __attribute__((__aligned__(x)))
 #endif
+#else // !__clang__
+#ifdef _MSC_VER
+#define _ALIGNAS_TYPE(x) alignas(x)
+#define _ALIGNAS(x) alignas(x)
+#else
+// Assume gcc
+#define _ALIGNAS(x) __attribute__((__aligned__(x)))
+#endif
+#endif // __clang__
 
 ios_base::~ios_base() {
   // TODO

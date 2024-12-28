@@ -134,13 +134,13 @@ Be careful! Not all C++ STL functions are supported for each module.
 
 Even though NanoSTL should be compilable with older and various C++ compilers, at least following compilers shold work well.
 
-* gcc 4.4.7+
-  * NanoSTL itself can be compilable with gcc 4.2.4(fails to compile Catch unit test code)
+* gcc 4.8+
+  * NOTE: it may cause compilation error when mixing gnustl headers and nanostl.
 * clang 3.4+
 
 ## Supported threading library
 
-For `thread` and parallel STL feature, threading library is required.
+For `thread` and parallel STL feature(W.I.P.), threading library is required.
 
 * pthread(non-Windows)
 * Win32 thread(Windows)
@@ -201,8 +201,8 @@ This is useful if you want to use NanoSTL as a header-only library
   * [ ] Unit tests on CUDA platform
   * [ ] Write mote unit tests for CPU platform
 * [ ] Multithread support
-* [ ] Backport of some C++11 features(e.g. `unordered_map`)
-* [ ] Replace oiio math functions so that we can have clean MIT licensed code.
+* [ ] `unordered_map`
+* [ ] Replace oiio math functions so that we can have clean MIT or Apache 2.0 licensed code(ref. `llvmlibc`).
 * [ ] FLOAT16 and BFLOAT16 support.
 * [ ] C++17 parallel STL
 
