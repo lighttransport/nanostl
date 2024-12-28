@@ -388,9 +388,8 @@ string to_string(double value) {
   return string(buf);
 }
 
-#if 0
 NANOSTL_HOST_AND_DEVICE_QUAL
-float stof(const nanostl::string &str, nanostl::size_t *idx) {
+float stof(const string &str, size_t *idx) {
   (void)idx;  // TODO(LTE):
   float value;
   ryu::RyuStatus ret = ryu::s2f_n(str.c_str(), str.size(), &value);
@@ -402,8 +401,6 @@ float stof(const nanostl::string &str, nanostl::size_t *idx) {
 
   return value;
 }
-#else
-#endif
 
 NANOSTL_HOST_AND_DEVICE_QUAL
 float stod(const string &str, size_t *idx) {

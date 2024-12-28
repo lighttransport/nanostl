@@ -23,9 +23,9 @@ constexpr static nanostl::uint64_t powers_of_ten_uint64[] = {
 // this algorithm is not even close to optimized, but it has no practical
 // effect on performance: in order to have a faster algorithm, we'd need
 // to slow down performance for faster algorithms, and this is still fast.
-fastfloat_really_inline int32_t scientific_exponent(parsed_number_string& num) noexcept {
-  uint64_t mantissa = num.mantissa;
-  int32_t exponent = int32_t(num.exponent);
+fastfloat_really_inline nanostl::int32_t scientific_exponent(parsed_number_string& num) noexcept {
+  nanostl::uint64_t mantissa = num.mantissa;
+  nanostl::int32_t exponent = nanostl::int32_t(num.exponent);
   while (mantissa >= 10000) {
     mantissa /= 10000;
     exponent += 4;
@@ -50,7 +50,7 @@ fastfloat_really_inline adjusted_mantissa to_extended(T value) noexcept {
   constexpr equiv_uint hidden_bit_mask = binary_format<T>::hidden_bit_mask();
 
   adjusted_mantissa am;
-  int32_t bias = binary_format<T>::mantissa_explicit_bits() - binary_format<T>::minimum_exponent();
+  nanostl::int32_t bias = binary_format<T>::mantissa_explicit_bits() - binary_format<T>::minimum_exponent();
   equiv_uint bits;
   ::nanostl::memcpy(&bits, &value, sizeof(T));
   if ((bits & exponent_mask) == 0) {
@@ -59,7 +59,7 @@ fastfloat_really_inline adjusted_mantissa to_extended(T value) noexcept {
     am.mantissa = bits & mantissa_mask;
   } else {
     // normal
-    am.power2 = int32_t((bits & exponent_mask) >> binary_format<T>::mantissa_explicit_bits());
+    am.power2 = nanostl::int32_t((bits & exponent_mask) >> binary_format<T>::mantissa_explicit_bits());
     am.power2 -= bias;
     am.mantissa = (bits & mantissa_mask) | hidden_bit_mask;
   }
@@ -82,13 +82,13 @@ fastfloat_really_inline adjusted_mantissa to_extended_halfway(T value) noexcept 
 // round an extended-precision float to the nearest machine float.
 template <typename T, typename callback>
 fastfloat_really_inline void round(adjusted_mantissa& am, callback cb) noexcept {
-  int32_t mantissa_shift = 64 - binary_format<T>::mantissa_explicit_bits() - 1;
+  nanostl::int32_t mantissa_shift = 64 - binary_format<T>::mantissa_explicit_bits() - 1;
   if (-am.power2 >= mantissa_shift) {
     // have a denormal float
-    int32_t shift = -am.power2 + 1;
-    cb(am, ::nanostl::min<int32_t>(shift, 64));
+    nanostl::int32_t shift = -am.power2 + 1;
+    cb(am, ::nanostl::min<nanostl::int32_t>(shift, 64));
     // check for round-up: if rounding-nearest carried us to the hidden bit.
-    am.power2 = (am.mantissa < (uint64_t(1) << binary_format<T>::mantissa_explicit_bits())) ? 0 : 1;
+    am.power2 = (am.mantissa < (nanostl::uint64_t(1) << binary_format<T>::mantissa_explicit_bits())) ? 0 : 1;
     return;
   }
 
@@ -96,13 +96,13 @@ fastfloat_really_inline void round(adjusted_mantissa& am, callback cb) noexcept 
   cb(am, mantissa_shift);
 
   // check for carry
-  if (am.mantissa >= (uint64_t(2) << binary_format<T>::mantissa_explicit_bits())) {
-    am.mantissa = (uint64_t(1) << binary_format<T>::mantissa_explicit_bits());
+  if (am.mantissa >= (nanostl::uint64_t(2) << binary_format<T>::mantissa_explicit_bits())) {
+    am.mantissa = (nanostl::uint64_t(1) << binary_format<T>::mantissa_explicit_bits());
     am.power2++;
   }
 
   // check for infinite: we could have carried to an infinite power
-  am.mantissa &= ~(uint64_t(1) << binary_format<T>::mantissa_explicit_bits());
+  am.mantissa &= ~(nanostl::uint64_t(1) << binary_format<T>::mantissa_explicit_bits());
   if (am.power2 >= binary_format<T>::infinite_power()) {
     am.power2 = binary_format<T>::infinite_power();
     am.mantissa = 0;
@@ -111,22 +111,22 @@ fastfloat_really_inline void round(adjusted_mantissa& am, callback cb) noexcept 
 
 template <typename callback>
 fastfloat_really_inline
-void round_nearest_tie_even(adjusted_mantissa& am, int32_t shift, callback cb) noexcept {
-  uint64_t mask;
-  uint64_t halfway;
+void round_nearest_tie_even(adjusted_mantissa& am, nanostl::int32_t shift, callback cb) noexcept {
+  nanostl::uint64_t mask;
+  nanostl::uint64_t halfway;
   if (shift == 64) {
     mask = 18446744073709551615ull; // UINT64_MAX;
   } else {
-    mask = (uint64_t(1) << shift) - 1;
+    mask = (nanostl::uint64_t(1) << shift) - 1;
   }
   if (shift == 0) {
     halfway = 0;
   } else {
-    halfway = uint64_t(1) << (shift - 1);
+    halfway = nanostl::uint64_t(1) << (shift - 1);
   }
-  uint64_t truncated_bits = am.mantissa & mask;
-  uint64_t is_above = truncated_bits > halfway;
-  uint64_t is_halfway = truncated_bits == halfway;
+  nanostl::uint64_t truncated_bits = am.mantissa & mask;
+  nanostl::uint64_t is_above = truncated_bits > halfway;
+  nanostl::uint64_t is_halfway = truncated_bits == halfway;
 
   // shift digits into position
   if (shift == 64) {
@@ -137,10 +137,10 @@ void round_nearest_tie_even(adjusted_mantissa& am, int32_t shift, callback cb) n
   am.power2 += shift;
 
   bool is_odd = (am.mantissa & 1) == 1;
-  am.mantissa += uint64_t(cb(is_odd, is_halfway, is_above));
+  am.mantissa += nanostl::uint64_t(cb(is_odd, is_halfway, is_above));
 }
 
-fastfloat_really_inline void round_down(adjusted_mantissa& am, int32_t shift) noexcept {
+fastfloat_really_inline void round_down(adjusted_mantissa& am, nanostl::int32_t shift) noexcept {
   if (shift == 64) {
     am.mantissa = 0;
   } else {
@@ -150,9 +150,9 @@ fastfloat_really_inline void round_down(adjusted_mantissa& am, int32_t shift) no
 }
 
 fastfloat_really_inline void skip_zeros(const char*& first, const char* last) noexcept {
-  uint64_t val;
+  nanostl::uint64_t val;
   while (nanostl::distance(first, last) >= 8) {
-    ::nanostl::memcpy(&val, first, sizeof(uint64_t));
+    ::nanostl::memcpy(&val, first, sizeof(nanostl::uint64_t));
     if (val != 0x3030303030303030) {
       break;
     }
@@ -170,9 +170,9 @@ fastfloat_really_inline void skip_zeros(const char*& first, const char* last) no
 // all characters must be valid digits.
 fastfloat_really_inline bool is_truncated(const char* first, const char* last) noexcept {
   // do 8-bit optimizations, can just compare to 8 literal 0s.
-  uint64_t val;
+  nanostl::uint64_t val;
   while (nanostl::distance(first, last) >= 8) {
-    ::nanostl::memcpy(&val, first, sizeof(uint64_t));
+    ::nanostl::memcpy(&val, first, sizeof(nanostl::uint64_t));
     if (val != 0x3030303030303030) {
       return true;
     }
@@ -301,15 +301,15 @@ inline void parse_mantissa(bigint& result, parsed_number_string& num, nanostl::s
 }
 
 template <typename T>
-inline adjusted_mantissa positive_digit_comp(bigint& bigmant, int32_t exponent) noexcept {
-  FASTFLOAT_ASSERT(bigmant.pow10(uint32_t(exponent)));
+inline adjusted_mantissa positive_digit_comp(bigint& bigmant, nanostl::int32_t exponent) noexcept {
+  FASTFLOAT_ASSERT(bigmant.pow10(nanostl::uint32_t(exponent)));
   adjusted_mantissa answer;
   bool truncated;
   answer.mantissa = bigmant.hi64(truncated);
   int bias = binary_format<T>::mantissa_explicit_bits() - binary_format<T>::minimum_exponent();
   answer.power2 = bigmant.bit_length() - 64 + bias;
 
-  round<T>(answer, [truncated](adjusted_mantissa& a, int32_t shift) {
+  round<T>(answer, [truncated](adjusted_mantissa& a, nanostl::int32_t shift) {
     round_nearest_tie_even(a, shift, [truncated](bool is_odd, bool is_halfway, bool is_above) -> bool {
       return is_above || (is_halfway && truncated) || (is_odd && is_halfway);
     });
@@ -324,36 +324,36 @@ inline adjusted_mantissa positive_digit_comp(bigint& bigmant, int32_t exponent) 
 // we then need to scale by `2^(f- e)`, and then the two significant digits
 // are of the same magnitude.
 template <typename T>
-inline adjusted_mantissa negative_digit_comp(bigint& bigmant, adjusted_mantissa am, int32_t exponent) noexcept {
+inline adjusted_mantissa negative_digit_comp(bigint& bigmant, adjusted_mantissa am, nanostl::int32_t exponent) noexcept {
   bigint& real_digits = bigmant;
-  int32_t real_exp = exponent;
+  nanostl::int32_t real_exp = exponent;
 
   // get the value of `b`, rounded down, and get a bigint representation of b+h
   adjusted_mantissa am_b = am;
   // gcc7 buf: use a lambda to remove the noexcept qualifier bug with -Wnoexcept-type.
-  round<T>(am_b, [](adjusted_mantissa&a, int32_t shift) { round_down(a, shift); });
+  round<T>(am_b, [](adjusted_mantissa&a, nanostl::int32_t shift) { round_down(a, shift); });
   T b;
   to_float(false, am_b, b);
   adjusted_mantissa theor = to_extended_halfway(b);
   bigint theor_digits(theor.mantissa);
-  int32_t theor_exp = theor.power2;
+  nanostl::int32_t theor_exp = theor.power2;
 
   // scale real digits and theor digits to be same power.
-  int32_t pow2_exp = theor_exp - real_exp;
-  uint32_t pow5_exp = uint32_t(-real_exp);
+  nanostl::int32_t pow2_exp = theor_exp - real_exp;
+  nanostl::uint32_t pow5_exp = nanostl::uint32_t(-real_exp);
   if (pow5_exp != 0) {
     FASTFLOAT_ASSERT(theor_digits.pow5(pow5_exp));
   }
   if (pow2_exp > 0) {
-    FASTFLOAT_ASSERT(theor_digits.pow2(uint32_t(pow2_exp)));
+    FASTFLOAT_ASSERT(theor_digits.pow2(nanostl::uint32_t(pow2_exp)));
   } else if (pow2_exp < 0) {
-    FASTFLOAT_ASSERT(real_digits.pow2(uint32_t(-pow2_exp)));
+    FASTFLOAT_ASSERT(real_digits.pow2(nanostl::uint32_t(-pow2_exp)));
   }
 
   // compare digits, and use it to director rounding
   int ord = real_digits.compare(theor_digits);
   adjusted_mantissa answer = am;
-  round<T>(answer, [ord](adjusted_mantissa& a, int32_t shift) {
+  round<T>(answer, [ord](adjusted_mantissa& a, nanostl::int32_t shift) {
     round_nearest_tie_even(a, shift, [ord](bool is_odd, bool _, bool __) -> bool {
       (void)_;  // not needed, since we've done our comparison
       (void)__; // not needed, since we've done our comparison
@@ -388,13 +388,13 @@ inline adjusted_mantissa digit_comp(parsed_number_string& num, adjusted_mantissa
   // remove the invalid exponent bias
   am.power2 -= invalid_am_bias;
 
-  int32_t sci_exp = scientific_exponent(num);
+  nanostl::int32_t sci_exp = scientific_exponent(num);
   nanostl::size_t max_digits = binary_format<T>::max_digits();
   nanostl::size_t digits = 0;
   bigint bigmant;
   parse_mantissa(bigmant, num, max_digits, digits);
   // can't underflow, since digits is at most max_digits.
-  int32_t exponent = sci_exp + 1 - int32_t(digits);
+  nanostl::int32_t exponent = sci_exp + 1 - nanostl::int32_t(digits);
   if (exponent >= 0) {
     return positive_digit_comp<T>(bigmant, exponent);
   } else {

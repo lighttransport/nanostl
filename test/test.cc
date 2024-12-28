@@ -23,14 +23,15 @@
 
 #include "__nanostrutil.h"
 
-//#include <cstdio>
-//#include <cstdlib>
-//#include <cstdint>
-//#include <cassert>
-//#include <cmath>
-//#include <iostream>
-//#include <vector>
-//#include <valarray>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdint>
+#include <cassert>
+#include <cmath>
+#include <iostream>
+#include <vector>
+#include <valarray>
+#include <typeinfo>
 
 #include "nanoiterator.h"
 
