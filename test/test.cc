@@ -22,6 +22,7 @@
 //#include "nanoexpected.h"
 
 #include "__nanostrutil.h"
+#include "nanotypeinfo.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -158,6 +159,8 @@ static void test_vector(void) {
   TEST_CHECK(v[2] == 3);
   TEST_CHECK(v[3] == 4);
   TEST_CHECK(v[4] == 5);
+
+  TEST_CHECK(v.back() == 5);
 
   v.resize(3);
   TEST_CHECK(v.at(0) == 1);

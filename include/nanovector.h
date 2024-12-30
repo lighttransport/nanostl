@@ -151,6 +151,14 @@ class vector {
     return elements_ + size_;
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL reference back(void) {
+    return elements_[size_ - 1];
+  }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL const_reference back(void) const {
+    return elements_[size_ - 1];
+  }
+
   NANOSTL_HOST_AND_DEVICE_QUAL inline void pop_back() {
     if (size_ < 1) {
       // this should be undefined behavior
