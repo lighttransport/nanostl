@@ -28,6 +28,7 @@
 #include "nanoalgorithm.h"
 #include "nanocommon.h"
 #include "nanolimits.h"
+#include "nanocstring.h"
 
 //
 // Implements some <cmath> functionality.
@@ -389,11 +390,22 @@ static inline float copysign(const float x, const float y) {
 //  public domain sources or open source packages with compatible licenses.
 //  The individual functions give references were applicable.
 
+#define kM_PI (3.14159265358979323846264338327950288)
 #define kM_1_PI (0.318309886183790671537767526745028724)
 #define kM_PI_2 (1.57079632679489661923132169163975144)
 #define kM_PI_4 (0.785398163397448309615660845819875721)
 #define kM_LN2 (0.69314718055994530941723212145817656)
 #define kM_LN10 (2.30258509299404568401799145468436421)
+
+template <typename IN_TYPE, typename OUT_TYPE>
+inline OUT_TYPE bit_cast (const IN_TYPE in) {
+    // NOTE: this is the only standards compliant way of doing this type of casting,
+    // luckily the compilers we care about know how to optimize away this idiom.
+    OUT_TYPE out;
+    nanostl::memcpy (reinterpret_cast<void *>(&out), &in, sizeof(IN_TYPE));
+    return out;
+}
+
 
 /// Fused multiply and add: (a*b + c)
 static inline float madd(float a, float b, float c) { return a * b + c; }
@@ -410,7 +422,7 @@ static inline float fast_exp2(const float& xval) {
   float x = clamp(xval, -126.0f, 126.0f);
   // range reduction
   int m = int(x);
-  x -= m;
+  x -= float(m);
   x = 1.0f - (1.0f - x);  // crush denormals (does not affect max ulps!)
   // 5th degree polynomial generated with sollya
   // Examined 2247622658 values of exp2 on [-126,126]: 2.75764912 avg ulp diff,
@@ -463,7 +475,7 @@ static inline float fast_log2(const float& xval) {
   hi = madd(f, hi, 0.24187369696082f);
   hi = madd(f, hi, -0.34730547155299f);
   lo = madd(f, lo, 1.442689881667200f);
-  return ((f4 * hi) + (f * lo)) + exponent;
+  return ((f4 * hi) + (f * lo)) + float(exponent);
 }
 
 static inline float log(const float& x) {
@@ -549,7 +561,7 @@ static inline float sin(float x) {
   // Examined 2173837240 values of sin: 0.00662760244 avg ulp diff, 2 max
   // ulp, 1.19209e-07 max error
   int q = fast_rint(x * float(kM_1_PI));
-  float qf = q;
+  float qf = float(q);
   x = madd(qf, -0.78515625f * 4, x);
   x = madd(qf, -0.00024187564849853515625f * 4, x);
   x = madd(qf, -3.7747668102383613586e-08f * 4, x);
@@ -574,7 +586,7 @@ static inline float sin(float x) {
 static inline float cos(float x) {
   // same argument reduction as fast_sin
   int q = fast_rint(x * float(kM_1_PI));
-  float qf = q;
+  float qf = float(q);
   x = madd(qf, -0.78515625f * 4, x);
   x = madd(qf, -0.00024187564849853515625f * 4, x);
   x = madd(qf, -3.7747668102383613586e-08f * 4, x);
@@ -602,7 +614,7 @@ static inline float tan(float x) {
   // note that we cannot apply the "denormal crush" trick everywhere because
   // we sometimes need to take the reciprocal of the polynomial
   int q = fast_rint(x * float(2 * kM_1_PI));
-  float qf = q;
+  float qf = float(q);
   x = madd(qf, -0.78515625f * 2, x);
   x = madd(qf, -0.00024187564849853515625f * 2, x);
   x = madd(qf, -3.7747668102383613586e-08f * 2, x);
@@ -622,6 +634,41 @@ static inline float tan(float x) {
   if ((q & 1) != 0) u = -1.0f / u;
   return u;
 }
+
+inline float atan (float x) {
+      const float a = fabs(x);
+      const float k = a > 1.0f ? 1 / a : a;
+      const float s = 1.0f - (1.0f - k); // crush denormals
+      const float t = s * s;
+      // http://mathforum.org/library/drmath/view/62672.html
+      // the coefficients were tuned in mathematica with the assumption that we want atan(1)=pi/4
+      // (slightly higher error but no discontinuities)
+      // Examined 4278190080 values of atan: 2.53989068 avg ulp diff, 315 max ulp, 9.17912e-06 max error        // (with  denormals)
+      // Examined 4278190080 values of atan: 171160502 avg ulp diff, 855638016 max ulp, 9.17912e-06 max error   // (crush denormals)
+      float r = s * madd(0.430165678f, t, 1.0f) / madd(madd(0.0579354987f, t, 0.763007998f), t, 1.0f);
+      if (a > 1.0f) r = 1.570796326794896557998982f - r;
+      return copysign(r, x);
+}
+
+inline float atan2 (float y, float x) {
+      // based on atan approximation above
+      // the special cases around 0 and infinity were tested explicitly
+      // the only case not handled correctly is x=NaN,y=0 which returns 0 instead of nan
+      const float a = fabs(x);
+      const float b = fabs(y);
+
+      const float k = (b == 0) ? 0.0f : ((a == b) ? 1.0f : (b > a ? a / b : b / a));
+      const float s = 1.0f - (1.0f - k); // crush denormals
+      const float t = s * s;
+
+      float r = s * madd(0.430165678f, t, 1.0f) / madd(madd(0.0579354987f, t, 0.763007998f), t, 1.0f);
+
+      if (b > a) r = 1.570796326794896557998982f - r; // account for arg reduction
+      if (bit_cast<float, unsigned>(x) & 0x80000000u) // test sign bit of x
+          r = float(kM_PI) - r;
+      return copysign(r, y);
+}
+
 
 static inline float sinh(float x) {
   float a = fabs(x);
