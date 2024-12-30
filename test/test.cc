@@ -160,6 +160,7 @@ static void test_vector(void) {
   TEST_CHECK(v[3] == 4);
   TEST_CHECK(v[4] == 5);
 
+  TEST_CHECK(v.front() == 1);
   TEST_CHECK(v.back() == 5);
 
   v.resize(3);

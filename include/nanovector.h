@@ -151,6 +151,14 @@ class vector {
     return elements_ + size_;
   }
 
+  NANOSTL_HOST_AND_DEVICE_QUAL reference front(void) {
+    return elements_[0];
+  }
+
+  NANOSTL_HOST_AND_DEVICE_QUAL const_reference front(void) const {
+    return elements_[0];
+  }
+
   NANOSTL_HOST_AND_DEVICE_QUAL reference back(void) {
     return elements_[size_ - 1];
   }
