@@ -15,6 +15,7 @@
 #include "nanovector.h"
 #include "nanovalarray.h"
 #include "nanomemory.h"
+#include "nanonumeric.h"
 
 #include "nanooptional.h"
 //#include "nanoany.h"
@@ -33,6 +34,7 @@
 #include <vector>
 #include <valarray>
 #include <typeinfo>
+#include <numeric>
 
 #include "nanoiterator.h"
 
@@ -666,6 +668,24 @@ static void test_variant(void) {
   TEST_CHECK(nanostl::get_if<int>(&a) == nullptr);
 }
 
+static void test_accumulate(void) {
+  nanostl::vector<double> a;
+  a.push_back(1);
+  a.push_back(2);
+  a.push_back(3);
+  a.push_back(4);
+  a.push_back(5);
+  a.push_back(6);
+  a.push_back(7);
+  a.push_back(8);
+  a.push_back(9);
+  a.push_back(10);
+
+  double sum = nanostl::accumulate(a.begin(), a.end(), 0);
+  TEST_CHECK(float_equals(sum, 55.0));
+
+
+}
 
 #if 0
 static void test_expected(void) {
@@ -702,6 +722,7 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-unique_ptr", test_unique_ptr},
              {"test-optional", test_optional},
              {"test-variant", test_variant},
+             {"test-accumulate", test_accumulate},
              //{"test-any", test_any},
              //{"test-expected", test_expected},
              {nullptr, nullptr}};
