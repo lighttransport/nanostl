@@ -26,6 +26,7 @@
 #define NANOSTL_ALGORITHM_H_
 
 #include "nanocommon.h"
+#include "nanoiterator.h"
 
 namespace nanostl {
 
@@ -85,6 +86,36 @@ void fill(ExecutionPolicy&& exec, ForwardIterator first, ForwardIterator last,
   fill(first, last, value);
   }
 #endif
+
+//
+// std::sort()
+//
+// Use heap sort
+// TODO(LTE): Implement introsort(quicksort + heapsort)
+//
+
+namespace detail {
+
+#if 0
+template <class It> void heapify(It first, It last, It curr) {
+
+  It largest = curr;
+  It left = 2 *
+
+#endif
+
+} // namespace detail
+
+template <class It>
+NANOSTL_HOST_AND_DEVICE_QUAL void sort(It first, It last) {
+  if (first == last) {
+    return;
+  }
+
+  using diff_type = typename iterator_traits<It>::difference_type;
+  diff_type n = last - first;
+
+}
 
 }  // namespace nanostl
 

@@ -666,6 +666,26 @@ static void test_variant(void) {
   TEST_CHECK(nanostl::get_if<int>(&a) == nullptr);
 }
 
+static void test_sort(void) {
+
+  nanostl::vector<double> arr;
+  arr.push_back(3.0);
+  arr.push_back(3.1);
+  arr.push_back(5.0);
+  arr.push_back(2.0);
+  arr.push_back(-10.0);
+  arr.push_back(-10.1);
+
+  nanostl::sort(arr.begin(), arr.end());
+
+  TEST_CHECK(float_equals(arr[0], -10.1));
+  TEST_CHECK(float_equals(arr[1], -10.0));
+  TEST_CHECK(float_equals(arr[2], 2.0));
+  TEST_CHECK(float_equals(arr[3], 3.0));
+  TEST_CHECK(float_equals(arr[4], 3.1));
+  TEST_CHECK(float_equals(arr[5], 5.0));
+}
+
 
 #if 0
 static void test_expected(void) {
@@ -702,6 +722,7 @@ TEST_LIST = {{"test-vector", test_vector},
              {"test-unique_ptr", test_unique_ptr},
              {"test-optional", test_optional},
              {"test-variant", test_variant},
+             {"test-sort", test_sort},
              //{"test-any", test_any},
              //{"test-expected", test_expected},
              {nullptr, nullptr}};

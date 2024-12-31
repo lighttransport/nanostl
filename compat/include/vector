@@ -1,0 +1,4 @@
+#pragma once
+
+#define NANOSTL_NAMESPACE std
+#include "nanovector.h"
