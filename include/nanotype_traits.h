@@ -396,19 +396,31 @@ struct __two {char __lx[2];};
 
 // __is_referenceable  [defns.referenceable]
 
-struct __is_referenceable_impl {
+#if defined(__clang__)
+#if __has_builtin(__is_referenciable)
+#define NANOSTL_HAS_BUILTIN_IS_REFERENCIABLE
+#endif
+#endif
+
+#if defined(NANOSTL_HAS_BUILTIN_IS_REFERENCIABLE)
+template <class _Tp>
+  struct __nanostl_is_referenceable : integral_constant<bool, __is_referenceable(_Tp)> {};
+#else
+struct __nanostl_is_referenceable_impl {
     template <class _Tp> static _Tp& __test(int);
     template <class _Tp> static __two __test(...);
 };
 
 template <class _Tp>
-struct __is_referenceable : integral_constant<bool,
-    _IsNotSame<decltype(__is_referenceable_impl::__test<_Tp>(0)), __two>::value> {};
+struct __nanostl_is_referenceable : integral_constant<bool,
+    _IsNotSame<decltype(__nanostl_is_referenceable_impl::__test<_Tp>(0)), __two>::value> {};
+
+#endif
 
 // add_pointer
 
 template <class _Tp,
-        bool = __is_referenceable<_Tp>::value ||
+        bool = __nanostl_is_referenceable<_Tp>::value ||
                 is_same<typename remove_cv<_Tp>::type, void>::value>
 struct __add_pointer_impl
     {typedef  typename remove_reference<_Tp>::type* type;};
@@ -433,6 +445,22 @@ template <class _Tp> struct _NANOSTL_TEMPLATE_VIS is_function
 
 // decay
 
+#if defined(__clang__) 
+#if __has_builtin(__decay)
+#define NANOSTL_HAS_BUILTIN_DECAY 
+#endif
+#endif
+
+#if defined(NANOSTL_HAS_BUILTIN_DECAY)
+template <class _Tp>
+using __decay_t = __decay(_Tp);
+
+template <class _Tp>
+struct decay {
+  using type = __decay_t<_Tp>;
+};
+
+#else
 template <class _Up, bool>
 struct __decay {
     typedef typename remove_cv<_Up>::type type;
@@ -460,8 +488,9 @@ struct _NANOSTL_TEMPLATE_VIS decay
 private:
     typedef typename remove_reference<_Tp>::type _Up;
 public:
-    typedef typename __decay<_Up, __is_referenceable<_Up>::value>::type type;
+    typedef typename __decay<_Up, __nanostl_is_referenceable<_Up>::value>::type type;
 };
+#endif
 
 // Suppress deprecation notice for volatile-qualified return type resulting
 // from volatile-qualified types _Tp.
@@ -932,7 +961,7 @@ struct _NANOSTL_TEMPLATE_VIS is_nothrow_assignable
 
 // add_lvalue_reference
 
-template <class _Tp, bool = __is_referenceable<_Tp>::value> struct __add_lvalue_reference_impl            { typedef /*_LIBCPP_NODEBUG*/ _Tp  type; };
+template <class _Tp, bool = __nanostl_is_referenceable<_Tp>::value> struct __add_lvalue_reference_impl            { typedef /*_LIBCPP_NODEBUG*/ _Tp  type; };
 template <class _Tp                                       > struct __add_lvalue_reference_impl<_Tp, true> { typedef /*_LIBCPP_NODEBUG*/ _Tp& type; };
 
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS add_lvalue_reference
@@ -944,7 +973,7 @@ template <class _Tp> struct _NANOSTL_TEMPLATE_VIS add_lvalue_reference
 
 // add_rvalue_reference
 
-template <class _Tp, bool = __is_referenceable<_Tp>::value> struct __add_rvalue_reference_impl            { typedef /*_LIBCPP_NODEBUG*/ _Tp   type; };
+template <class _Tp, bool = __nanostl_is_referenceable<_Tp>::value> struct __add_rvalue_reference_impl            { typedef /*_LIBCPP_NODEBUG*/ _Tp   type; };
 template <class _Tp                                       > struct __add_rvalue_reference_impl<_Tp, true> { typedef /*_LIBCPP_NODEBUG*/ _Tp&& type; };
 
 template <class _Tp> struct _NANOSTL_TEMPLATE_VIS add_rvalue_reference
