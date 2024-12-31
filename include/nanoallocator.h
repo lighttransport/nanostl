@@ -33,7 +33,11 @@
 #endif
 #endif
 
-namespace nanostl {
+#ifndef NANOSTL_NAMESPACE
+#define NANOSTL_NAMESPACE nanostl
+#endif
+
+namespace NANOSTL_NAMESPACE {
 
 typedef unsigned long long size_type;
 
@@ -76,6 +80,7 @@ class allocator {
   }
 
   NANOSTL_HOST_AND_DEVICE_QUAL void deallocate(T* p, size_type n) {
+    // TODO(LTE): n
     (void)n;
     delete[] p;
   }
@@ -87,6 +92,6 @@ class allocator {
 #pragma clang diagnostic pop
 #endif
 
-}  // namespace nanostl
+}  // namespace NANOSTL_NAMESPACE
 
 #endif  // NANOSTL_ALLOCATOR_H_

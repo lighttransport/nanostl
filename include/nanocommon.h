@@ -47,6 +47,10 @@
 #define __NANOSTL_NOEXCEPT_(x)
 #endif
 
+#ifndef _NANOSTL_WEAK
+#define _NANOSTL_WEAK __attribute__((__weak__))
+#endif
+
 
 // TODO(LTE): Implement
 #ifndef _NANOSTL_TEMPLATE_VIS

@@ -32,7 +32,11 @@
 #include <iostream>
 #endif
 
-namespace nanostl {
+#ifndef NANOSTL_NAMESPACE
+#define NANOSTL_NAMESPACE nanostl
+#endif
+
+namespace NANOSTL_NAMESPACE {
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -45,7 +49,7 @@ namespace nanostl {
 #endif
 
 // TODO(LTE): Support allocator.
-template <class T, class Allocator = nanostl::allocator<T> >
+template <class T, class Allocator = NANOSTL_NAMESPACE::allocator<T> >
 class vector {
  public:
   typedef T value_type;
@@ -237,6 +241,6 @@ inline vector<T, Allocator>& vector<T, Allocator>::operator=(
 #pragma clang diagnostic pop
 #endif
 
-}  // namespace nanostl
+}  // namespace NANOSTL_NAMESPACE
 
 #endif  // NANOSTL_VECTOR_H_
