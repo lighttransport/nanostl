@@ -31,6 +31,8 @@
 #include "nanochrono.h"
 #include "nanotuple.h"
 #include "nanomemory.h"
+#include "nanotype_traits.h"
+#include "nanoutility.h"
 
 // forward decl(from libs_thread)
 typedef void* thread_tls_t;
@@ -39,6 +41,12 @@ extern thread_tls_t thread_tls_create( void );
 extern void thread_tls_set(thread_tls_t tls, void *value);
 
 namespace nanostl {
+
+// Thread proxy data interface
+struct __thread_proxy_data {
+  virtual ~__thread_proxy_data() {}
+  virtual void __run() = 0;
+};
 
 namespace {
 
@@ -172,35 +180,48 @@ class thread {
   class id {
    public:
     id() __NANOSTL_NOEXCEPT;
+    
+    friend bool operator==(id __x, id __y) __NANOSTL_NOEXCEPT {
+      return __x.__id_ == __y.__id_;
+    }
+    
+    friend bool operator!=(id __x, id __y) __NANOSTL_NOEXCEPT {
+      return !(__x == __y);
+    }
+    
+    friend bool operator<(id __x, id __y) __NANOSTL_NOEXCEPT {
+      return __x.__id_ < __y.__id_;
+    }
+    
+    friend bool operator<=(id __x, id __y) __NANOSTL_NOEXCEPT {
+      return !(__y < __x);
+    }
+    
+    friend bool operator>(id __x, id __y) __NANOSTL_NOEXCEPT {
+      return __y < __x;
+    }
+    
+    friend bool operator>=(id __x, id __y) __NANOSTL_NOEXCEPT {
+      return !(__x < __y);
+    }
+    
+    static id __make_id(uintptr_t __id) { return id(__id); }
 
-    //bool operator==(thread::id x, thread::id y) noexcept;
-    //bool operator!=(thread::id x, thread::id y) noexcept;
-    //bool operator<(thread::id x, thread::id y) noexcept;
-    //bool operator<=(thread::id x, thread::id y) noexcept;
-    //bool operator>(thread::id x, thread::id y) noexcept;
-    //bool operator>=(thread::id x, thread::id y) noexcept;
-
-    //template<class CharT, class Traits>
-    //std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& out, thread::id id);
-
-    template <class T> struct hash;
-    //template <> struct hash<thread::id>; // TODO
-
+   private:
+    uintptr_t __id_;
+    
+    explicit id(uintptr_t __id) : __id_(__id) {}
+    
+    friend class thread;
   };
 
   thread() __NANOSTL_NOEXCEPT;
 
   template <class _Fp, class ..._Args>
   explicit thread(_Fp&& __f, _Args&&... __args) {
-    typedef unique_ptr<__thread_struct> _TSPtr;
-    _TSPtr __tsp(new __thread_struct);
-    typedef tuple<_TSPtr, typename decay<_Fp>::type, typename decay<_Args>::type...> _Gp;
-
-    unique_ptr<_Gp> __p(
-            new _Gp(nanostl::move(__tsp),
-                    nanostl::__decay_copy(nanostl::forward<_Fp>(__f)),
-                    nanostl::__decay_copy(nanostl::forward<_Args>(__args))...));
-
+    typedef __thread_invoke_pair<typename decay<_Fp>::type, typename decay<_Args>::type...> _Gp;
+    __create_thread(nanostl::unique_ptr<__thread_proxy_data>(
+        new _Gp(nanostl::forward<_Fp>(__f), nanostl::forward<_Args>(__args)...)));
   }
 
 
@@ -229,14 +250,51 @@ class thread {
   static unsigned hardware_concurrency() __NANOSTL_NOEXCEPT;
 
  private:
-  // opeque pointer
   void *thread_handle_{nullptr};
+  bool joined_{false};
+  bool detached_{false};
+
+  template<class _Fp, class ..._Args>
+  struct __thread_invoke_pair : public __thread_proxy_data {
+    _Fp __f_;
+    tuple<_Args...> __args_;
+    
+    template<class _F, class ..._A>
+    __thread_invoke_pair(_F&& __f, _A&& ...__args) 
+        : __f_(nanostl::forward<_F>(__f)), __args_(nanostl::forward<_A>(__args)...) {}
+    
+    template<size_t ..._Indices>
+    void __invoke_impl(tao::seq::index_sequence<_Indices...>) {
+      __f_(tao::get<_Indices>(__args_)...);
+    }
+    
+    virtual void __run() {
+      __invoke_impl(tao::seq::make_index_sequence<sizeof...(_Args)>());
+    }
+  };
+
+  template<class _Fp>
+  struct __thread_invoke_pair<_Fp> : public __thread_proxy_data {
+    _Fp __f_;
+    
+    template<class _F>
+    __thread_invoke_pair(_F&& __f) : __f_(nanostl::forward<_F>(__f)) {}
+    
+    virtual void __run() {
+      __f_();
+    }
+  };
+
+  void __create_thread(nanostl::unique_ptr<__thread_proxy_data> __p);
+  static void* __thread_proxy(void* __vp);
 };
 
 namespace this_thread
 {
 
-void sleep_for(const chrono::nanoseconds &ns);
+thread::id get_id() __NANOSTL_NOEXCEPT;
+void sleep_for_ns(long long nanoseconds);
+void yield() __NANOSTL_NOEXCEPT;
 
 } // namespace this_thread
 

@@ -31,5 +31,7 @@
 #include "nanoalgorithm.h"
 #include "nanomath.h"
 #include "nanoiostream.h"
+#include "nanothread.h"
+#include "nanotuple.h"
 
 #endif // NANOSTL_H_
